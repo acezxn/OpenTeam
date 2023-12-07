@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import { auth } from './utils/firebase';
 import Teams from './pages/Teams';
 import Protected from './components/Protected';
-import { Editor } from './pages/Editor';
+import { TeamsPage } from './pages/TeamsPage';
 
 const darkTheme = createTheme({
   palette: {
@@ -57,8 +57,8 @@ export default class App extends React.Component {
               <Teams />
             </Protected>
           } />
-          <Route path="editor/:graphId" element={
-            <Editor />
+          <Route path="teams-page/:teamId" element={
+            <TeamsPage />
           } />
           {/* <Route path="editor/:graphId" element={
             <Protected isLoggedIn={user}>

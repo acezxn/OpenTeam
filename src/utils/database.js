@@ -5,6 +5,7 @@ export default class Database {
     static async createTeam() {
         const ref = await addDoc(collection(db, "teams"), {
             title: "New team",
+            description: "",
             public: false,
             ownerUID: auth.currentUser.uid
         });

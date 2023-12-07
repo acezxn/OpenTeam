@@ -88,6 +88,7 @@ export default function Navbar() {
                                         color="inherit"
                                         onClick={() => {
                                             setExpanded(false);
+                                            navigate("/");
                                         }}
                                     >
                                         OpenTeam
@@ -103,7 +104,7 @@ export default function Navbar() {
                                         disablePadding
                                     >
                                         <ListItem>
-                                            <ListItemText primary="Home" onClick={() => { navigate("/") }} />
+                                            <ListItemText primary="Explore" />
                                         </ListItem>
                                         <ListItem>
                                             <ListItemText primary="About" onClick={() => { navigate("/about") }} />
@@ -127,11 +128,12 @@ export default function Navbar() {
                             <Typography
                                 variant="h6"
                                 color="inherit"
+                                onClick={() => { navigate("/") }}
                             >
                                 OpenTeam
                             </Typography>
-                            <Button color="inherit" onClick={() => { navigate("/") }}>
-                                Home
+                            <Button color="inherit" >
+                                Explore
                             </Button>
                             <Button color="inherit" onClick={() => { navigate("/about") }}>
                                 About
