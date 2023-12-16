@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom"
 import Navbar from "../components/Navbar";
 import { collection, doc, getDoc } from "firebase/firestore";
-import { db } from "../utils/firebase";
+import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
 import { TeamView } from "../components/TeamView";
 
@@ -10,6 +10,7 @@ export const TeamsPage = () => {
     const navigate = useNavigate();
     const [teamTitle, setTeamTitle] = useState("");
     const [teamDescription, setTeamDescription] = useState("");
+    const [previewMode, setPreviewMode] = useState(false);
     const colletionRef = collection(db, 'teams');
     const docRef = doc(colletionRef, teamId);
 
@@ -19,6 +20,7 @@ export const TeamsPage = () => {
             const data = snapshot.data();
             setTeamTitle(data.title);
             setTeamDescription(data.description);
+            setPreviewMode(auth.currentUser === null || auth.currentUser.uid !== data.ownerUID);
         } catch (exception) {
             navigate("/login");
         }
@@ -26,11 +28,14 @@ export const TeamsPage = () => {
 
     useEffect(() => {
         refresh();
-    }, []);
+    }, [auth.currentUser]);
     return (
         <>
             <Navbar />
-            <TeamView teamTitle={teamTitle} teamDescription={teamDescription} />
+            <TeamView 
+            previewMode={previewMode}
+            teamTitle={teamTitle} 
+            teamDescription={teamDescription} />
         </>
     )
 }

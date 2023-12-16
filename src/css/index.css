@@ -1,6 +1,7 @@
 :root {
   --background-color: rgb(35, 35, 35);
   --foreground-color: rgb(255, 255, 255);
+  --placeholder-color: rgb(157, 157, 157);
   --error-color: rgb(255, 103, 103);
 }
 

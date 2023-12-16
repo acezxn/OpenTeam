@@ -11,6 +11,7 @@ import { auth } from './utils/firebase';
 import Teams from './pages/Teams';
 import Protected from './components/Protected';
 import { TeamsPage } from './pages/TeamsPage';
+import Explore from './pages/Explore';
 
 const darkTheme = createTheme({
   palette: {
@@ -30,7 +31,7 @@ export default class App extends React.Component {
 
   componentDidMount() {
     auth.onAuthStateChanged((user) => {
-      this.setState({ user });
+      this.setState({ user : user });
     });
   }
 
@@ -50,6 +51,7 @@ export default class App extends React.Component {
       <ThemeProvider theme={darkTheme}>
         <Routes>
           <Route exact path="/" element={<Home />} />
+          <Route path="explore" element={<Explore />} />
           <Route path="about" element={<About />} />
           <Route path="login" element={<Login />} />
           <Route path="teams" element={

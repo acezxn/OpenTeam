@@ -6,6 +6,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import Button from "@material-ui/core/Button";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { auth } from "../utils/firebase";
+import "../css/Navbar.css"
 
 import {
     List,
@@ -57,7 +58,7 @@ export default function Navbar() {
                     open={userMenuExpanded}
                     onClose={handleUserMenuClose}
                 >
-                    <MenuItem onClick={() => {navigate("/teams")}} disableRipple>
+                    <MenuItem onClick={() => { navigate("/teams") }} disableRipple>
                         Your teams
                     </MenuItem>
                     <MenuItem onClick={handleSignOut} disableRipple>
@@ -65,7 +66,7 @@ export default function Navbar() {
                     </MenuItem>
                 </Menu>
             </>}
-            <AppBar position="static" elevation={0} style={{ backgroundColor: "#204538" }}>
+            <AppBar position="static" elevation={0} style={{ backgroundColor: "#291c8c" }}>
                 <Toolbar variant="dense">
                     {small && (
                         <>
@@ -104,7 +105,7 @@ export default function Navbar() {
                                         disablePadding
                                     >
                                         <ListItem>
-                                            <ListItemText primary="Explore" />
+                                            <ListItemText primary="Explore" onClick={() => { navigate("/about") }} />
                                         </ListItem>
                                         <ListItem>
                                             <ListItemText primary="About" onClick={() => { navigate("/about") }} />
@@ -114,6 +115,7 @@ export default function Navbar() {
                                         </ListItem>
                                         {user && <>
                                             <ListItem color="inherit" onClick={handleUserMenuClick}>
+                                                {user && <img className="profile_image" src={user.photoURL}></img>}
                                                 {user && user.email}
                                             </ListItem>
                                         </>}
@@ -132,7 +134,7 @@ export default function Navbar() {
                             >
                                 OpenTeam
                             </Typography>
-                            <Button color="inherit" >
+                            <Button color="inherit" onClick={() => { navigate("/explore") }}>
                                 Explore
                             </Button>
                             <Button color="inherit" onClick={() => { navigate("/about") }}>
@@ -143,6 +145,7 @@ export default function Navbar() {
                             </Button>
                             {user && <>
                                 <Button color="inherit" onClick={handleUserMenuClick}>
+                                    {user && <img className="profile_image" src={user.photoURL}></img>}
                                     {user && user.email}
                                 </Button>
                             </>}

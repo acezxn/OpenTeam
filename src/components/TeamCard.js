@@ -46,25 +46,27 @@ const GraphCard = (props) => {
     }
     return (
         <div style={{ display: "inline-block", padding: 5 }}>
-            <Modal
-                open={modalOpen}
-                onClose={handleModalClose}>
-                <Box style={modalStyle}>
-                    <br />
-                    <Typography variant="h6" align="center">Rename team</Typography>
-                    <br />
-                    <form onSubmit={handleTeamRename}>
-                        <div style={{ display: "flex" }}>
-                            <TextField
-                                style={{ marginLeft: 10, width: "max(10vw, 220px)" }}
-                                helperText="Please enter new name"
-                                onChange={(e) => { setGraphTitle(e.target.value) }}
-                                required />
-                            <Button type="submit" color="inherit" style={{ width: 100, backgroundColor: "rgba(255, 255, 255, 0.1)" }}>Confirm</Button>
-                        </div>
-                    </form>
-                </Box>
-            </Modal>
+            {!props.preview && (
+                <Modal
+                    open={modalOpen}
+                    onClose={handleModalClose}>
+                    <Box style={modalStyle}>
+                        <br />
+                        <Typography variant="h6" align="center">Rename team</Typography>
+                        <br />
+                        <form onSubmit={handleTeamRename}>
+                            <div style={{ display: "flex" }}>
+                                <TextField
+                                    style={{ marginLeft: 10, width: "max(10vw, 220px)" }}
+                                    helperText="Please enter new name"
+                                    onChange={(e) => { setGraphTitle(e.target.value) }}
+                                    required />
+                                <Button type="submit" color="inherit" style={{ width: 100, backgroundColor: "rgba(255, 255, 255, 0.1)" }}>Confirm</Button>
+                            </div>
+                        </form>
+                    </Box>
+                </Modal>
+            )}
 
             <Menu
                 anchorEl={anchorElement}
@@ -78,7 +80,7 @@ const GraphCard = (props) => {
                     <SchemaIcon style={{ verticalAlign: "middle" }} fontSize='medium' />
                     <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "min(max(16vw, 1px), 100px)", marginLeft: 10 }}>{props.name}</Typography>
                 </div>
-                <Button onClick={handleMenuOpen}><MoreVertIcon fontSize='medium' /></Button>
+                {!props.preview && (<Button onClick={handleMenuOpen}><MoreVertIcon fontSize='medium' /></Button>)}
             </div>
         </div>
     )

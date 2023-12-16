@@ -83,7 +83,7 @@ const Teams = () => {
                 ) : (
                     <div style={{ marginTop: 10, overflow: "auto" }}>
                         {userData.map((team, index) => (
-                            <TeamCard key={index} name={team.data.title} id={team.teamId} onChange={handleTeamChange} />
+                            <TeamCard key={index} name={team.data.title} id={team.teamId} onChange={handleTeamChange} preview={false} />
                         ))}
                     </div>
                 )}
