@@ -1,3 +1,4 @@
+import { Typography } from "@mui/material";
 import Navbar from "../components/Navbar"
 
 const Home = () => {
@@ -5,7 +6,7 @@ const Home = () => {
         <>
             <Navbar />
             <div style={{margin: 10}}>
-                <h1>OpenTeam</h1>
+                <Typography variant="h2">Enables next generation teaming</Typography>
             </div>
         </>
     );

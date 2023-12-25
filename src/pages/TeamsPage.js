@@ -8,8 +8,10 @@ import { TeamView } from "../components/TeamView";
 export const TeamsPage = () => {
     let { teamId } = useParams();
     const navigate = useNavigate();
+    const [data, setData] = useState(null);
     const [teamTitle, setTeamTitle] = useState("");
     const [teamDescription, setTeamDescription] = useState("");
+    const [links, setLinks] = useState([]);
     const [previewMode, setPreviewMode] = useState(false);
     const colletionRef = collection(db, 'teams');
     const docRef = doc(colletionRef, teamId);
@@ -18,8 +20,7 @@ export const TeamsPage = () => {
         try {
             const snapshot = await getDoc(docRef);
             const data = snapshot.data();
-            setTeamTitle(data.title);
-            setTeamDescription(data.description);
+            setData(data);
             setPreviewMode(auth.currentUser === null || auth.currentUser.uid !== data.ownerUID);
         } catch (exception) {
             navigate("/login");
@@ -32,10 +33,9 @@ export const TeamsPage = () => {
     return (
         <>
             <Navbar />
-            <TeamView 
-            previewMode={previewMode}
-            teamTitle={teamTitle} 
-            teamDescription={teamDescription} />
+            <TeamView
+                previewMode={previewMode}
+                data={data} />
         </>
     )
 }

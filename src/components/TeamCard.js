@@ -1,5 +1,5 @@
 import SchemaIcon from '@mui/icons-material/Schema';
-import "../css/GraphCard.css"
+import "../css/TeamCard.css"
 import { Box, Button, Menu, MenuItem, Modal, TextField, Typography } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useState } from 'react';
@@ -18,12 +18,12 @@ const modalStyle = {
     zIndex: "1"
 };
 
-const GraphCard = (props) => {
+const TeamCard = (props) => {
     const navigate = useNavigate();
     const cardId = props.id;
     const [anchorElement, setAnchorElement] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
-    const [graphTitle, setGraphTitle] = useState("");
+    const [teamTitle, setTeamTitle] = useState("");
     const menuOpened = Boolean(anchorElement)
     const handleModalOpen = () => setModalOpen(true);
     const handleModalClose = () => setModalOpen(false);
@@ -36,7 +36,7 @@ const GraphCard = (props) => {
     }
     async function handleTeamRename(event) {
         event.preventDefault();
-        await Database.renameTeam(cardId, graphTitle);
+        await Database.renameTeam(cardId, teamTitle);
         handleModalClose();
         props.onChange("rename");
     }
@@ -59,7 +59,7 @@ const GraphCard = (props) => {
                                 <TextField
                                     style={{ marginLeft: 10, width: "max(10vw, 220px)" }}
                                     helperText="Please enter new name"
-                                    onChange={(e) => { setGraphTitle(e.target.value) }}
+                                    onChange={(e) => { setTeamTitle(e.target.value) }}
                                     required />
                                 <Button type="submit" color="inherit" style={{ width: 100, backgroundColor: "rgba(255, 255, 255, 0.1)" }}>Confirm</Button>
                             </div>
@@ -86,4 +86,4 @@ const GraphCard = (props) => {
     )
 }
 
-export default GraphCard;
+export default TeamCard;

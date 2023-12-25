@@ -1,14 +1,30 @@
 import { Typography } from "@mui/material";
 import ReactLoading from "react-loading";
-import "../css/TeamView.css"
+import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import "../css/TeamView.css"
 
 export const TeamView = (props) => {
     const [loading, setLoading] = useState(true);
+    const [data, setData] = useState(null);
+    const [participantData, setParticipantData] = useState([]);
     const previewMode = props.previewMode;
 
+    const getParticipants = () => {
+        props.data.participants.map((participantUID) => {
+            getDoc(doc(db, "user_data", participantUID))
+            .then((snapshot) => {
+                setParticipantData([...participantData, snapshot.data()]);
+            })
+        });
+        console.log(participantData);
+    }
+
     useEffect(() => {
-        if (props.teamTitle) {
+        if (props.data) {
+            setData(props.data);
+            getParticipants();
             setLoading(false);
         }
     }, [props]);
@@ -31,14 +47,30 @@ export const TeamView = (props) => {
                     </div>
                     <div style={{ margin: 10 }}>
                         <div style={{ height: 100 }}></div>
-                        <Typography variant="h2" className="team_title">{props.teamTitle}</Typography>
+                        <Typography variant="h2" className="team_title">{data.title}</Typography>
                         <div style={{ height: 30 }}></div>
                         <Typography variant="h6">About:</Typography>
                         <Typography>
-                            {props.teamDescription === "" ?
+                            {data.description === "" ?
                                 <i style={{ color: "var(--placeholder-color)" }}>No description provided</i>
-                                : props.teamDescription}
+                                : data.description}
                         </Typography>
+                        {data.links.map((link, key) => (
+                            <>
+                                <a
+                                    href={link}
+                                    key={key}
+                                    style={{ color: "var(--placeholder-color)", textDecoration: "none" }}>
+                                    {link}
+                                </a>
+                                <br />
+                            </>
+                        ))}
+                        <Typography variant="h6">Participants:</Typography>
+
+                        {participantData.map((items, key) => (
+                            <img className="profile_image" src={items.photoURL}></img>
+                        ))}
                     </div>
                 </>
             )}
