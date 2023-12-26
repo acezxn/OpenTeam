@@ -1,24 +1,29 @@
-import { Typography } from "@mui/material";
+import { Divider, IconButton, Modal, Typography } from "@mui/material";
 import ReactLoading from "react-loading";
-import { auth, db } from "../utils/firebase";
+import { db } from "../utils/firebase";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
+import SettingsIcon from '@mui/icons-material/Settings';
+import PeopleIcon from '@mui/icons-material/People';
 import "../css/TeamView.css"
+import { TeamSettingsModal } from "./TeamSettingsModal";
 
 export const TeamView = (props) => {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
     const [participantData, setParticipantData] = useState([]);
-    const previewMode = props.previewMode;
+    const [settingsOpen, setSettingsOpen] = useState(false);
+    const handleSettingsOpen = () => setSettingsOpen(true);
+    const handleSettingsClose = () => setSettingsOpen(false);
 
     const getParticipants = () => {
         props.data.participants.map((participantUID) => {
             getDoc(doc(db, "user_data", participantUID))
-            .then((snapshot) => {
-                setParticipantData([...participantData, snapshot.data()]);
-            })
+                .then((snapshot) => {
+                    setParticipantData([...participantData, snapshot.data()]);
+                })
+            return;
         });
-        console.log(participantData);
     }
 
     useEffect(() => {
@@ -40,9 +45,38 @@ export const TeamView = (props) => {
                 />
             ) : (
                 <>
+                    <IconButton
+                        size="small"
+                        style={{
+                            position: "absolute",
+                            zIndex: 1,
+                            top: 60,
+                            right: 10,
+                            color: "inherit",
+                        }}
+                        onClick={handleSettingsOpen}>
+                        <SettingsIcon fontSize="large" />
+                    </IconButton>
+                    <IconButton
+                        size="small"
+                        style={{
+                            position: "absolute",
+                            zIndex: 1,
+                            top: 60,
+                            right: 60,
+                            color: "inherit"
+                        }}>
+                        <PeopleIcon fontSize="large" />
+                    </IconButton>
+                    <Modal
+                        open={settingsOpen}
+                        onClose={handleSettingsClose}>
+                        <TeamSettingsModal data={data} onLinkUpdate={(data) => {console.log(data)}}/>
+                    </Modal>
                     <div className="banner">
                         <img
-                            src="https://lh3.googleusercontent.com/a/ACg8ocLPxHSXGieHGPRCtziYc0vXyqw1rHF2T1JRCig4BKV3YGw=s96-c">
+                            src="https://lh3.googleusercontent.com/a/ACg8ocLPxHSXGieHGPRCtziYc0vXyqw1rHF2T1JRCig4BKV3YGw=s96-c"
+                            alt="banner">
                         </img>
                     </div>
                     <div style={{ margin: 10 }}>
@@ -68,9 +102,12 @@ export const TeamView = (props) => {
                         ))}
                         <Typography variant="h6">Participants:</Typography>
 
-                        {participantData.map((items, key) => (
-                            <img className="profile_image" src={items.photoURL}></img>
-                        ))}
+                        <div style={{ width: "max(20%, 150px)", maxHeight: "200px", overflow: "scroll" }}>
+                            {participantData.map((items, key) => (
+                                <img className="profile_image" src={items.photoURL} alt={items.photoURL}></img>
+                            ))}
+                        </div>
+                        <Divider style={{ paddingBottom: 10 }} />
                     </div>
                 </>
             )}

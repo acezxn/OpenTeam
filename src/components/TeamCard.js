@@ -61,7 +61,7 @@ const TeamCard = (props) => {
                                     helperText="Please enter new name"
                                     onChange={(e) => { setTeamTitle(e.target.value) }}
                                     required />
-                                <Button type="submit" color="inherit" style={{ width: 100, backgroundColor: "rgba(255, 255, 255, 0.1)" }}>Confirm</Button>
+                                <Button type="submit" color="inherit" variant="contained" style={{ width: 100 }} disableElevation>Confirm</Button>
                             </div>
                         </form>
                     </Box>

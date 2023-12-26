@@ -6,6 +6,9 @@ export default class Database {
         const ref = await addDoc(collection(db, "teams"), {
             title: "New team",
             description: "",
+            links: [],
+            participants: [],
+            pendingParticipants: [],
             public: false,
             ownerUID: auth.currentUser.uid
         });
