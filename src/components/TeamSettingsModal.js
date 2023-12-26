@@ -1,6 +1,7 @@
-import { Box, Button, IconButton, TextField, Typography } from "@mui/material"
+import { Box, Button, IconButton, List, ListItem, ListItemText, TextField, Typography } from "@mui/material"
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from "react";
+import { styled } from '@mui/material/styles';
 
 const modalStyle = {
     position: 'absolute',
@@ -16,14 +17,26 @@ const modalStyle = {
     zIndex: 1
 };
 
-export const TeamSettingsModal = (props) => {
+const OutlinedList = styled(List)(({ theme }) => ({
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: theme.shape.borderRadius,
+    padding: 0,
+    margin: 10,
+    '& > :not(:last-child)': {
+        borderBottom: `1px solid ${theme.palette.divider}`,
+    },
+}));
 
-    const [links, setLinks] = useState([]);
+export const TeamSettingsModal = (props) => {
+    const [title, setTitle] = useState(props.data.title);
+    const [description, setDescription] = useState(props.data.description);
+    const [links, setLinks] = useState(props.data.links);
     const [newLink, setNewLink] = useState("");
 
     const handleLinkDeletion = (key) => {
         setLinks(links.filter((_, index) => index !== key));
     }
+
     const handleNewLink = (e) => {
         e.preventDefault();
         setLinks([...links, newLink]);
@@ -32,10 +45,10 @@ export const TeamSettingsModal = (props) => {
     useEffect(() => {
         props.onLinkUpdate(links);
     }, [links]);
-    
+
     useEffect(() => {
-        setLinks(props.data.links);
-    }, []);
+        props.onTeamInfoUpdate({ title: title, description: description });
+    }, [title, description]);
 
     return (
         <>
@@ -43,44 +56,44 @@ export const TeamSettingsModal = (props) => {
                 <br />
                 <Typography variant="h6" align="center">Settings</Typography>
                 <br />
-                <form>
-                    <Typography style={{ marginLeft: 10 }}>Team title</Typography>
-                    <TextField
-                        style={{ marginLeft: 10, width: "max(40vw, 220px)" }}
-                        helperText="Please enter team title"
-                        required />
+                <Typography style={{ marginLeft: 10 }}>Team title</Typography>
+                <TextField
+                    style={{ marginLeft: 10, width: "max(40vw, 220px)" }}
+                    helperText="Please enter team title"
+                    onChange={(e) => { setTitle(e.target.value) }} />
 
-                    <Typography style={{ marginLeft: 10 }}>Team description</Typography>
-                    <TextField
-                        style={{ marginLeft: 10, width: "max(40vw, 220px)" }}
-                        helperText="Please enter team description" />
-                    <Typography style={{ marginLeft: 10 }}>Related links</Typography>
-                </form>
-                <form onSubmit={handleNewLink}>
+                <Typography style={{ marginLeft: 10 }}>Team description</Typography>
+                <TextField
+                    style={{ marginLeft: 10, width: "max(40vw, 220px)" }}
+                    helperText="Please enter team description"
+                    onChange={(e) => { setDescription(e.target.value) }} />
+
+                <Typography style={{ marginLeft: 10 }}>Related links</Typography>
+                <List variant="outlined">
                     {links.map((link, key) => (
-                        <>
-                            <Typography
-                                key={key}
-                                style={{
-                                    marginLeft: 10,
-                                    color: "var(--placeholder-color)"
-                                }}>
-
-                                <label style={{
-                                    display: "inline-block",
-                                    width: "max(40vw, 220px)"
-                                }}>{link}</label>
-                                <IconButton onClick={() => handleLinkDeletion(key)}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            </Typography>
-                        </>
+                        <OutlinedList>
+                            <ListItem>
+                                <ListItemText
+                                    key={key}>
+                                    <IconButton
+                                        onClick={() => handleLinkDeletion(key)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                    <label
+                                        style={{
+                                            marginLeft: 10
+                                        }}>{link}</label>
+                                </ListItemText>
+                            </ListItem>
+                        </OutlinedList>
                     ))}
+                </List>
 
+                <form onSubmit={handleNewLink}>
                     <TextField
-                        style={{ marginLeft: 10, width: "max(30vw, 220px)" }}
+                        style={{ marginLeft: 10, width: "max(20vw, 220px)" }}
                         helperText="New link"
-                        onInput={(e) => { setNewLink(e.target.value) }}
+                        onChange={(e) => { setNewLink(e.target.value) }}
                         required
                     />
                     <br />
@@ -91,7 +104,6 @@ export const TeamSettingsModal = (props) => {
                         style={{ marginLeft: 10 }}
                         disableElevation>New Link</Button>
                 </form>
-
             </Box>
         </>
     )

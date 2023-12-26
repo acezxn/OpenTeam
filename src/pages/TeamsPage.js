@@ -12,7 +12,6 @@ export const TeamsPage = () => {
     const [teamTitle, setTeamTitle] = useState("");
     const [teamDescription, setTeamDescription] = useState("");
     const [links, setLinks] = useState([]);
-    const [previewMode, setPreviewMode] = useState(false);
     const colletionRef = collection(db, 'teams');
     const docRef = doc(colletionRef, teamId);
 
@@ -21,7 +20,6 @@ export const TeamsPage = () => {
             const snapshot = await getDoc(docRef);
             const data = snapshot.data();
             setData(data);
-            setPreviewMode(auth.currentUser === null || auth.currentUser.uid !== data.ownerUID);
         } catch (exception) {
             navigate("/login");
         }
@@ -34,7 +32,7 @@ export const TeamsPage = () => {
         <>
             <Navbar />
             <TeamView
-                previewMode={previewMode}
+                teamId={teamId}
                 data={data} />
         </>
     )

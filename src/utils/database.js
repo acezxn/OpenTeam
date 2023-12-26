@@ -28,4 +28,13 @@ export default class Database {
             { title: title },
             { merge: true });
     }
+    static async updateTeamLinks(teamId, links) {
+        await updateDoc(doc(db, "teams", teamId),
+            { links: links });
+    }
+    static async updateTeamInfo(teamId, title, description) {
+        await updateDoc(doc(db, "teams", teamId),
+            { title: title },
+            { description: description },);
+    }
 }

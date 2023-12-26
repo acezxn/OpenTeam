@@ -1,12 +1,13 @@
 import { Divider, IconButton, Modal, Typography } from "@mui/material";
 import ReactLoading from "react-loading";
-import { db } from "../utils/firebase";
+import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import SettingsIcon from '@mui/icons-material/Settings';
 import PeopleIcon from '@mui/icons-material/People';
 import "../css/TeamView.css"
 import { TeamSettingsModal } from "./TeamSettingsModal";
+import Database from "../utils/database";
 
 export const TeamView = (props) => {
     const [loading, setLoading] = useState(true);
@@ -17,13 +18,25 @@ export const TeamView = (props) => {
     const handleSettingsClose = () => setSettingsOpen(false);
 
     const getParticipants = () => {
-        props.data.participants.map((participantUID) => {
-            getDoc(doc(db, "user_data", participantUID))
+        for (let participantUID of props.data.participants) {
+            getDoc(doc(db, "photo_url", participantUID))
                 .then((snapshot) => {
                     setParticipantData([...participantData, snapshot.data()]);
-                })
-            return;
-        });
+                });
+        }
+    }
+    const handleLinkUpdate = (links) => {
+        let updatedData = data;
+        updatedData.links = links;
+        setData(updatedData);
+        Database.updateTeamLinks(props.teamId, links);
+    }
+    const handleTeamInfoUpdate = (info) => {
+        let updatedData = data;
+        updatedData.title = info.title;
+        updatedData.description = info.description;
+        setData(updatedData);
+        Database.updateTeamInfo(props.teamId, info.title, info.description);
     }
 
     useEffect(() => {
@@ -45,33 +58,44 @@ export const TeamView = (props) => {
                 />
             ) : (
                 <>
-                    <IconButton
-                        size="small"
-                        style={{
-                            position: "absolute",
-                            zIndex: 1,
-                            top: 60,
-                            right: 10,
-                            color: "inherit",
-                        }}
-                        onClick={handleSettingsOpen}>
-                        <SettingsIcon fontSize="large" />
-                    </IconButton>
-                    <IconButton
-                        size="small"
-                        style={{
-                            position: "absolute",
-                            zIndex: 1,
-                            top: 60,
-                            right: 60,
-                            color: "inherit"
-                        }}>
-                        <PeopleIcon fontSize="large" />
-                    </IconButton>
+                    {
+                        (auth.currentUser !== null && (data && auth.currentUser.uid === data.ownerUID)) &&
+                        (
+                            <>
+                                <IconButton
+                                    size="small"
+                                    style={{
+                                        position: "absolute",
+                                        zIndex: 1,
+                                        top: 60,
+                                        right: 10,
+                                        color: "inherit",
+                                    }}
+                                    onClick={handleSettingsOpen}>
+                                    <SettingsIcon fontSize="large" />
+                                </IconButton>
+                                <IconButton
+                                    size="small"
+                                    style={{
+                                        position: "absolute",
+                                        zIndex: 1,
+                                        top: 60,
+                                        right: 60,
+                                        color: "inherit"
+                                    }}>
+                                    <PeopleIcon fontSize="large" />
+                                </IconButton>
+                            </>
+                        )
+                    }
+
                     <Modal
                         open={settingsOpen}
                         onClose={handleSettingsClose}>
-                        <TeamSettingsModal data={data} onLinkUpdate={(data) => {console.log(data)}}/>
+                        <TeamSettingsModal
+                            data={data}
+                            onLinkUpdate={(links) => { handleLinkUpdate(links) }}
+                            onTeamInfoUpdate={(links) => { handleTeamInfoUpdate(links) }} />
                     </Modal>
                     <div className="banner">
                         <img
@@ -104,7 +128,7 @@ export const TeamView = (props) => {
 
                         <div style={{ width: "max(20%, 150px)", maxHeight: "200px", overflow: "scroll" }}>
                             {participantData.map((items, key) => (
-                                <img className="profile_image" src={items.photoURL} alt={items.photoURL}></img>
+                                <img key={key} className="profile_image" src={items.photoURL} alt={items.photoURL}></img>
                             ))}
                         </div>
                         <Divider style={{ paddingBottom: 10 }} />
