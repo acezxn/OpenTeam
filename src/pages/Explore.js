@@ -10,7 +10,7 @@ const Explore = () => {
     const [loading, setLoading] = useState(false);
     const fetchTeams = async () => {
         setLoading(true);
-        const publicQuery = query(collection(db, "teams"), where("public", "==", true));
+        const publicQuery = query(collection(db, "teams"), where("publiclyVisible", "==", true));
         const publicQuerySnapshot = await getDocs(publicQuery);
         const newPublicData = publicQuerySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
         setTeams(newPublicData);

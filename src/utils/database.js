@@ -10,7 +10,7 @@ export default class Database {
             links: [],
             participants: [auth.currentUser.uid],
             pendingParticipants: [],
-            public: false,
+            publiclyVisible: false,
             joinable: false,
             ownerUID: auth.currentUser.uid
         });
@@ -34,7 +34,11 @@ export default class Database {
         await updateDoc(doc(db, "teams", teamId),
             { links: links });
     }
-    static async updateTeamInfo(teamId, title, description) {
+    static async updateTeamInfo(teamId, title, description, publiclyVisible, joinable) {
+        updateDoc(doc(db, "teams", teamId),
+            { publiclyVisible: publiclyVisible });
+        updateDoc(doc(db, "teams", teamId),
+            { joinable: joinable });
         await updateDoc(doc(db, "teams", teamId),
             { title: title },
             { description: description });

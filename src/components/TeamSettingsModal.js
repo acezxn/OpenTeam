@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, List, ListItem, ListItemText, TextField, Typography } from "@mui/material"
+import { Box, Button, IconButton, List, ListItem, ListItemText, Switch, TextField, Typography } from "@mui/material"
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from "react";
 import { styled } from '@mui/material/styles';
@@ -31,8 +31,11 @@ export const TeamSettingsModal = (props) => {
     const [title, setTitle] = useState(props.data.title);
     const [description, setDescription] = useState(props.data.description);
     const [bannerImage, setBannerImage] = useState(null);
+    const [publiclyVisible, setPubliclyVisible] = useState(props.data.publiclyVisible);
+    const [joinable, setJoinable] = useState(props.data.joinable);
     const [links, setLinks] = useState(props.data.links);
     const [newLink, setNewLink] = useState("");
+    const [message, setMessage] = useState("");
 
     const handleLinkDeletion = (key) => { setLinks(links.filter((_, index) => index !== key)) }
     const handleNewImage = (e) => { setBannerImage(e.target.files[0]) }
@@ -40,10 +43,14 @@ export const TeamSettingsModal = (props) => {
         e.preventDefault();
         setLinks([...links, newLink]);
     }
+    const handleSaveChanges = (e) => {
+        props.onBannerImageUpdate(bannerImage);
+        props.onLinkUpdate(links);
+        props.onTeamInfoUpdate({ title: title, description: description, publiclyVisible: publiclyVisible, joinable: joinable });
+        setMessage("Changes Saved");
+    }
 
-    useEffect(() => { props.onBannerImageUpdate(bannerImage) }, [props, bannerImage]);
-    useEffect(() => { props.onLinkUpdate(links) }, [props, links]);
-    useEffect(() => { props.onTeamInfoUpdate({ title: title, description: description }) }, [props, title, description]);
+    useEffect(() => { setMessage("") }, [props, bannerImage, links, title, description, joinable, publiclyVisible]);
 
     return (
         <>
@@ -72,6 +79,10 @@ export const TeamSettingsModal = (props) => {
                         onChange={handleNewImage}
                         hidden />
                 </Button>
+                <Typography style={{ marginLeft: 10 }}>Visible to public</Typography>
+                <Switch onChange={() => { setPubliclyVisible(!publiclyVisible) }} checked={publiclyVisible} />
+                <Typography style={{ marginLeft: 10 }}>Allow users to join</Typography>
+                <Switch onChange={() => { setJoinable(!joinable) }} checked={joinable} />
                 <Typography style={{ marginLeft: 10 }}>Related links</Typography>
                 <List variant="outlined">
                     {links.map((link, key) => (
@@ -108,6 +119,17 @@ export const TeamSettingsModal = (props) => {
                         style={{ marginLeft: 10 }}
                         disableElevation>New Link</Button>
                 </form>
+                <br />
+
+                <Typography style={{ marginLeft: 10 }} color="success.main">{message}</Typography>
+                <Button
+                    style={{ marginLeft: 10 }}
+                    color="success"
+                    variant="contained"
+                    onClick={handleSaveChanges}
+                    disableElevation>
+                    Save
+                </Button>
             </Box>
         </>
     )

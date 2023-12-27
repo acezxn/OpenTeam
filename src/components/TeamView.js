@@ -53,8 +53,10 @@ export const TeamView = (props) => {
         let updatedData = data;
         updatedData.title = info.title;
         updatedData.description = info.description;
+        updatedData.publiclyVisible = info.publiclyVisible;
+        updatedData.joinable = info.joinable;
         setData(updatedData);
-        Database.updateTeamInfo(props.teamId, info.title, info.description);
+        Database.updateTeamInfo(props.teamId, info.title, info.description, info.publiclyVisible, info.joinable);
     }
     const handleJoin = (e) => {
         if (auth.currentUser.uid !== data.ownerUID) {
