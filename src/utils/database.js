@@ -8,9 +8,10 @@ export default class Database {
             description: "",
             bannerImageURL: "",
             links: [],
-            participants: [],
+            participants: [auth.currentUser.uid],
             pendingParticipants: [],
             public: false,
+            joinable: false,
             ownerUID: auth.currentUser.uid
         });
         const userDataDocRef = doc(db, 'user_data', auth.currentUser.uid);
@@ -41,5 +42,9 @@ export default class Database {
     static async updateTeamBannerImageURL(teamId, url) {
         await updateDoc(doc(db, "teams", teamId),
             { bannerImageURL: url });
+    }
+    static async addPendingParticipant(teamId, uid) {
+        await updateDoc(doc(db, "teams", teamId),
+            { pendingParticipants : arrayUnion(uid) });
     }
 }

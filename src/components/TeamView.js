@@ -1,4 +1,4 @@
-import { Divider, IconButton, Modal, Typography } from "@mui/material";
+import { Button, Divider, IconButton, Modal, Typography } from "@mui/material";
 import { auth, db, storage } from "../utils/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -7,6 +7,7 @@ import { TeamSettingsModal } from "./TeamSettingsModal";
 import ReactLoading from "react-loading";
 import SettingsIcon from '@mui/icons-material/Settings';
 import PeopleIcon from '@mui/icons-material/People';
+import AddIcon from '@mui/icons-material/Add';
 import Database from "../utils/database";
 import "../css/TeamView.css"
 
@@ -54,6 +55,11 @@ export const TeamView = (props) => {
         updatedData.description = info.description;
         setData(updatedData);
         Database.updateTeamInfo(props.teamId, info.title, info.description);
+    }
+    const handleJoin = (e) => {
+        if (auth.currentUser.uid !== data.ownerUID) {
+            Database.addPendingParticipant(props.teamId, auth.currentUser.uid);
+        }
     }
 
     useEffect(() => {
@@ -131,6 +137,26 @@ export const TeamView = (props) => {
                                 <i style={{ color: "var(--placeholder-color)" }}>No description provided</i>
                                 : data.description}
                         </Typography>
+                        <br />
+                        {
+                            data && (data.joinable ? (
+                                <Typography>New member joins are accepted</Typography>)
+                                : <Typography>New members are not accepted</Typography>)
+                        }
+                        {
+                            auth.currentUser !== null && (data && !data.participants.includes(auth.currentUser.uid)) &&
+                            (
+                                <Button
+                                    color="inherit"
+                                    variant="contained"
+                                    startIcon={<AddIcon />}
+                                    onClick={handleJoin}
+                                    disableElevation>
+                                    Join
+                                </Button>
+                            )
+                        }
+                        <Typography variant="h6">Related Links:</Typography>
                         {data.links.map((link, key) => (
                             <>
                                 <a
@@ -153,8 +179,6 @@ export const TeamView = (props) => {
                     </div>
                 </>
             )}
-
-
         </>
     )
 }

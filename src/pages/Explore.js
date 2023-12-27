@@ -13,17 +13,7 @@ const Explore = () => {
         const publicQuery = query(collection(db, "teams"), where("public", "==", true));
         const publicQuerySnapshot = await getDocs(publicQuery);
         const newPublicData = publicQuerySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-        
-        if (auth.currentUser !== null) {
-            const ownedQuery = query(collection(db, "teams"), where("ownerUID", "==", auth.currentUser.uid));
-            const ownedQuerySnapshot = await getDocs(ownedQuery);
-            const newOwnedData = ownedQuerySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-            const newData = newPublicData.concat(newOwnedData);
-            setTeams(newData);
-        } else {
-            setTeams(newPublicData);
-        }
-        
+        setTeams(newPublicData);
         setLoading(false);
     }
     useEffect(() => {
