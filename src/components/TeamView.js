@@ -1,13 +1,14 @@
 import { Divider, IconButton, Modal, Typography } from "@mui/material";
-import ReactLoading from "react-loading";
-import { auth, db } from "../utils/firebase";
-import { useEffect, useState } from "react";
+import { auth, db, storage } from "../utils/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useEffect, useState } from "react";
+import { TeamSettingsModal } from "./TeamSettingsModal";
+import ReactLoading from "react-loading";
 import SettingsIcon from '@mui/icons-material/Settings';
 import PeopleIcon from '@mui/icons-material/People';
-import "../css/TeamView.css"
-import { TeamSettingsModal } from "./TeamSettingsModal";
 import Database from "../utils/database";
+import "../css/TeamView.css"
 
 export const TeamView = (props) => {
     const [loading, setLoading] = useState(true);
@@ -22,6 +23,22 @@ export const TeamView = (props) => {
             getDoc(doc(db, "photo_url", participantUID))
                 .then((snapshot) => {
                     setParticipantData([...participantData, snapshot.data()]);
+                });
+        }
+    }
+    const handleBannerImageUpdate = (img) => {
+        if (img) {
+            const imageRef = storageRef(storage, `banner_images/${img.name}`);
+            uploadBytes(imageRef, img)
+                .then((snapshot) => {
+                    getDownloadURL(snapshot.ref)
+                        .then((url) => {
+                            console.log(url);
+                            let updatedData = data;
+                            updatedData.bannerImageURL = url;
+                            setData(updatedData);
+                            Database.updateTeamBannerImageURL(props.teamId, url);
+                        });
                 });
         }
     }
@@ -94,12 +111,13 @@ export const TeamView = (props) => {
                         onClose={handleSettingsClose}>
                         <TeamSettingsModal
                             data={data}
+                            onBannerImageUpdate={(img) => { handleBannerImageUpdate(img) }}
                             onLinkUpdate={(links) => { handleLinkUpdate(links) }}
                             onTeamInfoUpdate={(links) => { handleTeamInfoUpdate(links) }} />
                     </Modal>
                     <div className="banner">
                         <img
-                            src="https://lh3.googleusercontent.com/a/ACg8ocLPxHSXGieHGPRCtziYc0vXyqw1rHF2T1JRCig4BKV3YGw=s96-c"
+                            src={data.bannerImageURL}
                             alt="banner">
                         </img>
                     </div>

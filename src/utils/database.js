@@ -6,6 +6,7 @@ export default class Database {
         const ref = await addDoc(collection(db, "teams"), {
             title: "New team",
             description: "",
+            bannerImageURL: "",
             links: [],
             participants: [],
             pendingParticipants: [],
@@ -35,6 +36,10 @@ export default class Database {
     static async updateTeamInfo(teamId, title, description) {
         await updateDoc(doc(db, "teams", teamId),
             { title: title },
-            { description: description },);
+            { description: description });
+    }
+    static async updateTeamBannerImageURL(teamId, url) {
+        await updateDoc(doc(db, "teams", teamId),
+            { bannerImageURL: url });
     }
 }

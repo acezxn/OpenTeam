@@ -30,25 +30,20 @@ const OutlinedList = styled(List)(({ theme }) => ({
 export const TeamSettingsModal = (props) => {
     const [title, setTitle] = useState(props.data.title);
     const [description, setDescription] = useState(props.data.description);
+    const [bannerImage, setBannerImage] = useState(null);
     const [links, setLinks] = useState(props.data.links);
     const [newLink, setNewLink] = useState("");
 
-    const handleLinkDeletion = (key) => {
-        setLinks(links.filter((_, index) => index !== key));
-    }
-
+    const handleLinkDeletion = (key) => { setLinks(links.filter((_, index) => index !== key)) }
+    const handleNewImage = (e) => { setBannerImage(e.target.files[0]) }
     const handleNewLink = (e) => {
         e.preventDefault();
         setLinks([...links, newLink]);
     }
 
-    useEffect(() => {
-        props.onLinkUpdate(links);
-    }, [links]);
-
-    useEffect(() => {
-        props.onTeamInfoUpdate({ title: title, description: description });
-    }, [title, description]);
+    useEffect(() => { props.onBannerImageUpdate(bannerImage) }, [props, bannerImage]);
+    useEffect(() => { props.onLinkUpdate(links) }, [props, links]);
+    useEffect(() => { props.onTeamInfoUpdate({ title: title, description: description }) }, [props, title, description]);
 
     return (
         <>
@@ -68,6 +63,15 @@ export const TeamSettingsModal = (props) => {
                     helperText="Please enter team description"
                     onChange={(e) => { setDescription(e.target.value) }} />
 
+                <Typography style={{ marginLeft: 10 }}>Banner image</Typography>
+                <Button color="inherit" variant="contained" component="label" style={{ marginLeft: 10 }} disableElevation>
+                    Upload Image
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleNewImage}
+                        hidden />
+                </Button>
                 <Typography style={{ marginLeft: 10 }}>Related links</Typography>
                 <List variant="outlined">
                     {links.map((link, key) => (
