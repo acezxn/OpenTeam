@@ -35,5 +35,5 @@ code {
 .profile_image {
   width: 38px;
   border-radius: 30px;
-  padding-right: 10px;
+  vertical-align: middle;
 }

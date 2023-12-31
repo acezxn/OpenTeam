@@ -14,16 +14,17 @@ const Login = () => {
     const onLogin = async (event) => {
         await signInWithGooglePopup();
         const userDoc = doc(db, "user_data", auth.currentUser.uid);
-        const photoURLDoc = doc(db, "photo_url", auth.currentUser.uid);
+        const publicUserDoc = doc(db, "public_user_data", auth.currentUser.uid);
         let data = await getDoc(userDoc);
         if (data.data() === undefined) {
             await setDoc(userDoc, {
                 teams: []
             });
         }
-        data = await getDoc(photoURLDoc);
+        data = await getDoc(publicUserDoc);
         if (data.data() === undefined) {
-            await setDoc(photoURLDoc, {
+            await setDoc(publicUserDoc, {
+                email: auth.currentUser.email,
                 photoURL: auth.currentUser.photoURL
             });
         }

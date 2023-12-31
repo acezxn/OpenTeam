@@ -75,13 +75,25 @@ const TeamCard = (props) => {
                 <MenuItem onClick={handleModalOpen}>Rename team</MenuItem>
                 <MenuItem onClick={onRemoveTeam}>Delete team</MenuItem>
             </Menu>
-            <div className="card" >
-                <div onClick={() => { navigate(`/teams-page/${cardId}`) }} style={{ display: "inline-block" }}>
-                    <SchemaIcon style={{ verticalAlign: "middle" }} fontSize='medium' />
-                    <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "min(max(16vw, 1px), 100px)", marginLeft: 10 }}>{props.name}</Typography>
-                </div>
-                {!props.preview && (<Button onClick={handleMenuOpen}><MoreVertIcon fontSize='medium' /></Button>)}
-            </div>
+            {
+                !props.preview ? (
+                    <div className="card">
+                        <div style={{ display: "inline-block" }} onClick={() => { navigate(`/teams-page/${cardId}`) }}>
+                            <SchemaIcon style={{ verticalAlign: "middle" }} fontSize='medium' />
+                            <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "min(max(16vw, 1px), 100px)", marginLeft: 10 }}>{props.name}</Typography>
+                        </div>
+                        <Button onClick={handleMenuOpen}><MoreVertIcon fontSize='medium' /></Button>
+                    </div>
+                ) : (
+                    <div className="card" onClick={() => { navigate(`/teams-page/${cardId}`) }}>
+                        <div style={{ display: "inline-block" }}>
+                            <SchemaIcon style={{ verticalAlign: "middle" }} fontSize='medium' />
+                            <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "min(max(16vw, 1px), 100px)", marginLeft: 10 }}>{props.name}</Typography>
+                        </div>
+                    </div>
+                )
+            }
+
         </div>
     )
 }

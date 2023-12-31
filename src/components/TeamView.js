@@ -1,7 +1,8 @@
 import { Button, Divider, IconButton, Modal, Typography } from "@mui/material";
 import { auth, db, storage } from "../utils/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { v4 as uuidv4 } from 'uuid';
 import { useEffect, useState } from "react";
 import { TeamSettingsModal } from "./TeamSettingsModal";
 import ReactLoading from "react-loading";
@@ -10,37 +11,56 @@ import PeopleIcon from '@mui/icons-material/People';
 import AddIcon from '@mui/icons-material/Add';
 import Database from "../utils/database";
 import "../css/TeamView.css"
+import { MembersModal } from "./MembersModal";
+import { JoinRequestsModal } from "./JoinRequestsModal";
+import { JoinModal } from "./JoinModal";
 
 export const TeamView = (props) => {
+    // loading states
     const [loading, setLoading] = useState(true);
+
+    // modal open states
+    const [settingsOpen, setSettingsOpen] = useState(false);
+    const [joinRequestsModalOpen, setJoinRequestsModalOpen] = useState(false);
+    const [joinModalOpen, setJoinModalOpen] = useState(false);
+    const [membersOpen, setMembersOpen] = useState(false);
+
+    // component data states
     const [data, setData] = useState(null);
     const [participantData, setParticipantData] = useState([]);
-    const [settingsOpen, setSettingsOpen] = useState(false);
+    const [message, setMessage] = useState("");
+
+    // modal state setters
+    const handleJoinRequestsModalOpen = () => setJoinRequestsModalOpen(true);
+    const handleJoinRequestsModalClose = () => setJoinRequestsModalOpen(false);
+    const handleJoinModalOpen = () => setJoinModalOpen(true);
+    const handleJoinModalClose = () => setJoinModalOpen(false);
     const handleSettingsOpen = () => setSettingsOpen(true);
     const handleSettingsClose = () => setSettingsOpen(false);
+    const handleMembersOpen = () => setMembersOpen(true);
+    const handleMembersClose = () => setMembersOpen(false);
 
-    const getParticipants = () => {
+    const getParticipants = async () => {
+        var participants = [];
         for (let participantUID of props.data.participants) {
-            getDoc(doc(db, "photo_url", participantUID))
-                .then((snapshot) => {
-                    setParticipantData([...participantData, snapshot.data()]);
-                });
+            let snapshot = await getDoc(doc(db, "public_user_data", participantUID));
+            participants.push(snapshot.data());
         }
+        setParticipantData(participants);
     }
-    const handleBannerImageUpdate = (img) => {
+    const handleBannerImageUpdate = async (img) => {
         if (img) {
-            const imageRef = storageRef(storage, `banner_images/${img.name}`);
-            uploadBytes(imageRef, img)
-                .then((snapshot) => {
-                    getDownloadURL(snapshot.ref)
-                        .then((url) => {
-                            console.log(url);
-                            let updatedData = data;
-                            updatedData.bannerImageURL = url;
-                            setData(updatedData);
-                            Database.updateTeamBannerImageURL(props.teamId, url);
-                        });
-                });
+            if (data.bannerImageURL !== "") {
+                const prevImageRef = storageRef(storage, data.bannerImageURL);
+                deleteObject(prevImageRef);
+            }
+            const imageRef = storageRef(storage, `banner_images/${uuidv4()}-${img.name}`);
+            const snapshot = await uploadBytes(imageRef, img)
+            const newURL = await getDownloadURL(snapshot.ref)
+            let updatedData = data;
+            updatedData.bannerImageURL = newURL;
+            setData(updatedData);
+            Database.updateTeamBannerImageURL(props.teamId, newURL);
         }
     }
     const handleLinkUpdate = (links) => {
@@ -58,9 +78,10 @@ export const TeamView = (props) => {
         setData(updatedData);
         Database.updateTeamInfo(props.teamId, info.title, info.description, info.publiclyVisible, info.joinable);
     }
-    const handleJoin = (e) => {
+    const handleJoin = (introduction) => {
         if (auth.currentUser.uid !== data.ownerUID) {
-            Database.addPendingParticipant(props.teamId, auth.currentUser.uid);
+            Database.addPendingParticipant(props.teamId, auth.currentUser.uid, introduction);
+            setMessage("Join request initiated");
         }
     }
 
@@ -84,7 +105,7 @@ export const TeamView = (props) => {
             ) : (
                 <>
                     {
-                        (auth.currentUser !== null && (data && auth.currentUser.uid === data.ownerUID)) &&
+                        (auth.currentUser !== null && (data && auth.currentUser.uid === data.ownerUID)) ?
                         (
                             <>
                                 <IconButton
@@ -107,28 +128,53 @@ export const TeamView = (props) => {
                                         top: 60,
                                         right: 60,
                                         color: "inherit"
-                                    }}>
+                                    }}
+                                    onClick={handleJoinRequestsModalOpen}>
                                     <PeopleIcon fontSize="large" />
                                 </IconButton>
+                                <Modal
+                                    open={settingsOpen}
+                                    onClose={handleSettingsClose}>
+                                    <TeamSettingsModal
+                                        data={data}
+                                        onBannerImageUpdate={(img) => { handleBannerImageUpdate(img) }}
+                                        onLinkUpdate={(links) => { handleLinkUpdate(links) }}
+                                        onTeamInfoUpdate={(links) => { handleTeamInfoUpdate(links) }} />
+                                </Modal>
+                                <Modal
+                                    open={membersOpen}
+                                    onClose={handleMembersClose}>
+                                    <MembersModal data={data} />
+                                </Modal>
+                                <Modal
+                                    open={joinRequestsModalOpen}
+                                    onClose={handleJoinRequestsModalClose}>
+                                    <JoinRequestsModal data={data} teamId={props.teamId}/>
+                                </Modal>
+                            </>
+                        ) : (
+                            <Modal
+                            open={joinModalOpen}
+                            onClose={handleJoinModalClose}>
+                                <JoinModal onSubmit={handleJoin}/>
+                            </Modal>
+                        )
+                    }
+
+                    {
+                        data.bannerImageURL !== "" ? (
+                            <div className="banner">
+                                <img
+                                    src={data.bannerImageURL}
+                                    alt="banner">
+                                </img>
+                            </div>
+                        ) : (
+                            <>
                             </>
                         )
                     }
 
-                    <Modal
-                        open={settingsOpen}
-                        onClose={handleSettingsClose}>
-                        <TeamSettingsModal
-                            data={data}
-                            onBannerImageUpdate={(img) => { handleBannerImageUpdate(img) }}
-                            onLinkUpdate={(links) => { handleLinkUpdate(links) }}
-                            onTeamInfoUpdate={(links) => { handleTeamInfoUpdate(links) }} />
-                    </Modal>
-                    <div className="banner">
-                        <img
-                            src={data.bannerImageURL}
-                            alt="banner">
-                        </img>
-                    </div>
                     <div style={{ margin: 10 }}>
                         <div style={{ height: 100 }}></div>
                         <Typography variant="h2" className="team_title">{data.title}</Typography>
@@ -148,14 +194,17 @@ export const TeamView = (props) => {
                         {
                             auth.currentUser !== null && (data && !data.participants.includes(auth.currentUser.uid)) &&
                             (
-                                <Button
-                                    color="inherit"
-                                    variant="contained"
-                                    startIcon={<AddIcon />}
-                                    onClick={handleJoin}
-                                    disableElevation>
-                                    Join
-                                </Button>
+                                <>
+                                    <Button
+                                        color="inherit"
+                                        variant="contained"
+                                        startIcon={<AddIcon />}
+                                        onClick={handleJoinModalOpen}
+                                        disableElevation>
+                                        Join
+                                    </Button>
+                                    <Typography color="success.main">{message}</Typography>
+                                </>
                             )
                         }
                         <Typography variant="h6">Related Links:</Typography>
@@ -177,6 +226,12 @@ export const TeamView = (props) => {
                                 <img key={key} className="profile_image" src={items.photoURL} alt={items.photoURL}></img>
                             ))}
                         </div>
+                        {
+                            (auth.currentUser !== null && (data && auth.currentUser.uid === data.ownerUID)) &&
+                            (
+                                <Button onClick={handleMembersOpen}>Edit</Button>
+                            )
+                        }
                         <Divider style={{ paddingBottom: 10 }} />
                     </div>
                 </>

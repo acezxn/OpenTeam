@@ -64,10 +64,10 @@ const Teams = () => {
             <Navbar />
             <div style={{ margin: 10 }}>
                 <div style={{ display: "inline-block", padding: 5 }}>
-                    <Button color="inherit" variant="contained" onClick={onNewTeam}>New team</Button>
+                    <Button color="inherit" variant="contained" onClick={onNewTeam} disableElevation>New team</Button>
                 </div>
                 <div style={{ display: "inline-block", padding: 5 }}>
-                    <Button color="inherit" variant="contained" onClick={onRefresh}><RefreshIcon /></Button>
+                    <Button color="inherit" variant="contained" onClick={onRefresh} disableElevation><RefreshIcon /></Button>
                 </div>
                 <Divider style={{ paddingBottom: 10 }} />
                 {loading ? (
