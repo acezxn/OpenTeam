@@ -4,7 +4,7 @@ import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
 import ReactLoading from "react-loading";
 import TeamCard from "../components/TeamCard";
-import { Button, Divider } from "@mui/material";
+import { Button, Divider, Typography } from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Database from "../utils/database";
 
@@ -34,7 +34,7 @@ const Teams = () => {
         const data = snapshot.data();
         if (data !== null && data !== undefined) {
             await getTeamData(snapshot.data().teams);
-        }  
+        }
         setLoading(false);
     }
 
@@ -63,6 +63,7 @@ const Teams = () => {
         <>
             <Navbar />
             <div style={{ margin: 10 }}>
+                <Typography variant="h6">Your teams</Typography>
                 <div style={{ display: "inline-block", padding: 5 }}>
                     <Button color="inherit" variant="contained" onClick={onNewTeam} disableElevation>New team</Button>
                 </div>
@@ -83,10 +84,14 @@ const Teams = () => {
                 ) : (
                     <div style={{ marginTop: 10, overflow: "auto" }}>
                         {userData.map((team, index) => (
-                            <TeamCard key={index} name={team.data.title} id={team.teamId} onChange={handleTeamChange} preview={false} />
+                            <TeamCard key={index} name={team.data.title} id={team.teamId} onChange={handleTeamChange} />
                         ))}
                     </div>
                 )}
+                <Divider style={{ paddingBottom: 10 }} />
+                <br />
+                <Typography variant="h6">Joined teams</Typography>
+                <Divider style={{ paddingBottom: 10 }} />
             </div>
         </>
     );

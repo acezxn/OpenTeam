@@ -40,9 +40,9 @@ export const TeamView = (props) => {
     const handleMembersOpen = () => setMembersOpen(true);
     const handleMembersClose = () => setMembersOpen(false);
 
-    const getParticipants = async () => {
+    const getParticipants = async (participantUIDs) => {
         var participants = [];
-        for (let participantUID of props.data.participants) {
+        for (let participantUID of participantUIDs) {
             let snapshot = await getDoc(doc(db, "public_user_data", participantUID));
             participants.push(snapshot.data());
         }
@@ -79,16 +79,19 @@ export const TeamView = (props) => {
         Database.updateTeamInfo(props.teamId, info.title, info.description, info.publiclyVisible, info.joinable);
     }
     const handleJoin = (introduction) => {
-        if (auth.currentUser.uid !== data.ownerUID) {
+        if (auth.currentUser.uid !== data.ownerUID && data.joinable) {
             Database.addPendingParticipant(props.teamId, auth.currentUser.uid, introduction);
             setMessage("Join request initiated");
         }
+    }
+    const handleParticipantsUpdate = (participants) => {
+        getParticipants(participants);
     }
 
     useEffect(() => {
         if (props.data) {
             setData(props.data);
-            getParticipants();
+            getParticipants(props.data.participants);
             setLoading(false);
         }
     }, [props]);
@@ -106,59 +109,62 @@ export const TeamView = (props) => {
                 <>
                     {
                         (auth.currentUser !== null && (data && auth.currentUser.uid === data.ownerUID)) ?
-                        (
-                            <>
-                                <IconButton
-                                    size="small"
-                                    style={{
-                                        position: "absolute",
-                                        zIndex: 1,
-                                        top: 60,
-                                        right: 10,
-                                        color: "inherit",
-                                    }}
-                                    onClick={handleSettingsOpen}>
-                                    <SettingsIcon fontSize="large" />
-                                </IconButton>
-                                <IconButton
-                                    size="small"
-                                    style={{
-                                        position: "absolute",
-                                        zIndex: 1,
-                                        top: 60,
-                                        right: 60,
-                                        color: "inherit"
-                                    }}
-                                    onClick={handleJoinRequestsModalOpen}>
-                                    <PeopleIcon fontSize="large" />
-                                </IconButton>
+                            (
+                                <>
+                                    <IconButton
+                                        size="small"
+                                        style={{
+                                            position: "absolute",
+                                            zIndex: 1,
+                                            top: 60,
+                                            right: 10,
+                                            color: "inherit",
+                                        }}
+                                        onClick={handleSettingsOpen}>
+                                        <SettingsIcon fontSize="large" />
+                                    </IconButton>
+                                    <IconButton
+                                        size="small"
+                                        style={{
+                                            position: "absolute",
+                                            zIndex: 1,
+                                            top: 60,
+                                            right: 60,
+                                            color: "inherit"
+                                        }}
+                                        onClick={handleJoinRequestsModalOpen}>
+                                        <PeopleIcon fontSize="large" />
+                                    </IconButton>
+                                    <Modal
+                                        open={settingsOpen}
+                                        onClose={handleSettingsClose}>
+                                        <TeamSettingsModal
+                                            data={data}
+                                            onBannerImageUpdate={(img) => { handleBannerImageUpdate(img) }}
+                                            onLinkUpdate={(links) => { handleLinkUpdate(links) }}
+                                            onTeamInfoUpdate={(links) => { handleTeamInfoUpdate(links) }} />
+                                    </Modal>
+                                    <Modal
+                                        open={membersOpen}
+                                        onClose={handleMembersClose}>
+                                        <MembersModal data={data} />
+                                    </Modal>
+                                    <Modal
+                                        open={joinRequestsModalOpen}
+                                        onClose={handleJoinRequestsModalClose}>
+                                        <JoinRequestsModal
+                                            data={data}
+                                            teamId={props.teamId}
+                                            onParticipantsUpdate={(participants) => { handleParticipantsUpdate(participants) }} />
+                                    </Modal>
+                                </>
+                            ) : (
                                 <Modal
-                                    open={settingsOpen}
-                                    onClose={handleSettingsClose}>
-                                    <TeamSettingsModal
-                                        data={data}
-                                        onBannerImageUpdate={(img) => { handleBannerImageUpdate(img) }}
-                                        onLinkUpdate={(links) => { handleLinkUpdate(links) }}
-                                        onTeamInfoUpdate={(links) => { handleTeamInfoUpdate(links) }} />
+                                    open={joinModalOpen}
+                                    onClose={handleJoinModalClose}>
+                                    <JoinModal teamId={props.teamId} uid={auth.currentUser.uid} onSubmit={handleJoin} />
                                 </Modal>
-                                <Modal
-                                    open={membersOpen}
-                                    onClose={handleMembersClose}>
-                                    <MembersModal data={data} />
-                                </Modal>
-                                <Modal
-                                    open={joinRequestsModalOpen}
-                                    onClose={handleJoinRequestsModalClose}>
-                                    <JoinRequestsModal data={data} teamId={props.teamId}/>
-                                </Modal>
-                            </>
-                        ) : (
-                            <Modal
-                            open={joinModalOpen}
-                            onClose={handleJoinModalClose}>
-                                <JoinModal onSubmit={handleJoin}/>
-                            </Modal>
-                        )
+                            )
                     }
 
                     {
@@ -182,7 +188,7 @@ export const TeamView = (props) => {
                         <Typography variant="h6">About:</Typography>
                         <Typography>
                             {data.description === "" ?
-                                <i style={{ color: "var(--placeholder-color)" }}>No description provided</i>
+                                <Typography sx={{ color: "var(--placeholder-color)", fontStyle: 'italic' }}>No description provided</Typography>
                                 : data.description}
                         </Typography>
                         <br />
@@ -192,7 +198,7 @@ export const TeamView = (props) => {
                                 : <Typography>New members are not accepted</Typography>)
                         }
                         {
-                            auth.currentUser !== null && (data && !data.participants.includes(auth.currentUser.uid)) &&
+                            auth.currentUser !== null && (data && data.joinable && !data.participants.includes(auth.currentUser.uid)) &&
                             (
                                 <>
                                     <Button

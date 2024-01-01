@@ -1,7 +1,8 @@
 import { Box, Button, TextField, Typography } from "@mui/material"
 import AddIcon from '@mui/icons-material/Add';
-import { styled } from '@mui/material/styles';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../utils/firebase";
 
 const modalStyle = {
     position: 'absolute',
@@ -23,6 +24,20 @@ export const JoinModal = (props) => {
         e.preventDefault();
         props.onSubmit(introduction);
     }
+    useEffect(() => {
+        if (props) {
+            getDoc(doc(db, "join_requests", props.teamId)).then((snapshot) => {
+                let data = snapshot.data();
+                for (let request of data.requests) {
+                    if (request.uid === props.uid) {
+                        setIntroduction(request.introduction);
+                        break;
+                    }
+                }
+            });
+        }
+    }, [props.uid]);
+    
     return (
         <Box style={modalStyle}>
             <form onSubmit={handleSubmit}>
@@ -32,6 +47,7 @@ export const JoinModal = (props) => {
                 <TextField
                     style={{ marginLeft: 10, width: "max(calc(50vw - 20px), 320px)" }}
                     onChange={(e) => { setIntroduction(e.target.value) }}
+                    value={introduction}
                     rows={4}
                     multiline
                     required />

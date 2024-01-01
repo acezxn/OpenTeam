@@ -19,7 +19,8 @@ export default class Database {
             { merge: true });
         await setDoc(doc(db, "join_requests", ref.id), {
             pendingParticipants: [],
-            introductions: []
+            introductions: [],
+            requests: []
         });
     }
     static async removeTeam(teamId) {
@@ -53,17 +54,31 @@ export default class Database {
     }
     static async addPendingParticipant(teamId, uid, introduction) {
         const data = (await getDoc(doc(db, "join_requests", teamId))).data();
-        const pendingParticipants = data.pendingParticipants;
-        const introductions = data.introductions;
-        if (!pendingParticipants.includes(uid)) {
-            await updateDoc(doc(db, "join_requests", teamId),
-                { introductions: arrayUnion(introduction) });
-            await updateDoc(doc(db, "join_requests", teamId),
-                { pendingParticipants: arrayUnion(uid) });
-        } else {
-            introductions[pendingParticipants.indexOf(uid)] = introduction;
-            await updateDoc(doc(db, "join_requests", teamId),
-                { introductions: introductions });
+        const requests = data.requests;
+        let recordExist = false;
+        let recordIndex = -1;
+        for (let index = 0; index < requests.length; index++) {
+            if (requests.uid === uid) {
+                recordExist = true;
+                recordIndex = index;
+                break;
+            }
         }
+        if (!recordExist) {
+            await updateDoc(doc(db, "join_requests", teamId),
+                { requests: arrayUnion({uid: uid, introduction: introduction})});
+        } else {
+            requests[recordIndex].introduction = introduction;
+            await updateDoc(doc(db, "join_requests", teamId),
+                { requests: requests });
+        }
+    }
+    static async removePendingParticipant(teamId, uid, introduction) {
+        await updateDoc(doc(db, "join_requests", teamId),
+            { requests: arrayRemove({uid: uid, introduction: introduction})});
+    }
+    static async addTeamMember(teamId, uid) {
+        await updateDoc(doc(db, "teams", teamId),
+            { participants: arrayUnion(uid)});
     }
 }

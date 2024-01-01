@@ -30,25 +30,26 @@ const OutlinedList = styled(List)(({ theme }) => ({
 }));
 
 export const MembersModal = (props) => {
-    const [participantUID, setParticipantUID] = useState(props.data.participants);
+    const [participantUID, setParticipantUID] = useState([]);
     const [membersEmail, setMembersEmail] = useState([]);
     const [membersPhotoURL, setMembersPhotoURL] = useState([]);
 
     const getMembers = async () => {
         let emails = [];
         let photoURLs = [];
-        for (let uid of participantUID) {
+        for (let uid of props.data.participants) {
             let data = (await getDoc(doc(db, "public_user_data", uid))).data();
             emails.push(data.email);
             photoURLs.push(data.photoURL);
         }
+        setParticipantUID(props.data.participants);
         setMembersEmail(emails);
         setMembersPhotoURL(photoURLs);
     }
     useEffect(() => {
         getMembers();
     }, [props]);
-    
+
     return (
         <Box style={modalStyle}>
             <br />
