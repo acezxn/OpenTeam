@@ -87,7 +87,7 @@ export const JoinRequestsModal = (props) => {
         }));
         props.onParticipantsUpdate([props.data.ownerUID, ...participantsUID]);
     }
-    
+
     const handleDecline = (index) => {
         Database.removePendingParticipant(props.teamId, participantsUID[index], participantIntroduction[index]);
         setParticipantsUID(participantsUID.filter((uid, key) => {

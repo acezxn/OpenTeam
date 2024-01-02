@@ -81,6 +81,7 @@ export const TeamView = (props) => {
     const handleJoin = (introduction) => {
         if (auth.currentUser.uid !== data.ownerUID && data.joinable) {
             Database.addPendingParticipant(props.teamId, auth.currentUser.uid, introduction);
+            Database.createJoinedTeamsLink(props.teamId, auth.currentUser.uid);
             setMessage("Join request initiated");
         }
     }

@@ -12,7 +12,8 @@ import Database from "../utils/database";
 const Teams = () => {
     const colletionRef = collection(db, 'user_data');
     const [loadingMessage, setLoadingMessage] = useState("Loading teams")
-    const [userData, setUserData] = useState([]);
+    const [ownedTeams, setOwnedTeams] = useState([]);
+    const [joinedTeams, setJoinedTeams] = useState([]);
     const [loading, setLoading] = useState(false);
 
     async function onNewTeam() {
@@ -33,18 +34,31 @@ const Teams = () => {
         const snapshot = await getDoc(docRef);
         const data = snapshot.data();
         if (data !== null && data !== undefined) {
-            await getTeamData(snapshot.data().teams);
+            await getOwnedTeamsData(snapshot.data().teams);
+            await getJoinedTeamsData(snapshot.data().joinedTeams);
         }
         setLoading(false);
     }
-
-    async function getTeamData(teamDocArray) {
+    async function getOwnedTeamsData(teamDocArray) {
         let items = [];
         for (let teamDoc of teamDocArray) {
             const teamSnapShot = await getDoc(teamDoc);
             items.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
         }
-        setUserData(items);
+        setOwnedTeams(items);
+    }
+    async function getJoinedTeamsData(teamDocArray) {
+        let items = [];
+        for (let teamDoc of teamDocArray) {
+            const teamSnapShot = await getDoc(teamDoc);
+            const isMember = await Database.checkIsMember(teamDoc.id, auth.currentUser.uid);
+            if (!isMember) {
+                Database.removeJoinedTeamsLink(teamDoc.id, auth.currentUser.uid);
+            } else {
+                items.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
+            }
+        }
+        setJoinedTeams(items);
     }
     function handleTeamChange(message) {
         if (message === "delete") {
@@ -83,7 +97,7 @@ const Teams = () => {
                     </>
                 ) : (
                     <div style={{ marginTop: 10, overflow: "auto" }}>
-                        {userData.map((team, index) => (
+                        {ownedTeams.map((team, index) => (
                             <TeamCard key={index} name={team.data.title} id={team.teamId} onChange={handleTeamChange} />
                         ))}
                     </div>
@@ -92,6 +106,23 @@ const Teams = () => {
                 <br />
                 <Typography variant="h6">Joined teams</Typography>
                 <Divider style={{ paddingBottom: 10 }} />
+                {loading ? (
+                    <>
+                        <h2>{loadingMessage}</h2>
+                        <ReactLoading
+                            type={"bars"}
+                            color={"#ffffff"}
+                            height={50}
+                            width={100}
+                        />
+                    </>
+                ) : (
+                    <div style={{ marginTop: 10, overflow: "auto" }}>
+                        {joinedTeams.map((team, index) => (
+                            <TeamCard key={index} name={team.data.title} id={team.teamId} onChange={handleTeamChange} preview={true}/>
+                        ))}
+                    </div>
+                )}
             </div>
         </>
     );

@@ -1,10 +1,10 @@
 import { Button, Typography } from "@mui/material";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
-import { auth, db } from "../utils/firebase";
+import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import Database from "../utils/database";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -13,21 +13,7 @@ const Login = () => {
     const signInWithGooglePopup = () => signInWithPopup(auth, provider);
     const onLogin = async (event) => {
         await signInWithGooglePopup();
-        const userDoc = doc(db, "user_data", auth.currentUser.uid);
-        const publicUserDoc = doc(db, "public_user_data", auth.currentUser.uid);
-        let data = await getDoc(userDoc);
-        if (data.data() === undefined) {
-            await setDoc(userDoc, {
-                teams: []
-            });
-        }
-        data = await getDoc(publicUserDoc);
-        if (data.data() === undefined) {
-            await setDoc(publicUserDoc, {
-                email: auth.currentUser.email,
-                photoURL: auth.currentUser.photoURL
-            });
-        }
+        Database.createUserData(auth.currentUser.uid);
         navigate("/");
     }
 
