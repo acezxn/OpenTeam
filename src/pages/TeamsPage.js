@@ -36,11 +36,10 @@ export const TeamsPage = () => {
                 teamId={teamId}
                 data={data} />
             {
-                ((data && data.participants.includes(auth.currentUser.uid)) ||
-                    (data && auth.currentUser.uid === data.ownerUID)) &&
+                auth.currentUser !== null && (((data && data.participants.includes(auth.currentUser.uid)) ||
+                    (data && auth.currentUser.uid === data.ownerUID))) &&
                 <TaskBoard teamId={teamId} />
             }
-
         </>
     )
 }

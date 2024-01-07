@@ -23,6 +23,12 @@ code {
     monospace;
 }
 
+.gradient_background {
+  background: linear-gradient(45deg, rgba(2,0,36,1) 0%, rgb(24, 7, 27) 49%, rgb(17, 27, 103) 100%);
+  height: 100vh;
+  width: 100vw;
+}
+
 .login-card {
   position: absolute;
 	top: 40%;

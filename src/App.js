@@ -43,7 +43,7 @@ export default class App extends React.Component {
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route path="explore" element={<Explore />} />
-          <Route path="about" element={<About />} />
+          {/* <Route path="about" element={<About />} /> */}
           <Route path="login" element={<Login />} />
           <Route path="teams" element={
             <Protected isLoggedIn={user}>

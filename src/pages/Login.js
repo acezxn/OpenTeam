@@ -9,25 +9,29 @@ const Login = () => {
     const navigate = useNavigate();
 
     const provider = new GithubAuthProvider();
-    const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+    const signInWithGithubPopup = () => signInWithPopup(auth, provider);
     const onLogin = async (event) => {
-        await signInWithGooglePopup();
-        Database.createUserData(auth.currentUser.uid);
-        navigate("/");
+        try {
+            await signInWithGithubPopup();
+            Database.createUserData(auth.currentUser.uid);
+            navigate("/");
+        } catch (exception) {
+            
+        }
     }
 
     return (
-        <>
+        <div className="gradient_background">
             <Navbar />
             <div className="login-card">
                 <br />
                 <Typography variant="h3" style={{ textAlign: "center" }}>Login</Typography>
                 <br />
                 <div style={{ display: "flex", alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
-                    <Button color="inherit" variant="contained" onClick={onLogin}>Log in with Github</Button>
+                    <Button onClick={onLogin} disableElevation>Log in with Github</Button>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 

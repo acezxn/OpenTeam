@@ -105,11 +105,11 @@ export default function Navbar() {
                                         disablePadding
                                     >
                                         <ListItem>
-                                            <ListItemText primary="Explore" onClick={() => { navigate("/about") }} />
+                                            <ListItemText primary="Explore" onClick={() => { navigate("/explore") }} />
                                         </ListItem>
-                                        <ListItem>
+                                        {/* <ListItem>
                                             <ListItemText primary="About" onClick={() => { navigate("/about") }} />
-                                        </ListItem>
+                                        </ListItem> */}
                                         <ListItem>
                                             <ListItemText primary="Login" onClick={() => { navigate("/login") }} />
                                         </ListItem>
@@ -137,9 +137,9 @@ export default function Navbar() {
                             <Button color="inherit" onClick={() => { navigate("/explore") }}>
                                 Explore
                             </Button>
-                            <Button color="inherit" onClick={() => { navigate("/about") }}>
+                            {/* <Button color="inherit" onClick={() => { navigate("/about") }}>
                                 About
-                            </Button>
+                            </Button> */}
                             <Button color="inherit" onClick={() => { navigate("/login") }}>
                                 Login
                             </Button>
