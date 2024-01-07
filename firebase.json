@@ -10,7 +10,13 @@
     "rules": "storage.rules"
   },
   "hosting": {
-    "public": "build"
+    "public": "build",
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   },
   "emulators": {
     "auth": {
