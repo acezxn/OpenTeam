@@ -35,15 +35,6 @@ export default class App extends React.Component {
     });
   }
 
-  // isAuthorized(protectedRoute, user) {
-  //   return Boolean(user) || !protectedRoute;
-  // }
-
-  // componentWillUpdate(props, state) {
-  //   return !this.isAuthorized(props.children.props.route.protected, state.user) &&
-  //     browserHistory.push(routeCodes.ROOT);
-  // }
-
   render() {
     let user = auth.currentUser;
 

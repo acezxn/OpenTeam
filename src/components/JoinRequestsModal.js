@@ -18,7 +18,7 @@ const modalStyle = {
     transform: 'translate(-50%, -50%)',
     width: "max(50vw, 340px)",
     height: "70vh",
-    backgroundColor: 'rgb(40, 40, 40)',
+    backgroundColor: 'var(--background-color)',
     borderRadius: 4,
     overflow: "hidden",
     overflowY: "scroll",
@@ -44,7 +44,7 @@ const AccordionSummary = styled((props) => (
 ))(({ theme }) => ({
     backgroundColor:
         theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, .05)'
+            ? 'rgb(17, 22, 27)'
             : 'rgba(0, 0, 0, .03)',
     '& .MuiAccordionSummary-content': {
         marginLeft: theme.spacing(1),
@@ -59,7 +59,7 @@ const AccordionDetails = styled((props) => (
 ))(({ theme }) => ({
     backgroundColor:
         theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, .07)'
+            ? 'rgb(23, 28, 33)'
             : 'rgba(0, 0, 0, .03)',
     '& .MuiAccordionSummary-content': {
         marginLeft: theme.spacing(1),
@@ -157,11 +157,11 @@ export const JoinRequestsModal = (props) => {
                                     </ListItemText>
                                 </AccordionSummary>
                                 <AccordionDetails>
-                                    <IconButton>
-                                        <CheckIcon onClick={() => { handleAccept(index) }} />
+                                    <IconButton onClick={() => { handleAccept(index) }} >
+                                        <CheckIcon />
                                     </IconButton>
-                                    <IconButton>
-                                        <CloseIcon onClick={() => { handleDecline(index) }} />
+                                    <IconButton onClick={() => { handleDecline(index) }} >
+                                        <CloseIcon />
                                     </IconButton>
                                     <Typography>Introduction:</Typography>
                                     <Typography>{participantIntroduction[index]}</Typography>

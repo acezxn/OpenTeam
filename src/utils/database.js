@@ -1,5 +1,6 @@
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { auth, db } from "./firebase";
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { auth, db, storage } from "./firebase";
 
 export default class Database {
     /**
@@ -15,7 +16,12 @@ export default class Database {
         let data = await getDoc(userDoc);
         if (data.data() === undefined) {
             await setDoc(userDoc, {
-                teams: [],
+                teams: []
+            });
+            await updateDoc(userDoc, {
+                pendingTeams: []
+            });
+            await updateDoc(userDoc, {
                 joinedTeams: []
             });
         }
@@ -51,6 +57,11 @@ export default class Database {
         await setDoc(doc(db, "join_requests", ref.id), {
             requests: []
         });
+        await setDoc(doc(db, "protected_team_data", ref.id), {
+            announcement: "",
+            taskCategories: ["Not started", "In progress", "Done"],
+            tasks: []
+        });
     }
     /**
      * Removes team data
@@ -65,6 +76,7 @@ export default class Database {
             { teams: arrayRemove(doc(db, 'teams', teamId)) }
         );
         await deleteDoc(doc(db, "teams", teamId));
+        await deleteDoc(doc(db, "protected_team_data", teamId));
     }
     /**
      * Renames team
@@ -103,13 +115,28 @@ export default class Database {
      * @memberof Database
      */
     static async updateTeamInfo(teamId, title, description, publiclyVisible, joinable) {
-        updateDoc(doc(db, "teams", teamId),
+        await updateDoc(doc(db, "teams", teamId),
             { publiclyVisible: publiclyVisible });
-        updateDoc(doc(db, "teams", teamId),
+        await updateDoc(doc(db, "teams", teamId),
             { joinable: joinable });
         await updateDoc(doc(db, "teams", teamId),
-            { title: title },
+            { title: title });
+        await updateDoc(doc(db, "teams", teamId),
             { description: description });
+    }
+    /**
+     * Upload image to firebase storage
+     *
+     * @static
+     * @param {File} img image file
+     * @param {string} path storage path
+     * @return {string} download url for the image
+     * @memberof Database
+     */
+    static async uploadImage(img, path) {
+        const imageRef = storageRef(storage, path);
+        const snapshot = await uploadBytes(imageRef, img);
+        return await getDownloadURL(snapshot.ref)
     }
     /**
      * Updates team banner image url
@@ -138,7 +165,7 @@ export default class Database {
         return participants.includes(uid);
     }
     /**
-     * Records join requests of pending participants
+     * Records join requests of pending participants, and add pending team linkage in user data
      *
      * @static
      * @param {string} teamId Team id
@@ -160,36 +187,14 @@ export default class Database {
         }
         if (!recordExist) {
             await updateDoc(doc(db, "join_requests", teamId),
-                { requests: arrayUnion({uid: uid, introduction: introduction})});
+                { requests: arrayUnion({ uid: uid, introduction: introduction }) });
         } else {
             requests[recordIndex].introduction = introduction;
             await updateDoc(doc(db, "join_requests", teamId),
                 { requests: requests });
         }
-    }
-    /**
-     * Records joined team linkage to user data
-     *
-     * @static
-     * @param {string} teamId Team id
-     * @param {string} uid User id
-     * @memberof Database
-     */
-    static async createJoinedTeamsLink(teamId, uid) {
         await updateDoc(doc(db, "user_data", uid),
-            { joinedTeams: arrayUnion(doc(db, "teams", teamId))});
-    }
-    /**
-     * Removes joined team linkage from user data
-     *
-     * @static
-     * @param {string} teamId Team id
-     * @param {string} uid User id
-     * @memberof Database
-     */
-    static async removeJoinedTeamsLink(teamId, uid) {
-        await updateDoc(doc(db, "user_data", uid),
-            { joinedTeams: arrayRemove(doc(db, "teams", teamId))});
+            { pendingTeams: arrayUnion(doc(db, "teams", teamId)) });
     }
     /**
      * Removes join requests of pending participants
@@ -202,9 +207,36 @@ export default class Database {
      */
     static async removePendingParticipant(teamId, uid, introduction) {
         await updateDoc(doc(db, "join_requests", teamId),
-            { requests: arrayRemove({uid: uid, introduction: introduction})});
+            { requests: arrayRemove({ uid: uid, introduction: introduction }) });
     }
-    
+    /**
+     * Removes pending and joined team linkage from user data
+     *
+     * @static
+     * @param {string} teamId Team id
+     * @param {string} uid User id
+     * @memberof Database
+     */
+    static async removeTeamsLink(teamId, uid) {
+        await updateDoc(doc(db, "user_data", uid),
+            { pendingTeams: arrayRemove(doc(db, "teams", teamId)) });
+        await updateDoc(doc(db, "user_data", uid),
+            { joinedTeams: arrayRemove(doc(db, "teams", teamId)) });
+    }
+    /**
+     * Records joined team linkage to user data, and removes pending team linkage
+     *
+     * @static
+     * @param {string} teamId Team id
+     * @param {string} uid User id
+     * @memberof Database
+     */
+    static async createJoinedTeamsLink(teamId, uid) {
+        await updateDoc(doc(db, "user_data", uid),
+            { pendingTeams: arrayRemove(doc(db, "teams", teamId)) });
+        await updateDoc(doc(db, "user_data", uid),
+            { joinedTeams: arrayUnion(doc(db, "teams", teamId)) });
+    }
     /**
      * Adds new team member to team data
      *
@@ -215,6 +247,39 @@ export default class Database {
      */
     static async addTeamMember(teamId, uid) {
         await updateDoc(doc(db, "teams", teamId),
-            { participants: arrayUnion(uid)});
+            { participants: arrayUnion(uid) });
+    }
+    /**
+     * Removes team member from team data
+     *
+     * @static
+     * @param {string} teamId Team id
+     * @param {string} uid User id
+     * @memberof Database
+     */
+    static async removeTeamMember(teamId, uid) {
+        await updateDoc(doc(db, "teams", teamId),
+            { participants: arrayRemove(uid) });
+    }
+    static async getProtectedTeamData(teamId) {
+        return await getDoc(doc(db, "protected_team_data", teamId));
+    }
+    static async updateProtectedTeamData(teamId, protectedData) {
+        await updateDoc(doc(db, "protected_team_data", teamId),
+            { announcement: protectedData.announcement });
+    }
+    static async createNewTask(teamId, taskData) {
+        await updateDoc(doc(db, "protected_team_data", teamId),
+            { tasks: arrayUnion({ id: taskData.id, title: taskData.title, description: taskData.description, category: taskData.category }) });
+    }
+    static async removeTask(teamId, taskData) {
+        await updateDoc(doc(db, "protected_team_data", teamId),
+            { tasks: arrayRemove({ id: taskData.id, title: taskData.title, description: taskData.description, category: taskData.category }) });
+    }
+    static async updateTaskData(teamId, oldTaskData, newTaskData) {
+        await updateDoc(doc(db, "protected_team_data", teamId),
+            { tasks: arrayRemove({ id: oldTaskData.id, title: oldTaskData.title, description: oldTaskData.description, category: oldTaskData.category }) });
+        await updateDoc(doc(db, "protected_team_data", teamId),
+            { tasks: arrayUnion({ id: newTaskData.id, title: newTaskData.title, description: newTaskData.description, category: newTaskData.category }) });
     }
 }

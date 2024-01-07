@@ -1,19 +1,22 @@
-import { Button, Divider, IconButton, Modal, Typography } from "@mui/material";
+import { Button, Divider, Icon, IconButton, Modal, Typography } from "@mui/material";
 import { auth, db, storage } from "../utils/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { ref as storageRef, deleteObject } from "firebase/storage";
 import { v4 as uuidv4 } from 'uuid';
 import { useEffect, useState } from "react";
 import { TeamSettingsModal } from "./TeamSettingsModal";
+import MDEditor from "@uiw/react-md-editor";
 import ReactLoading from "react-loading";
 import SettingsIcon from '@mui/icons-material/Settings';
 import PeopleIcon from '@mui/icons-material/People';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
 import Database from "../utils/database";
 import "../css/TeamView.css"
 import { MembersModal } from "./MembersModal";
 import { JoinRequestsModal } from "./JoinRequestsModal";
 import { JoinModal } from "./JoinModal";
+import { EditAnnouncementModal } from "./EditAnnouncementModal";
 
 export const TeamView = (props) => {
     // loading states
@@ -24,11 +27,14 @@ export const TeamView = (props) => {
     const [joinRequestsModalOpen, setJoinRequestsModalOpen] = useState(false);
     const [joinModalOpen, setJoinModalOpen] = useState(false);
     const [membersOpen, setMembersOpen] = useState(false);
+    const [announcementEditOpen, setAnnouncementEditOpen] = useState(false);
 
     // component data states
     const [data, setData] = useState(null);
+    const [protectedData, setProtectedData] = useState({});
     const [participantData, setParticipantData] = useState([]);
     const [message, setMessage] = useState("");
+    const [announcement, setAnnouncement] = useState("");
 
     // modal state setters
     const handleJoinRequestsModalOpen = () => setJoinRequestsModalOpen(true);
@@ -39,6 +45,8 @@ export const TeamView = (props) => {
     const handleSettingsClose = () => setSettingsOpen(false);
     const handleMembersOpen = () => setMembersOpen(true);
     const handleMembersClose = () => setMembersOpen(false);
+    const handleAnnouncementEditOpen = () => setAnnouncementEditOpen(true);
+    const handleAnnouncementEditClose = () => setAnnouncementEditOpen(false);
 
     const getParticipants = async (participantUIDs) => {
         var participants = [];
@@ -54,9 +62,7 @@ export const TeamView = (props) => {
                 const prevImageRef = storageRef(storage, data.bannerImageURL);
                 deleteObject(prevImageRef);
             }
-            const imageRef = storageRef(storage, `banner_images/${uuidv4()}-${img.name}`);
-            const snapshot = await uploadBytes(imageRef, img)
-            const newURL = await getDownloadURL(snapshot.ref)
+            const newURL = await Database.uploadImage(img, `user/${auth.currentUser.uid}/public/images/${uuidv4()}-${img.name}`);
             let updatedData = data;
             updatedData.bannerImageURL = newURL;
             setData(updatedData);
@@ -78,10 +84,16 @@ export const TeamView = (props) => {
         setData(updatedData);
         Database.updateTeamInfo(props.teamId, info.title, info.description, info.publiclyVisible, info.joinable);
     }
+    const handleAnnouncementUpdate = (content) => {
+        let updatedProtectedData = protectedData;
+        updatedProtectedData.announcement = content;
+        setProtectedData(updatedProtectedData);
+        setAnnouncement(content);
+        Database.updateProtectedTeamData(props.teamId, updatedProtectedData);
+    }
     const handleJoin = (introduction) => {
         if (auth.currentUser.uid !== data.ownerUID && data.joinable) {
             Database.addPendingParticipant(props.teamId, auth.currentUser.uid, introduction);
-            Database.createJoinedTeamsLink(props.teamId, auth.currentUser.uid);
             setMessage("Join request initiated");
         }
     }
@@ -92,6 +104,13 @@ export const TeamView = (props) => {
     useEffect(() => {
         if (props.data) {
             setData(props.data);
+            Database.getProtectedTeamData(props.teamId)
+                .then((snapshot) => {
+                    setAnnouncement(snapshot.data().announcement);
+                })
+                .catch((exception) => {
+                    console.log("Permission error");
+                });
             getParticipants(props.data.participants);
             setLoading(false);
         }
@@ -148,7 +167,7 @@ export const TeamView = (props) => {
                                     <Modal
                                         open={membersOpen}
                                         onClose={handleMembersClose}>
-                                        <MembersModal data={data} />
+                                        <MembersModal data={data} teamId={props.teamId} />
                                     </Modal>
                                     <Modal
                                         open={joinRequestsModalOpen}
@@ -160,11 +179,22 @@ export const TeamView = (props) => {
                                     </Modal>
                                 </>
                             ) : (
-                                <Modal
-                                    open={joinModalOpen}
-                                    onClose={handleJoinModalClose}>
-                                    <JoinModal teamId={props.teamId} uid={auth.currentUser.uid} onSubmit={handleJoin} />
-                                </Modal>
+                                <>
+                                    {
+                                        auth.currentUser !== null ?
+                                            (
+                                                <Modal
+                                                    open={joinModalOpen}
+                                                    onClose={handleJoinModalClose}>
+                                                    <JoinModal teamId={props.teamId} uid={auth.currentUser.uid} onSubmit={handleJoin} />
+                                                </Modal>
+                                            ) :
+                                            (
+                                                <>
+                                                </>
+                                            )
+                                    }
+                                </>
                             )
                     }
 
@@ -186,58 +216,91 @@ export const TeamView = (props) => {
                         <div style={{ height: 100 }}></div>
                         <Typography variant="h2" className="team_title">{data.title}</Typography>
                         <div style={{ height: 30 }}></div>
-                        <Typography variant="h6">About:</Typography>
-                        <Typography>
-                            {data.description === "" ?
-                                <Typography sx={{ color: "var(--placeholder-color)", fontStyle: 'italic' }}>No description provided</Typography>
-                                : data.description}
-                        </Typography>
-                        <br />
-                        {
-                            data && (data.joinable ? (
-                                <Typography>New member joins are accepted</Typography>)
-                                : <Typography>New members are not accepted</Typography>)
-                        }
-                        {
-                            auth.currentUser !== null && (data && data.joinable && !data.participants.includes(auth.currentUser.uid)) &&
-                            (
+                        <div style={{
+                            width: auth.currentUser !== null &&
+                                ((data && data.participants.includes(auth.currentUser.uid)) ||
+                                    (data && auth.currentUser.uid === data.ownerUID)) ? "40vw" : "calc(100vw - 20px)", height: 240, display: "inline-block", verticalAlign: "top"
+                        }}>
+                            <Typography variant="h6">About:</Typography>
+                            <Typography>
+                                {data.description === "" ?
+                                    <Typography sx={{ color: "var(--placeholder-color)", fontStyle: 'italic' }}>No description provided</Typography>
+                                    : data.description}
+                            </Typography>
+                            <br />
+                            {
+                                data && (data.joinable ? (
+                                    <Typography>New member joins are accepted</Typography>)
+                                    : <Typography>New members are not accepted</Typography>)
+                            }
+                            {
+                                auth.currentUser !== null && (data && data.joinable && !data.participants.includes(auth.currentUser.uid)) &&
+                                (
+                                    <>
+                                        <Button
+                                            color="inherit"
+                                            variant="contained"
+                                            startIcon={<AddIcon />}
+                                            onClick={handleJoinModalOpen}
+                                            disableElevation>
+                                            Join
+                                        </Button>
+                                        <Typography color="success.main">{message}</Typography>
+                                    </>
+                                )
+                            }
+                            <Typography variant="h6">Related Links:</Typography>
+                            {data.links.map((link, key) => (
                                 <>
-                                    <Button
-                                        color="inherit"
-                                        variant="contained"
-                                        startIcon={<AddIcon />}
-                                        onClick={handleJoinModalOpen}
-                                        disableElevation>
-                                        Join
-                                    </Button>
-                                    <Typography color="success.main">{message}</Typography>
+                                    <a
+                                        href={link}
+                                        key={key}
+                                        style={{ color: "var(--placeholder-color)", textDecoration: "none" }}>
+                                        {link}
+                                    </a>
+                                    <br />
                                 </>
-                            )
-                        }
-                        <Typography variant="h6">Related Links:</Typography>
-                        {data.links.map((link, key) => (
-                            <>
-                                <a
-                                    href={link}
-                                    key={key}
-                                    style={{ color: "var(--placeholder-color)", textDecoration: "none" }}>
-                                    {link}
-                                </a>
-                                <br />
-                            </>
-                        ))}
-                        <Typography variant="h6">Participants:</Typography>
-
-                        <div style={{ width: "max(20%, 150px)", maxHeight: "200px", overflow: "scroll" }}>
-                            {participantData.map((items, key) => (
-                                <img key={key} className="profile_image" src={items.photoURL} alt={items.photoURL}></img>
                             ))}
+                            <Typography variant="h6">Participants:</Typography>
+
+                            <div style={{ width: "max(20%, 150px)", maxHeight: "200px", overflow: "scroll" }}>
+                                {participantData.map((items, key) => (
+                                    <img key={key} className="profile_image" src={items.photoURL} alt={items.photoURL}></img>
+                                ))}
+                            </div>
+                            {
+                                (auth.currentUser !== null && (data && auth.currentUser.uid === data.ownerUID)) &&
+                                (
+                                    <Button onClick={handleMembersOpen}>Edit</Button>
+                                )
+                            }
                         </div>
                         {
-                            (auth.currentUser !== null && (data && auth.currentUser.uid === data.ownerUID)) &&
-                            (
-                                <Button onClick={handleMembersOpen}>Edit</Button>
-                            )
+                            auth.currentUser !== null &&
+                            ((data && data.participants.includes(auth.currentUser.uid)) ||
+                                (data && auth.currentUser.uid === data.ownerUID)) &&
+                            <>
+                                <Modal
+                                    open={announcementEditOpen}
+                                    onClose={handleAnnouncementEditClose}>
+                                    <EditAnnouncementModal
+                                        announcement={announcement}
+                                        onAnnouncementUpdate={handleAnnouncementUpdate} />
+                                </Modal>
+                                <div className="announcement_board" style={{ overflow: "scroll" }}>
+                                    <div style={{ margin: 25 }}>
+                                        <IconButton style={{
+                                            float: "right",
+                                            zIndex: 1,
+                                            color: "inherit",
+                                        }}
+                                            onClick={handleAnnouncementEditOpen}>
+                                            <EditIcon />
+                                        </IconButton>
+                                        <MDEditor.Markdown source={announcement} />
+                                    </div>
+                                </div>
+                            </>
                         }
                         <Divider style={{ paddingBottom: 10 }} />
                     </div>

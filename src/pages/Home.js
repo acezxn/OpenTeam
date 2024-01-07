@@ -6,7 +6,7 @@ const Home = () => {
         <>
             <Navbar />
             <div style={{margin: 10}}>
-                <Typography variant="h2">Enables next generation teaming</Typography>
+                <Typography variant="h2">Facilitates communication between developers</Typography>
             </div>
         </>
     );

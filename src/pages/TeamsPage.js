@@ -4,6 +4,7 @@ import { collection, doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
 import { TeamView } from "../components/TeamView";
+import { TaskBoard } from "../components/TaskBoard";
 
 export const TeamsPage = () => {
     let { teamId } = useParams();
@@ -34,6 +35,12 @@ export const TeamsPage = () => {
             <TeamView
                 teamId={teamId}
                 data={data} />
+            {
+                ((data && data.participants.includes(auth.currentUser.uid)) ||
+                    (data && auth.currentUser.uid === data.ownerUID)) &&
+                <TaskBoard teamId={teamId} />
+            }
+
         </>
     )
 }

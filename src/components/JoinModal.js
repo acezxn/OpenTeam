@@ -11,7 +11,7 @@ const modalStyle = {
     transform: 'translate(-50%, -50%)',
     width: "max(50vw, 340px)",
     height: "70vh",
-    backgroundColor: 'rgb(40, 40, 40)',
+    backgroundColor: 'var(--background-color)',
     borderRadius: 4,
     overflow: "hidden",
     overflowY: "scroll",

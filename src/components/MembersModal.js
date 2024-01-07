@@ -4,6 +4,7 @@ import { styled } from '@mui/material/styles';
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../utils/firebase";
 import { useEffect, useState } from "react";
+import Database from "../utils/database";
 
 const modalStyle = {
     position: 'absolute',
@@ -12,7 +13,7 @@ const modalStyle = {
     transform: 'translate(-50%, -50%)',
     width: "max(50vw, 340px)",
     height: "70vh",
-    backgroundColor: 'rgb(40, 40, 40)',
+    backgroundColor: 'var(--background-color)',
     borderRadius: 4,
     overflow: "hidden",
     overflowY: "scroll",
@@ -30,7 +31,7 @@ const OutlinedList = styled(List)(({ theme }) => ({
 }));
 
 export const MembersModal = (props) => {
-    const [participantUID, setParticipantUID] = useState([]);
+    const [membersUID, setMembersUID] = useState([]);
     const [membersEmail, setMembersEmail] = useState([]);
     const [membersPhotoURL, setMembersPhotoURL] = useState([]);
 
@@ -42,9 +43,22 @@ export const MembersModal = (props) => {
             emails.push(data.email);
             photoURLs.push(data.photoURL);
         }
-        setParticipantUID(props.data.participants);
+        setMembersUID(props.data.participants);
         setMembersEmail(emails);
         setMembersPhotoURL(photoURLs);
+    }
+    const handleRemoveMember = (uid) => {
+        Database.removeTeamMember(props.teamId, uid);
+        let index = membersUID.indexOf(uid);
+        setMembersUID(membersUID.filter((uid, key) => {
+            return key !== index;
+        }));
+        setMembersEmail(membersEmail.filter((email, key) => {
+            return key !== index;
+        }));
+        setMembersPhotoURL(membersPhotoURL.filter((photoURL, key) => {
+            return key !== index;
+        }));
     }
     useEffect(() => {
         getMembers();
@@ -55,7 +69,7 @@ export const MembersModal = (props) => {
             <br />
             <Typography variant="h6" align="center">Members</Typography>
             <List variant="outlined">
-                {participantUID.map((uid, key) => (
+                {membersUID.map((uid, key) => (
                     <>
                         {
                             uid === props.data.ownerUID ? (
@@ -74,7 +88,7 @@ export const MembersModal = (props) => {
                                     <ListItem>
                                         <ListItemText
                                             key={key}>
-                                            <IconButton>
+                                            <IconButton onClick={() => {handleRemoveMember(uid)}}>
                                                 <DeleteIcon />
                                             </IconButton>
                                             <img alt="profile_image" className="profile_image" src={membersPhotoURL[key]} />
