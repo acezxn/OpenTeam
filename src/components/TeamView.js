@@ -1,4 +1,4 @@
-import { Button, Divider, Icon, IconButton, Modal, Typography } from "@mui/material";
+import { Button, Divider, IconButton, Modal, Typography } from "@mui/material";
 import { auth, db, storage } from "../utils/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { ref as storageRef, deleteObject } from "firebase/storage";
@@ -111,7 +111,7 @@ export const TeamView = (props) => {
                 .catch((exception) => {
                     console.log("Permission error");
                 });
-            getParticipants(props.data.participants);
+            getParticipants(props.participants);
             setLoading(false);
         }
     }, [props]);
@@ -167,7 +167,7 @@ export const TeamView = (props) => {
                                     <Modal
                                         open={membersOpen}
                                         onClose={handleMembersClose}>
-                                        <MembersModal data={data} teamId={props.teamId} />
+                                        <MembersModal data={data} participants={props.participants} teamId={props.teamId} />
                                     </Modal>
                                     <Modal
                                         open={joinRequestsModalOpen}
@@ -218,7 +218,7 @@ export const TeamView = (props) => {
                         <div style={{ height: 30 }}></div>
                         <div style={{
                             width: auth.currentUser !== null &&
-                                ((data && data.participants.includes(auth.currentUser.uid)) ||
+                                ((data && props.participants.includes(auth.currentUser.uid)) ||
                                     (data && auth.currentUser.uid === data.ownerUID)) ? "40vw" : "calc(100vw - 20px)", height: 240, display: "inline-block", verticalAlign: "top"
                         }}>
                             <Typography variant="h6">About:</Typography>
@@ -234,7 +234,9 @@ export const TeamView = (props) => {
                                     : <Typography>New members are not accepted</Typography>)
                             }
                             {
-                                auth.currentUser !== null && (data && data.joinable && !data.participants.includes(auth.currentUser.uid)) &&
+                                auth.currentUser !== null && 
+                                auth.currentUser.uid !== data.ownerUID &&
+                                (data && data.joinable && !props.participants.includes(auth.currentUser.uid)) &&
                                 (
                                     <>
                                         <Button
@@ -277,7 +279,7 @@ export const TeamView = (props) => {
                         </div>
                         {
                             auth.currentUser !== null &&
-                            ((data && data.participants.includes(auth.currentUser.uid)) ||
+                            ((data && props.participants.includes(auth.currentUser.uid)) ||
                                 (data && auth.currentUser.uid === data.ownerUID)) &&
                             <>
                                 <Modal

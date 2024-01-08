@@ -5,22 +5,23 @@ import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
 import { TeamView } from "../components/TeamView";
 import { TaskBoard } from "../components/TaskBoard";
+import Database from "../utils/database";
 
 export const TeamsPage = () => {
     let { teamId } = useParams();
     const navigate = useNavigate();
     const [data, setData] = useState(null);
-    const [teamTitle, setTeamTitle] = useState("");
-    const [teamDescription, setTeamDescription] = useState("");
-    const [links, setLinks] = useState([]);
+    const [participantData, setParticipantData] = useState([]);
     const colletionRef = collection(db, 'teams');
     const docRef = doc(colletionRef, teamId);
 
     async function refresh() {
+        setParticipantData((await Database.getPublicTeamData(teamId)).data().participants);
         try {
             const snapshot = await getDoc(docRef);
             const data = snapshot.data();
             setData(data);
+            
         } catch (exception) {
             navigate("/login");
         }
@@ -34,9 +35,10 @@ export const TeamsPage = () => {
             <Navbar />
             <TeamView
                 teamId={teamId}
+                participants={participantData}
                 data={data} />
             {
-                auth.currentUser !== null && (((data && data.participants.includes(auth.currentUser.uid)) ||
+                auth.currentUser !== null && (((participantData && participantData.includes(auth.currentUser.uid)) ||
                     (data && auth.currentUser.uid === data.ownerUID))) &&
                 <TaskBoard teamId={teamId} />
             }

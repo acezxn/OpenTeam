@@ -33,6 +33,7 @@ export const NewTaskModal = (props) => {
         let columnNames = []
         Object.entries(props.columns).filter(([id, column], index) => {
             columnNames.push(column.name);
+            return null;
         });
         setAvailableCategories(columnNames);
     }, [props]);

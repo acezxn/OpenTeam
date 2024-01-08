@@ -31,7 +31,7 @@ const Explore = () => {
                 ) : (
                     <div style={{ marginTop: 10, overflow: "auto" }}>
                         {teams.map((team, index) => (
-                            <TeamCard key={index} name={team.title} id={team.id} preview={true}/>
+                            <TeamCard key={index} name={team.title} id={team.id} />
                         ))}
                     </div>
                 )}

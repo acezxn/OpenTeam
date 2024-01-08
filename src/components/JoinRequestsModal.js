@@ -72,6 +72,7 @@ export const JoinRequestsModal = (props) => {
     const [participantsPhotoURL, setParticipantsPhotoURL] = useState([]);
     const [participantIntroduction, setParticipantIntroduction] = useState([]);
     const [expanded, setExpanded] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const handleAccept = (index) => {
         Database.removePendingParticipant(props.teamId, participantsUID[index], participantIntroduction[index]);
@@ -123,6 +124,7 @@ export const JoinRequestsModal = (props) => {
         setParticipantsEmail(emails);
         setParticipantsPhotoURL(photoURLs);
         setParticipantIntroduction(introductions);
+        setLoading(false);
     }
     useEffect(() => {
         getJoinRequests();
@@ -131,7 +133,14 @@ export const JoinRequestsModal = (props) => {
         <Box style={modalStyle}>
             <br />
             <Typography variant="h6" align="center">Join Requests</Typography>
-            {participantsUID.length === 0 ? (
+            {
+                loading && 
+                <>
+                    <br />
+                    <Typography align="center" sx={{ color: "var(--placeholder-color)", fontStyle: 'italic' }}>Still loading</Typography>
+                </>
+            }
+            {!loading && participantsUID.length === 0 ? (
                 <>
                     <br />
                     <Typography align="center" sx={{ color: "var(--placeholder-color)", fontStyle: 'italic' }}>No join requests</Typography>

@@ -1,5 +1,5 @@
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, db, storage } from "./firebase";
 
 export default class Database {
@@ -45,7 +45,6 @@ export default class Database {
             description: "",
             bannerImageURL: "",
             links: [],
-            participants: [auth.currentUser.uid],
             publiclyVisible: false,
             joinable: false,
             ownerUID: auth.currentUser.uid
@@ -62,6 +61,17 @@ export default class Database {
             taskCategories: ["Not started", "In progress", "Done"],
             tasks: []
         });
+        await setDoc(doc(db, "public_team_data", ref.id), {
+            participants: [auth.currentUser.uid]
+        });
+    }
+    static async getPublicTeamData(teamId) {
+        return getDoc(doc(db, "public_team_data", teamId));
+    }
+    static async updatePublicTeamData(teamId, teamData) {
+        await updateDoc(doc(db, "public_team_data", teamId), {
+            participants: teamData.participants
+        });
     }
     /**
      * Removes team data
@@ -75,8 +85,9 @@ export default class Database {
         await updateDoc(doc(db, "user_data", auth.currentUser.uid),
             { teams: arrayRemove(doc(db, 'teams', teamId)) }
         );
-        await deleteDoc(doc(db, "teams", teamId));
+        await deleteDoc(doc(db, "public_team_data", teamId));
         await deleteDoc(doc(db, "protected_team_data", teamId));
+        await deleteDoc(doc(db, "teams", teamId));
     }
     /**
      * Renames team
@@ -160,7 +171,7 @@ export default class Database {
      * @memberof Database
      */
     static async checkIsMember(teamId, uid) {
-        const data = (await getDoc(doc(db, "teams", teamId))).data();
+        const data = (await getDoc(doc(db, "public_team_data", teamId))).data();
         const participants = data.participants;
         return participants.includes(uid);
     }
@@ -246,7 +257,7 @@ export default class Database {
      * @memberof Database
      */
     static async addTeamMember(teamId, uid) {
-        await updateDoc(doc(db, "teams", teamId),
+        await updateDoc(doc(db, "public_team_data", teamId),
             { participants: arrayUnion(uid) });
     }
     /**
@@ -258,8 +269,12 @@ export default class Database {
      * @memberof Database
      */
     static async removeTeamMember(teamId, uid) {
-        await updateDoc(doc(db, "teams", teamId),
+        try {
+            await updateDoc(doc(db, "public_team_data", teamId),
             { participants: arrayRemove(uid) });
+        } catch (exception) {
+            console.log("permission error");
+        }
     }
     static async getProtectedTeamData(teamId) {
         return await getDoc(doc(db, "protected_team_data", teamId));

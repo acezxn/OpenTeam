@@ -34,50 +34,52 @@ const Teams = () => {
         const snapshot = await getDoc(docRef);
         const data = snapshot.data();
         if (data !== null && data !== undefined) {
-            await getOwnedTeamsData(snapshot.data().teams);
-            await getJoinedTeamsData(snapshot.data().joinedTeams);
-            await getPendingTeamsData(snapshot.data().pendingTeams);
+            await getTeamData(snapshot.data());
         }
         setLoading(false);
     }
-    async function getOwnedTeamsData(teamDocArray) {
-        let items = [];
-        for (let teamDoc of teamDocArray) {
+    async function getTeamData(data) {
+        let teamItems = [];
+        let joinedTeamItems = [];
+        let pendingTeamItems = [];
+        for (let teamDoc of data.teams) {
             const teamSnapShot = await getDoc(teamDoc);
-            items.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
+            teamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
         }
-        setOwnedTeams(items);
-    }
-    async function getJoinedTeamsData(teamDocArray) {
-        let items = [];
-        for (let teamDoc of teamDocArray) {
+        
+        for (let teamDoc of data.joinedTeams) {
             const teamSnapShot = await getDoc(teamDoc);
             const isMember = await Database.checkIsMember(teamDoc.id, auth.currentUser.uid);
             if (!isMember) {
                 Database.removeTeamsLink(teamDoc.id, auth.currentUser.uid);
             } else {
-                items.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
+                joinedTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
             }
         }
-        setJoinedTeams(items);
-    }
-    async function getPendingTeamsData(teamDocArray) {
-        let items = [];
-        for (let teamDoc of teamDocArray) {
+        
+        for (let teamDoc of data.pendingTeams) {
             const teamSnapShot = await getDoc(teamDoc);
             const isMember = await Database.checkIsMember(teamDoc.id, auth.currentUser.uid);
             if (isMember) {
                 Database.createJoinedTeamsLink(teamDoc.id, auth.currentUser.uid);
+                joinedTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
+            } else {
+                pendingTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
             }
-            items.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
         }
-        setPendingTeams(items);
+        
+        setOwnedTeams(teamItems);
+        setJoinedTeams(joinedTeamItems);
+        setPendingTeams(pendingTeamItems);
     }
+
     function handleTeamChange(message) {
         if (message === "delete") {
             setLoadingMessage("Deleting team");
         } else if (message === "rename") {
             setLoadingMessage("Renaming team");
+        } else if (message === "leave") {
+            setLoadingMessage("Leaving team");
         }
         refresh();
     }
@@ -112,7 +114,7 @@ const Teams = () => {
                         <Divider style={{ paddingBottom: 10 }} />
                         <div style={{ marginTop: 10, overflow: "auto" }}>
                             {ownedTeams.map((team, index) => (
-                                <TeamCard key={index} name={team.data.title} id={team.teamId} onChange={handleTeamChange} />
+                                <TeamCard key={index} name={team.data.title} id={team.teamId} onChange={handleTeamChange} permission="owner" />
                             ))}
                         </div>
                         <Divider style={{ paddingBottom: 10 }} />
@@ -122,7 +124,7 @@ const Teams = () => {
 
                         <div style={{ marginTop: 10, overflow: "auto" }}>
                             {joinedTeams.map((team, index) => (
-                                <TeamCard key={index} name={team.data.title} id={team.teamId} preview={true} />
+                                <TeamCard key={index} name={team.data.title} id={team.teamId} onChange={handleTeamChange} permission="member" />
                             ))}
                         </div>
                         <Divider style={{ paddingBottom: 10 }} />
@@ -130,7 +132,7 @@ const Teams = () => {
                         <Typography variant="h6">Pending teams</Typography>
                         <div style={{ marginTop: 10, overflow: "auto" }}>
                             {pendingTeams.map((team, index) => (
-                                <TeamCard key={index} name={team.data.title} id={team.teamId} preview={true} />
+                                <TeamCard key={index} name={team.data.title} id={team.teamId} onChange={handleTeamChange} permission="member" />
                             ))}
                         </div>
                         <Divider style={{ paddingBottom: 10 }} />

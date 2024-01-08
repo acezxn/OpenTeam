@@ -5,6 +5,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useState } from 'react';
 import Database from '../utils/database';
 import { useNavigate } from 'react-router-dom';
+import { auth } from '../utils/firebase';
 
 const modalStyle = {
     position: 'absolute',
@@ -44,9 +45,14 @@ const TeamCard = (props) => {
         await Database.removeTeam(cardId);
         props.onChange("delete");
     }
+    async function onLeaveTeam() {
+        await Database.removeTeamsLink(cardId, auth.currentUser.uid);
+        await Database.removeTeamMember(cardId, auth.currentUser.uid);
+        props.onChange("leave");
+    }
     return (
         <div style={{ display: "inline-block", padding: 5 }}>
-            {!props.preview && (
+            {props.permission === "owner" && (
                 <Modal
                     open={modalOpen}
                     onClose={handleModalClose}>
@@ -68,15 +74,27 @@ const TeamCard = (props) => {
                 </Modal>
             )}
 
-            <Menu
-                anchorEl={anchorElement}
-                open={menuOpened}
-                onClose={handleMenuClose}>
-                <MenuItem onClick={handleModalOpen}>Rename team</MenuItem>
-                <MenuItem onClick={onRemoveTeam}>Delete team</MenuItem>
-            </Menu>
             {
-                !props.preview ? (
+                props.permission === "owner" &&
+                <Menu
+                    anchorEl={anchorElement}
+                    open={menuOpened}
+                    onClose={handleMenuClose}>
+                    <MenuItem onClick={handleModalOpen}>Rename team</MenuItem>
+                    <MenuItem onClick={onRemoveTeam}>Delete team</MenuItem>
+                </Menu>
+            }
+            {
+                props.permission === "member" &&
+                <Menu
+                    anchorEl={anchorElement}
+                    open={menuOpened}
+                    onClose={handleMenuClose}>
+                    <MenuItem onClick={onLeaveTeam}>Leave team</MenuItem>
+                </Menu>
+            }
+            {
+                props.permission === "owner" ? (
                     <div className="card">
                         <div style={{ display: "inline-block" }} onClick={() => { navigate(`/teams-page/${cardId}`) }}>
                             <SchemaIcon style={{ verticalAlign: "middle" }} fontSize='medium' />
@@ -85,12 +103,26 @@ const TeamCard = (props) => {
                         <Button onClick={handleMenuOpen}><MoreVertIcon fontSize='medium' /></Button>
                     </div>
                 ) : (
-                    <div className="card" onClick={() => { navigate(`/teams-page/${cardId}`) }}>
-                        <div style={{ display: "inline-block" }}>
-                            <SchemaIcon style={{ verticalAlign: "middle" }} fontSize='medium' />
-                            <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "min(max(16vw, 1px), 100px)", marginLeft: 10 }}>{props.name}</Typography>
-                        </div>
-                    </div>
+                    <>
+                        {
+                            props.permission === "member" ? (
+                                <div className="card">
+                                    <div style={{ display: "inline-block" }} onClick={() => { navigate(`/teams-page/${cardId}`) }}>
+                                        <SchemaIcon style={{ verticalAlign: "middle" }} fontSize='medium' />
+                                        <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "min(max(16vw, 1px), 100px)", marginLeft: 10 }}>{props.name}</Typography>
+                                    </div>
+                                    <Button onClick={handleMenuOpen}><MoreVertIcon fontSize='medium' /></Button>
+                                </div>
+                            ) : (
+                                <div className="card" onClick={() => { navigate(`/teams-page/${cardId}`) }}>
+                                    <div style={{ display: "inline-block" }}>
+                                        <SchemaIcon style={{ verticalAlign: "middle" }} fontSize='medium' />
+                                        <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "min(max(16vw, 1px), 100px)", marginLeft: 10 }}>{props.name}</Typography>
+                                    </div>
+                                </div>
+                            )
+                        }
+                    </>
                 )
             }
 

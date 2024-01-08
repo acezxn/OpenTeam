@@ -38,12 +38,13 @@ export const MembersModal = (props) => {
     const getMembers = async () => {
         let emails = [];
         let photoURLs = [];
-        for (let uid of props.data.participants) {
+        console.log(props);
+        for (let uid of props.participants) {
             let data = (await getDoc(doc(db, "public_user_data", uid))).data();
             emails.push(data.email);
             photoURLs.push(data.photoURL);
         }
-        setMembersUID(props.data.participants);
+        setMembersUID(props.participants);
         setMembersEmail(emails);
         setMembersPhotoURL(photoURLs);
     }
