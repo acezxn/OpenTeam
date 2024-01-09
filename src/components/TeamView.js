@@ -4,7 +4,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { ref as storageRef, deleteObject } from "firebase/storage";
 import { v4 as uuidv4 } from 'uuid';
 import { useEffect, useState } from "react";
-import { TeamSettingsModal } from "./TeamSettingsModal";
+import { TeamSettingsModal } from "./modals/TeamSettingsModal";
 import MDEditor from "@uiw/react-md-editor";
 import ReactLoading from "react-loading";
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -13,10 +13,10 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import Database from "../utils/database";
 import "../css/TeamView.css"
-import { MembersModal } from "./MembersModal";
-import { JoinRequestsModal } from "./JoinRequestsModal";
-import { JoinModal } from "./JoinModal";
-import { EditAnnouncementModal } from "./EditAnnouncementModal";
+import { MembersModal } from "./modals/MembersModal";
+import { JoinRequestsModal } from "./modals/JoinRequestsModal";
+import { JoinModal } from "./modals/JoinModal";
+import { EditAnnouncementModal } from "./modals/EditAnnouncementModal";
 
 export const TeamView = (props) => {
     // loading states

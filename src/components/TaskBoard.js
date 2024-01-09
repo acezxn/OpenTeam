@@ -1,28 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import Database from "../utils/database";
-import { Button, IconButton, Modal, TextField, Typography } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
-import { NewTaskModal } from "./NewTaskModal";
+import { Button, IconButton, Modal, Typography } from "@mui/material";
+import { NewTaskModal } from "./modals/NewTaskModal";
 import { v4 as uuidv4 } from 'uuid';
+import { EditTaskModal } from "./modals/EditTaskModal";
+import AddIcon from '@mui/icons-material/Add';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 var categoryToIdMap = {};
 
-
-
 export const TaskBoard = (props) => {
     const [columns, setColumns] = useState({});
+    const [selectedTaskData, setSelectedTaskData] = useState({});
+    const [selectedColumn, setSeletedColumn] = useState({});
+    const [selectedColumnId, setSeletedColumnId] = useState("");
 
     // Modal states
     const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
+    const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
 
     const handleNewTaskModalOpen = () => setNewTaskModalOpen(true);
     const handleNewTaskModalClose = () => setNewTaskModalOpen(false);
+    const handleEditTaskModalOpen = () => setEditTaskModalOpen(true);
+    const handleEditTaskModalClose = () => setEditTaskModalOpen(false);
 
     const onDragEnd = (result) => {
         if (!result.destination) return;
         const { source, destination } = result;
-    
+
         if (source.droppableId !== destination.droppableId) {
             const sourceColumn = columns[source.droppableId];
             const destColumn = columns[destination.droppableId];
@@ -64,7 +71,7 @@ export const TaskBoard = (props) => {
             });
         }
     };
-    
+
     const getTaskData = async () => {
         let snapshot = await Database.getProtectedTeamData(props.teamId);
         let data = snapshot.data();
@@ -100,8 +107,8 @@ export const TaskBoard = (props) => {
         setColumns(columnsData);
         handleNewTaskModalClose();
     }
-    const handleTaskRemove = async (columnId, column, item) => {
-        await Database.removeTask(props.teamId, {category: column.name, ...item});
+    const handleTaskRemove = (columnId, column, item) => {
+        Database.removeTask(props.teamId, { category: column.name, ...item });
         setColumns({
             ...columns,
             [columnId]: {
@@ -109,6 +116,30 @@ export const TaskBoard = (props) => {
                 items: column.items.filter((searchItem, index) => {
                     return searchItem !== item;
                 })
+            }
+        });
+    }
+    const handleTaskUpdate = (taskData) => {
+        Database.updateTaskData(
+            props.teamId,
+            { ...selectedTaskData, category: selectedColumn.name },
+            { ...taskData, category: selectedColumn.name }
+        );
+
+        // replace the old team data with the new team data
+        let tasks = [];
+        for (let index = 0; index < selectedColumn.items.length; index++) {
+            if (selectedColumn.items[index] === selectedTaskData) {
+                tasks.push({ ...taskData, id: selectedColumn.items[index].id });
+            } else {
+                tasks.push(selectedColumn.items[index]);
+            }
+        }
+        setColumns({
+            ...columns,
+            [selectedColumnId]: {
+                ...selectedColumn,
+                items: tasks
             }
         });
     }
@@ -122,6 +153,17 @@ export const TaskBoard = (props) => {
             <Modal open={newTaskModalOpen} onClose={handleNewTaskModalClose}>
                 <NewTaskModal columns={columns} onNewTask={handleNewTask} />
             </Modal>
+            <Modal open={editTaskModalOpen} onClose={handleEditTaskModalClose}>
+                <EditTaskModal
+                    columns={columns}
+                    taskData={selectedTaskData}
+                    onTaskDelete={() => {
+                        handleTaskRemove(selectedColumnId, selectedColumn, selectedTaskData);
+                        handleEditTaskModalClose();
+                    }}
+                    onTaskUpdate={handleTaskUpdate}
+                />
+            </Modal>
             <div style={{ margin: 10 }}>
                 <Button onClick={handleNewTaskModalOpen}>Create task</Button>
                 <br />
@@ -131,83 +173,94 @@ export const TaskBoard = (props) => {
                     >
                         {Object.entries(columns).map(([columnId, column], index) => {
                             return (
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        alignItems: "center"
-                                    }}
-                                    key={columnId}
-                                >
-                                    <h2>{column.name}</h2>
-                                    <div style={{ margin: 8 }}>
-                                        <Droppable droppableId={columnId} key={columnId}>
-                                            {(provided, snapshot) => {
-                                                return (
-                                                    <div
-                                                        {...provided.droppableProps}
-                                                        ref={provided.innerRef}
-                                                        style={{
-                                                            background: snapshot.isDraggingOver
-                                                                ? "var(--board-focus-color)"
-                                                                : "var(--board-color)",
-                                                            padding: 4,
-                                                            borderRadius: 7,
-                                                            width: 250,
-                                                            minHeight: 500
-                                                        }}
-                                                    >
-                                                        {column.items.map((item, index) => {
-                                                            return (
-                                                                <Draggable
-                                                                    key={item.id}
-                                                                    draggableId={item.id}
-                                                                    index={index}
-                                                                >
-                                                                    {(provided, snapshot) => {
-                                                                        return (
-                                                                            <div
-                                                                                ref={provided.innerRef}
-                                                                                {...provided.draggableProps}
-                                                                                {...provided.dragHandleProps}
+                                <div key={columnId}>
+                                    <Typography variant="h6" style={{ display: "inline-block", marginLeft: 20, width: 200 }}>{column.name}</Typography>
+                                    <IconButton>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                    <Droppable droppableId={columnId} key={columnId}>
+                                        {(provided, snapshot) => {
+                                            return (
+                                                <div
+                                                    {...provided.droppableProps}
+                                                    ref={provided.innerRef}
+                                                    style={{
+                                                        background: snapshot.isDraggingOver
+                                                            ? "var(--board-focus-color)"
+                                                            : "var(--board-color)",
+                                                        padding: 4,
+                                                        borderRadius: 7,
+                                                        width: 250,
+                                                        height: 500,
+                                                        overflow: "scroll",
+                                                        margin: 8
+                                                    }}
+                                                >
+
+                                                    {column.items.map((item, index) => {
+                                                        return (
+                                                            <Draggable
+                                                                key={item.id}
+                                                                draggableId={item.id}
+                                                                index={index}
+                                                            >
+                                                                {(provided, snapshot) => {
+                                                                    return (
+                                                                        <div
+                                                                            ref={provided.innerRef}
+                                                                            {...provided.draggableProps}
+                                                                            {...provided.dragHandleProps}
+                                                                            style={{
+                                                                                userSelect: "none",
+                                                                                padding: 16,
+                                                                                margin: "0 0 8px 0",
+                                                                                backgroundColor: snapshot.isDragging
+                                                                                    ? "#1d2d33"
+                                                                                    : "#2d454f",
+                                                                                color: "white",
+                                                                                borderRadius: 7,
+                                                                                overflow: "auto",
+                                                                                ...provided.draggableProps.style
+                                                                            }}
+                                                                        >
+                                                                            <Typography
                                                                                 style={{
-                                                                                    userSelect: "none",
-                                                                                    padding: 16,
-                                                                                    margin: "0 0 8px 0",
-                                                                                    backgroundColor: snapshot.isDragging
-                                                                                        ? "#1d2d33"
-                                                                                        : "#2d454f",
-                                                                                    color: "white",
-                                                                                    borderRadius: 7,
-                                                                                    overflow: "auto",
-                                                                                    ...provided.draggableProps.style
-                                                                                }}
-                                                                            >
-                                                                                <Typography
-                                                                                    style={{
-                                                                                        verticalAlign: "middle",
-                                                                                        display: "inline-block",
-                                                                                        width: 170
-                                                                                    }}>{item.title}</Typography>
-                                                                                <IconButton onClick={() => {handleTaskRemove(columnId, column, item)}}>
-                                                                                    <DeleteIcon />
-                                                                                </IconButton>
-                                                                            </div>
-                                                                        );
-                                                                    }}
-                                                                </Draggable>
-                                                            );
-                                                        })}
-                                                        {provided.placeholder}
-                                                    </div>
-                                                );
-                                            }}
-                                        </Droppable>
-                                    </div>
+                                                                                    verticalAlign: "middle",
+                                                                                    display: "inline-block",
+                                                                                    width: 170
+                                                                                }}>{item.title}</Typography>
+                                                                            {/* <IconButton onClick={() => { handleTaskRemove(columnId, column, item) }}>
+                                                                                <MoreVertIcon />
+                                                                            </IconButton> */}
+                                                                            <IconButton onClick={() => {
+                                                                                setSeletedColumn(column);
+                                                                                setSeletedColumnId(columnId);
+                                                                                setSelectedTaskData(item);
+                                                                                handleEditTaskModalOpen();
+                                                                            }}>
+                                                                                <MoreVertIcon />
+                                                                            </IconButton>
+
+                                                                        </div>
+                                                                    );
+                                                                }}
+                                                            </Draggable>
+                                                        );
+                                                    })}
+                                                    {provided.placeholder}
+                                                </div>
+                                            );
+                                        }}
+                                    </Droppable>
                                 </div>
                             );
                         })}
                     </DragDropContext>
+                    <div style={{ verticalAlign: "middle" }}>
+                        <p style={{ paddingTop: 30 }}>
+                            <Button startIcon={<AddIcon />}>Add board</Button>
+                        </p>
+                    </div>
                 </div>
             </div>
         </>
