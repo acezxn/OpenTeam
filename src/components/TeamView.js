@@ -66,14 +66,14 @@ export const TeamView = (props) => {
             let updatedData = data;
             updatedData.bannerImageURL = newURL;
             setData(updatedData);
-            Database.updateTeamBannerImageURL(props.teamId, newURL);
+            Database.TeamManager.updateTeamBannerImageURL(props.teamId, newURL);
         }
     }
     const handleLinkUpdate = (links) => {
         let updatedData = data;
         updatedData.links = links;
         setData(updatedData);
-        Database.updateTeamLinks(props.teamId, links);
+        Database.TeamManager.updateTeamLinks(props.teamId, links);
     }
     const handleTeamInfoUpdate = (info) => {
         let updatedData = data;
@@ -82,18 +82,18 @@ export const TeamView = (props) => {
         updatedData.publiclyVisible = info.publiclyVisible;
         updatedData.joinable = info.joinable;
         setData(updatedData);
-        Database.updateTeamInfo(props.teamId, info.title, info.description, info.publiclyVisible, info.joinable);
+        Database.TeamManager.updateTeamInfo(props.teamId, info.title, info.description, info.publiclyVisible, info.joinable);
     }
     const handleAnnouncementUpdate = (content) => {
         let updatedProtectedData = protectedData;
         updatedProtectedData.announcement = content;
         setProtectedData(updatedProtectedData);
         setAnnouncement(content);
-        Database.updateProtectedTeamData(props.teamId, updatedProtectedData);
+        Database.TeamManager.updateProtectedTeamData(props.teamId, updatedProtectedData);
     }
     const handleJoin = (introduction) => {
         if (auth.currentUser.uid !== data.ownerUID && data.joinable) {
-            Database.addPendingParticipant(props.teamId, auth.currentUser.uid, introduction);
+            Database.TeamManager.addPendingParticipant(props.teamId, auth.currentUser.uid, introduction);
             setMessage("Join request initiated");
         }
     }
@@ -104,7 +104,7 @@ export const TeamView = (props) => {
     useEffect(() => {
         if (props.data) {
             setData(props.data);
-            Database.getProtectedTeamData(props.teamId)
+            Database.TeamManager.getProtectedTeamData(props.teamId)
                 .then((snapshot) => {
                     setAnnouncement(snapshot.data().announcement);
                 })

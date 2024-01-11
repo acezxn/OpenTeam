@@ -16,7 +16,7 @@ export const TeamsPage = () => {
     const docRef = doc(colletionRef, teamId);
 
     async function refresh() {
-        setParticipantData((await Database.getPublicTeamData(teamId)).data().participants);
+        setParticipantData((await Database.TeamManager.getPublicTeamData(teamId)).data().participants);
         try {
             const snapshot = await getDoc(docRef);
             const data = snapshot.data();

@@ -13,10 +13,10 @@ const Login = () => {
     const onLogin = async (event) => {
         try {
             await signInWithGithubPopup();
-            Database.createUserData(auth.currentUser.uid);
+            Database.UserManager.createUserData(auth.currentUser.uid);
             navigate("/");
         } catch (exception) {
-            
+
         }
     }
 

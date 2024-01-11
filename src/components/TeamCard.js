@@ -37,17 +37,17 @@ const TeamCard = (props) => {
     }
     async function handleTeamRename(event) {
         event.preventDefault();
-        await Database.renameTeam(cardId, teamTitle);
+        await Database.TeamManager.renameTeam(cardId, teamTitle);
         handleModalClose();
         props.onChange("rename");
     }
     async function onRemoveTeam() {
-        await Database.removeTeam(cardId);
+        await Database.TeamManager.removeTeam(cardId);
         props.onChange("delete");
     }
     async function onLeaveTeam() {
-        await Database.removeTeamsLink(cardId, auth.currentUser.uid);
-        await Database.removeTeamMember(cardId, auth.currentUser.uid);
+        await Database.TeamManager.removeTeamsLink(cardId, auth.currentUser.uid);
+        await Database.TeamManager.removeTeamMember(cardId, auth.currentUser.uid);
         props.onChange("leave");
     }
     return (

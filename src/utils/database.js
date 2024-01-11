@@ -2,7 +2,24 @@ import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, se
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, db, storage } from "./firebase";
 
+
 export default class Database {
+    /**
+     * Upload image to firebase storage
+     *
+     * @static
+     * @param {File} img image file
+     * @param {string} path storage path
+     * @return {string} download url for the image
+     * @memberof Database
+     */
+    static async uploadImage(img, path) {
+        const imageRef = storageRef(storage, path);
+        const snapshot = await uploadBytes(imageRef, img);
+        return await getDownloadURL(snapshot.ref)
+    }
+}
+Database.UserManager = class {
     /**
      * Creates user data, including both public and private user data
      *
@@ -33,6 +50,22 @@ export default class Database {
             });
         }
     }
+    /**
+     * Checks whether a user is a member of the team
+     *
+     * @static
+     * @param {string} teamId Team id
+     * @param {string} uid User id
+     * @return {boolean} whether a user is a member of the team
+     * @memberof Database
+     */
+    static async checkIsMember(teamId, uid) {
+        const data = (await getDoc(doc(db, "public_team_data", teamId))).data();
+        const participants = data.participants;
+        return participants.includes(uid);
+    }
+}
+Database.TeamManager = class {
     /**
      * Creates team data
      *
@@ -65,14 +98,6 @@ export default class Database {
             participants: [auth.currentUser.uid]
         });
     }
-    static async getPublicTeamData(teamId) {
-        return getDoc(doc(db, "public_team_data", teamId));
-    }
-    static async updatePublicTeamData(teamId, teamData) {
-        await updateDoc(doc(db, "public_team_data", teamId), {
-            participants: teamData.participants
-        });
-    }
     /**
      * Removes team data
      *
@@ -101,6 +126,14 @@ export default class Database {
         await setDoc(doc(db, "teams", teamId),
             { title: title },
             { merge: true });
+    }
+    static async getPublicTeamData(teamId) {
+        return getDoc(doc(db, "public_team_data", teamId));
+    }
+    static async updatePublicTeamData(teamId, teamData) {
+        await updateDoc(doc(db, "public_team_data", teamId), {
+            participants: teamData.participants
+        });
     }
     /**
      * Update team related links
@@ -136,20 +169,6 @@ export default class Database {
             { description: description });
     }
     /**
-     * Upload image to firebase storage
-     *
-     * @static
-     * @param {File} img image file
-     * @param {string} path storage path
-     * @return {string} download url for the image
-     * @memberof Database
-     */
-    static async uploadImage(img, path) {
-        const imageRef = storageRef(storage, path);
-        const snapshot = await uploadBytes(imageRef, img);
-        return await getDownloadURL(snapshot.ref)
-    }
-    /**
      * Updates team banner image url
      *
      * @static
@@ -160,20 +179,6 @@ export default class Database {
     static async updateTeamBannerImageURL(teamId, url) {
         await updateDoc(doc(db, "teams", teamId),
             { bannerImageURL: url });
-    }
-    /**
-     * Checks whether a user is a member of the team
-     *
-     * @static
-     * @param {string} teamId Team id
-     * @param {string} uid User id
-     * @return {boolean} whether a user is a member of the team
-     * @memberof Database
-     */
-    static async checkIsMember(teamId, uid) {
-        const data = (await getDoc(doc(db, "public_team_data", teamId))).data();
-        const participants = data.participants;
-        return participants.includes(uid);
     }
     /**
      * Records join requests of pending participants, and add pending team linkage in user data
@@ -229,9 +234,9 @@ export default class Database {
      * @memberof Database
      */
     static async removeTeamsLink(teamId, uid) {
-        await updateDoc(doc(db, "user_data", uid),
+        updateDoc(doc(db, "user_data", uid),
             { pendingTeams: arrayRemove(doc(db, "teams", teamId)) });
-        await updateDoc(doc(db, "user_data", uid),
+        updateDoc(doc(db, "user_data", uid),
             { joinedTeams: arrayRemove(doc(db, "teams", teamId)) });
     }
     /**
@@ -243,9 +248,9 @@ export default class Database {
      * @memberof Database
      */
     static async createJoinedTeamsLink(teamId, uid) {
-        await updateDoc(doc(db, "user_data", uid),
+        updateDoc(doc(db, "user_data", uid),
             { pendingTeams: arrayRemove(doc(db, "teams", teamId)) });
-        await updateDoc(doc(db, "user_data", uid),
+        updateDoc(doc(db, "user_data", uid),
             { joinedTeams: arrayUnion(doc(db, "teams", teamId)) });
     }
     /**
@@ -271,7 +276,7 @@ export default class Database {
     static async removeTeamMember(teamId, uid) {
         try {
             await updateDoc(doc(db, "public_team_data", teamId),
-            { participants: arrayRemove(uid) });
+                { participants: arrayRemove(uid) });
         } catch (exception) {
             console.log("permission error");
         }
@@ -283,6 +288,8 @@ export default class Database {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { announcement: protectedData.announcement });
     }
+}
+Database.TeamManager.TasksManager = class {
     static async createNewTask(teamId, taskData) {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { tasks: arrayUnion({ id: taskData.id, title: taskData.title, description: taskData.description, category: taskData.category }) });
@@ -291,10 +298,27 @@ export default class Database {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { tasks: arrayRemove({ id: taskData.id, title: taskData.title, description: taskData.description, category: taskData.category }) });
     }
-    static async updateTaskData(teamId, oldTaskData, newTaskData) {
+    static async updateTaskData(teamId, oldCategoryName, newCategoryName, taskData) {
         await updateDoc(doc(db, "protected_team_data", teamId),
-            { tasks: arrayRemove({ id: oldTaskData.id, title: oldTaskData.title, description: oldTaskData.description, category: oldTaskData.category }) });
+            { tasks: arrayRemove({ id: taskData.id, title: taskData.title, description: taskData.description, category: oldCategoryName }) });
         await updateDoc(doc(db, "protected_team_data", teamId),
-            { tasks: arrayUnion({ id: newTaskData.id, title: newTaskData.title, description: newTaskData.description, category: newTaskData.category }) });
+            { tasks: arrayUnion({ id: taskData.id, title: taskData.title, description: taskData.description, category: newCategoryName }) });
+    }
+    static async createCategory(teamId, category) {
+        await updateDoc(doc(db, "protected_team_data", teamId),
+            { taskCategories: arrayUnion(category) });
+    }
+    static async removeCategory(teamId, category) {
+        updateDoc(doc(db, "protected_team_data", teamId),
+            { taskCategories: arrayRemove(category) });
+        let tasks = (await getDoc(doc(db, "protected_team_data", teamId))).data().tasks;
+        for (let index = 0; index < tasks.length; index++) {
+            if (tasks[index].category === category) {
+                tasks.splice(index, 1);
+                index--;
+            }
+        }
+        updateDoc(doc(db, "protected_team_data", teamId),
+            { tasks: tasks });
     }
 }

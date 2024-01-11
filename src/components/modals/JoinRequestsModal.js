@@ -75,8 +75,8 @@ export const JoinRequestsModal = (props) => {
     const [loading, setLoading] = useState(true);
 
     const handleAccept = (index) => {
-        Database.removePendingParticipant(props.teamId, participantsUID[index], participantIntroduction[index]);
-        Database.addTeamMember(props.teamId, participantsUID[index]);
+        Database.TeamManager.removePendingParticipant(props.teamId, participantsUID[index], participantIntroduction[index]);
+        Database.TeamManager.addTeamMember(props.teamId, participantsUID[index]);
         setParticipantsUID(participantsUID.filter((uid, key) => {
             return key !== index;
         }));
@@ -90,7 +90,7 @@ export const JoinRequestsModal = (props) => {
     }
 
     const handleDecline = (index) => {
-        Database.removePendingParticipant(props.teamId, participantsUID[index], participantIntroduction[index]);
+        Database.TeamManager.removePendingParticipant(props.teamId, participantsUID[index], participantIntroduction[index]);
         setParticipantsUID(participantsUID.filter((uid, key) => {
             return key !== index;
         }));

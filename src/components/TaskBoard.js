@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import Database from "../utils/database";
-import { Button, IconButton, Modal, Typography } from "@mui/material";
+import { Button, IconButton, Menu, MenuItem, Modal, Typography } from "@mui/material";
 import { NewTaskModal } from "./modals/NewTaskModal";
 import { v4 as uuidv4 } from 'uuid';
 import { EditTaskModal } from "./modals/EditTaskModal";
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import DeleteIcon from '@mui/icons-material/Delete';
-
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { NewCategoryModal } from "./modals/NewCategoryModal";
 var categoryToIdMap = {};
 
 export const TaskBoard = (props) => {
@@ -16,15 +16,25 @@ export const TaskBoard = (props) => {
     const [selectedTaskData, setSelectedTaskData] = useState({});
     const [selectedColumn, setSeletedColumn] = useState({});
     const [selectedColumnId, setSeletedColumnId] = useState("");
+    const [anchorElement, setAnchorElement] = useState(null);
 
-    // Modal states
+    // Modal and menu states
     const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
+    const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
     const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const handleNewTaskModalOpen = () => setNewTaskModalOpen(true);
     const handleNewTaskModalClose = () => setNewTaskModalOpen(false);
+    const handleNewCategoryModalOpen = () => setNewCategoryModalOpen(true);
+    const handleNewCategoryModalClose = () => setNewCategoryModalOpen(false);
     const handleEditTaskModalOpen = () => setEditTaskModalOpen(true);
     const handleEditTaskModalClose = () => setEditTaskModalOpen(false);
+    const handleMenuOpen = (e) => {
+        setAnchorElement(e.target);
+        setMenuOpen(true)
+    };
+    const handleMenuClose = () => setMenuOpen(false);
 
     const onDragEnd = (result) => {
         if (!result.destination) return;
@@ -35,17 +45,18 @@ export const TaskBoard = (props) => {
             const destColumn = columns[destination.droppableId];
             const sourceItems = [...sourceColumn.items];
             const destItems = [...destColumn.items];
-            const [removed] = sourceItems.splice(source.index, 1);
-            destItems.splice(destination.index, 0, removed);
-            Database.updateTaskData(props.teamId,
-                {
-                    category: sourceColumn.name,
-                    ...removed
-                },
-                {
-                    category: destColumn.name,
-                    ...removed
-                });
+            const oldCategoryName = sourceColumn.name;
+            const newCategoryName = destColumn.name;
+            const taskToRemove = sourceItems[source.index];
+
+            Database.TeamManager.TasksManager.updateTaskData(props.teamId,
+                oldCategoryName,
+                newCategoryName,
+                taskToRemove
+            );
+
+            sourceItems.splice(source.index, 1);
+            destItems.splice(destination.index, 0, taskToRemove);
             setColumns({
                 ...columns,
                 [source.droppableId]: {
@@ -73,7 +84,7 @@ export const TaskBoard = (props) => {
     };
 
     const getTaskData = async () => {
-        let snapshot = await Database.getProtectedTeamData(props.teamId);
+        let snapshot = await Database.TeamManager.getProtectedTeamData(props.teamId);
         let data = snapshot.data();
         let columnsData = {};
         for (let index = 0; index < data.taskCategories.length; index++) {
@@ -91,7 +102,9 @@ export const TaskBoard = (props) => {
                 title: data.tasks[index].title,
                 description: data.tasks[index].description,
             }
-            columnsData[categoryToIdMap[category]].items.push(categoryData);
+            if (categoryToIdMap[category] !== undefined) {
+                columnsData[categoryToIdMap[category]].items.push(categoryData);
+            }
         }
         setColumns(columnsData);
     }
@@ -103,12 +116,12 @@ export const TaskBoard = (props) => {
             ...taskData
         }
         columnsData[categoryToIdMap[taskData.category]].items.push(uploadData);
-        Database.createNewTask(props.teamId, uploadData);
+        Database.TeamManager.TasksManager.createNewTask(props.teamId, uploadData);
         setColumns(columnsData);
         handleNewTaskModalClose();
     }
     const handleTaskRemove = (columnId, column, item) => {
-        Database.removeTask(props.teamId, { category: column.name, ...item });
+        Database.TeamManager.TasksManager.removeTask(props.teamId, { category: column.name, ...item });
         setColumns({
             ...columns,
             [columnId]: {
@@ -120,7 +133,7 @@ export const TaskBoard = (props) => {
         });
     }
     const handleTaskUpdate = (taskData) => {
-        Database.updateTaskData(
+        Database.TeamManager.TasksManager.updateTaskData(
             props.teamId,
             { ...selectedTaskData, category: selectedColumn.name },
             { ...taskData, category: selectedColumn.name }
@@ -143,13 +156,40 @@ export const TaskBoard = (props) => {
             }
         });
     }
+    const handleNewCategory = (categoryName) => {
+        handleNewCategoryModalClose();
+        Database.TeamManager.TasksManager.createCategory(props.teamId, categoryName);
+        let categoryId = uuidv4();
+        setColumns({
+            ...columns,
+            [categoryId]: {
+                name: categoryName,
+                items: []
+            }
+        });
+        categoryToIdMap[categoryName] = categoryId;
+    }
+    const handleCategoryRemove = () => {
+        handleMenuClose();
+        Database.TeamManager.TasksManager.removeCategory(props.teamId, selectedColumn.name);
+        let updatedColumns = columns;
+        delete updatedColumns[selectedColumnId];
+        setColumns(columns);
+    }
 
     useEffect(() => {
         getTaskData();
     }, [props]);
 
+
     return (
         <>
+            <Menu
+                anchorEl={anchorElement}
+                open={menuOpen}
+                onClose={handleMenuClose}>
+                <MenuItem onClick={handleCategoryRemove}>Delete</MenuItem>
+            </Menu>
             <Modal open={newTaskModalOpen} onClose={handleNewTaskModalClose}>
                 <NewTaskModal columns={columns} onNewTask={handleNewTask} />
             </Modal>
@@ -164,6 +204,9 @@ export const TaskBoard = (props) => {
                     onTaskUpdate={handleTaskUpdate}
                 />
             </Modal>
+            <Modal open={newCategoryModalOpen} onClose={handleNewCategoryModalClose}>
+                <NewCategoryModal onNewCategory={handleNewCategory} />
+            </Modal>
             <div style={{ margin: 10 }}>
                 <Button onClick={handleNewTaskModalOpen}>Create task</Button>
                 <br />
@@ -175,8 +218,12 @@ export const TaskBoard = (props) => {
                             return (
                                 <div key={columnId}>
                                     <Typography variant="h6" style={{ display: "inline-block", marginLeft: 20, width: 200 }}>{column.name}</Typography>
-                                    <IconButton>
-                                        <DeleteIcon />
+                                    <IconButton onClick={(event) => {
+                                        setSeletedColumn(column);
+                                        setSeletedColumnId(columnId)
+                                        handleMenuOpen(event);
+                                    }}>
+                                        <MoreHorizIcon />
                                     </IconButton>
                                     <Droppable droppableId={columnId} key={columnId}>
                                         {(provided, snapshot) => {
@@ -258,7 +305,7 @@ export const TaskBoard = (props) => {
                     </DragDropContext>
                     <div style={{ verticalAlign: "middle" }}>
                         <p style={{ paddingTop: 30 }}>
-                            <Button startIcon={<AddIcon />}>Add board</Button>
+                            <Button startIcon={<AddIcon />} onClick={handleNewCategoryModalOpen}>Add board</Button>
                         </p>
                     </div>
                 </div>

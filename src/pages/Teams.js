@@ -19,7 +19,7 @@ const Teams = () => {
     async function onNewTeam() {
         setLoadingMessage("Creating new team")
         setLoading(true);
-        await Database.createTeam();
+        await Database.TeamManager.createTeam();
         refresh();
     }
 
@@ -49,9 +49,9 @@ const Teams = () => {
         
         for (let teamDoc of data.joinedTeams) {
             const teamSnapShot = await getDoc(teamDoc);
-            const isMember = await Database.checkIsMember(teamDoc.id, auth.currentUser.uid);
+            const isMember = await Database.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
             if (!isMember) {
-                Database.removeTeamsLink(teamDoc.id, auth.currentUser.uid);
+                Database.TeamManager.removeTeamsLink(teamDoc.id, auth.currentUser.uid);
             } else {
                 joinedTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
             }
@@ -59,9 +59,9 @@ const Teams = () => {
         
         for (let teamDoc of data.pendingTeams) {
             const teamSnapShot = await getDoc(teamDoc);
-            const isMember = await Database.checkIsMember(teamDoc.id, auth.currentUser.uid);
+            const isMember = await Database.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
             if (isMember) {
-                Database.createJoinedTeamsLink(teamDoc.id, auth.currentUser.uid);
+                Database.TeamManager.createJoinedTeamsLink(teamDoc.id, auth.currentUser.uid);
                 joinedTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
             } else {
                 pendingTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
