@@ -77,13 +77,13 @@ export const TeamView = (props) => {
     }
     const handleTeamInfoUpdate = async (info) => {
         try {
-            await Database.TeamManager.updateTeamInfo(props.teamId, info.title, info.description, info.publiclyVisible, info.joinable);
             let updatedData = data;
             updatedData.title = info.title;
             updatedData.description = info.description;
             updatedData.publiclyVisible = info.publiclyVisible;
             updatedData.joinable = info.joinable;
             setData(updatedData);
+            await Database.TeamManager.updateTeamInfo(props.teamId, info.title, info.description, info.publiclyVisible, info.joinable);
         } catch (exception) {
 
         }
@@ -91,11 +91,11 @@ export const TeamView = (props) => {
     }
     const handleAnnouncementUpdate = async (content) => {
         try {
-            await Database.TeamManager.updateProtectedTeamData(props.teamId, updatedProtectedData);
             let updatedProtectedData = protectedData;
             updatedProtectedData.announcement = content;
             setProtectedData(updatedProtectedData);
             setAnnouncement(content);
+            await Database.TeamManager.updateProtectedTeamData(props.teamId, updatedProtectedData);
         } catch (exception) {
 
         }
