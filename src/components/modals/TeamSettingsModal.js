@@ -66,13 +66,15 @@ export const TeamSettingsModal = (props) => {
             <TextField
                 style={{ marginLeft: 10, width: "max(40vw, 220px)" }}
                 helperText="Please enter team title"
-                onChange={(e) => { setTitle(e.target.value) }} />
+                onChange={(e) => { setTitle(e.target.value) }} 
+                inputProps={{ maxLength: 50 }}/>
 
             <Typography style={{ marginLeft: 10 }}>Team description</Typography>
             <TextField
                 style={{ marginLeft: 10, width: "max(40vw, 220px)" }}
                 helperText="Please enter team description"
-                onChange={(e) => { setDescription(e.target.value) }} />
+                onChange={(e) => { setDescription(e.target.value) }} 
+                inputProps={{ maxLength: 400 }} />
 
             <Typography style={{ marginLeft: 10 }}>Banner image</Typography>
             <Button color="inherit" variant="contained" component="label" style={{ marginLeft: 10 }} disableElevation>

@@ -66,6 +66,7 @@ const TeamCard = (props) => {
                                     style={{ marginLeft: 10, width: "max(10vw, 220px)" }}
                                     helperText="Please enter new name"
                                     onChange={(e) => { setTeamTitle(e.target.value) }}
+                                    inputProps={{ maxLength: 50 }}
                                     required />
                                 <Button type="submit" color="inherit" variant="contained" style={{ width: 100 }} disableElevation>Confirm</Button>
                             </div>

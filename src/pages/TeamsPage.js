@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { TeamView } from "../components/TeamView";
 import { TaskBoard } from "../components/TaskBoard";
 import Database from "../utils/database";
+import { TeamTabView } from "../components/TeamTabView";
 
 export const TeamsPage = () => {
     let { teamId } = useParams();
@@ -40,7 +41,9 @@ export const TeamsPage = () => {
             {
                 auth.currentUser !== null && (((participantData && participantData.includes(auth.currentUser.uid)) ||
                     (data && auth.currentUser.uid === data.ownerUID))) &&
-                <TaskBoard teamId={teamId} />
+                <>
+                <TeamTabView teamId={teamId} />
+                </>
             }
         </>
     )

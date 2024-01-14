@@ -62,9 +62,9 @@ export const EditTaskModal = (props) => {
                     <>
                         <br />
                         <Typography variant="h6" align="center">Edit task</Typography>
-                        <Typography>Task title:</Typography>
+                        <Typography inputProps={{ maxLength: 100 }}>Task title:</Typography>
                         <TextField value={updatedTitle} onChange={(e) => { setUpdatedTitle(e.target.value) }}></TextField>
-                        <Typography>Task description</Typography>
+                        <Typography inputProps={{ maxLength: 400 }}>Task description</Typography>
                         <TextField value={updatedDescription} onChange={(e) => { setUpdatedDescription(e.target.value) }} style={{ width: "max(40vw, 220px)" }} rows={6} multiline required />
                         <Divider style={{ paddingBottom: 10 }} />
                         <Button onClick={() => {

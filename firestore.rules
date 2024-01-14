@@ -2,8 +2,14 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function belongsTo(userId) {
+      return request.auth.uid == userId;
+    }
+    function withinSizeLimit(content, size) {
+      return content.size() <= size;
+    }
     match /user_data/{UID} {
-      allow read, write: if request.auth != null && request.auth.uid == UID;
+      allow read, write: if request.auth != null && belongsTo(UID);
     }
     match /join_requests/{teamId} {
     	allow read;
@@ -12,24 +18,97 @@ service cloud.firestore {
       /databases/$(database)/documents/teams/$(teamId) in get(/databases/$(database)/documents/user_data/$(request.auth.uid)).data.teams;
     }
     match /public_user_data/{UID} {
-      allow write: if request.auth != null && request.auth.uid == UID;
+      allow write: if request.auth != null && belongsTo(UID);
       allow read;
     }
     match /teams/{teamId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.ownerUID;
+      allow read: if request.auth != null && 
+      belongsTo(resource.data.ownerUID);
+
       allow read: if resource.data.publiclyVisible || /databases/$(database)/documents/teams/$(teamId) in get(/databases/$(database)/documents/user_data/$(request.auth.uid)).data.joinedTeams;
+      
+      allow write: if request.auth != null && 
+      belongsTo(resource.data.ownerUID) && 
+      withinSizeLimit(request.resource.data.title, 50) && 
+      withinSizeLimit(request.resource.data.description, 400);
+
       allow create: if request.auth != null;
     }
     match /public_team_data/{teamId} {
-      allow read, write: if request.auth != null && (request.auth.uid == get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID || 
-      request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(teamId)).data.participants);
       allow read: if get(/databases/$(database)/documents/teams/$(teamId)).data.publiclyVisible || 
       /databases/$(database)/documents/teams/$(teamId) in get(/databases/$(database)/documents/user_data/$(request.auth.uid)).data.joinedTeams;
+      allow read: if request.auth != null && 
+      (
+        belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID) || 
+        request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(teamId)).data.participants
+      );
+      // only team owner can create
+      allow create: if request.auth != null && belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID);
+      
+      allow update: if request.auth != null && 
+      // only team members can update data
+      (
+        belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID) || 
+        request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(teamId)).data.participants
+      ) && 
+      // team members can only add or remove their own uid
+      (
+        belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID) || 
+        request.resource.data.participants == resource.data.participants ||
+        (
+          request.resource.data.participants.size() - resource.data.participants.size() == 1 &&
+          request.resource.data.participants.removeAll(resource.data.participants)[0] == request.auth.uid
+        ) ||
+        (
+          resource.data.participants.size() - request.resource.data.participants.size() == 1 &&
+          resource.data.participants.removeAll(request.resource.data.participants)[0] == request.auth.uid
+        )
+      );
     }
     match /protected_team_data/{teamId} {
-      allow read, write: if request.auth != null && (request.auth.uid == get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID || 
-      request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(teamId)).data.participants);
+      allow read: if request.auth != null && 
+      (
+        belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID) || 
+        request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(teamId)).data.participants
+        );
+
+      allow write: if request.auth != null && 
+      (
+        belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID) || 
+        request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(teamId)).data.participants
+      )
+      && withinSizeLimit(request.resource.data.announcement, 4000);
       allow create: if request.auth != null;
+    }
+    match /messages/{document=**} {
+      allow list: if request.auth != null;
+    }
+    match /messages/{messageId} {
+      // only message owner and team members can read the message
+      allow read: if request.auth != null && 
+      (
+        belongsTo(resource.data.uid) || 
+        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID) ||
+        request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(resource.data.teamId)).data.participants
+      );
+
+      // only team members could create messages
+      allow create: if request.auth != null &&
+      exists(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)) &&
+      request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)).data.participants;
+
+      // only team members and message owner could update messages
+      allow update: if request.auth != null &&
+      exists(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)) &&
+      request.auth.uid == resource.data.uid &&
+      request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)).data.participants;
+
+      // only message owner or team owner could delete messages
+      allow delete: if request.auth != null &&
+      (
+        request.auth.uid == resource.data.uid ||
+        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
+      )
     }
   }
 }

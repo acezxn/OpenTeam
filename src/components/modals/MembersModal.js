@@ -49,7 +49,7 @@ export const MembersModal = (props) => {
         setMembersPhotoURL(photoURLs);
     }
     const handleRemoveMember = (uid) => {
-        Database.removeTeamMember(props.teamId, uid);
+        Database.TeamManager.removeTeamMember(props.teamId, uid);
         let index = membersUID.indexOf(uid);
         setMembersUID(membersUID.filter((uid, key) => {
             return key !== index;

@@ -116,7 +116,7 @@ export default function Navbar() {
                                         {user && <>
                                             <ListItem color="inherit" onClick={handleUserMenuClick}>
                                                 {user && <img className="profile_image" src={user.photoURL}></img>}
-                                                {user && user.email}
+                                                {user && user.dis}
                                             </ListItem>
                                         </>}
                                     </List>

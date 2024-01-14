@@ -35,7 +35,11 @@ export const NewCategoryModal = (props) => {
                     <Typography variant="h6" align="center">New category</Typography>
                     <br />
                     <Typography>Category name</Typography>
-                    <TextField style={{ width: "max(40vw, 220px)" }} onChange={(e) => { setCategory(e.target.value) }} required />
+                    <TextField
+                        style={{ width: "max(40vw, 220px)" }}
+                        onChange={(e) => { setCategory(e.target.value) }}
+                        inputProps={{ maxLength: 50 }}
+                        required />
                     <br />
                     <br />
                     <Button type="submit" variant="contained" color="success" disableElevation>Create</Button>

@@ -1,4 +1,4 @@
-import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, limit, orderBy, query, where, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, db, storage } from "./firebase";
 
@@ -320,5 +320,19 @@ Database.TeamManager.TasksManager = class {
         }
         updateDoc(doc(db, "protected_team_data", teamId),
             { tasks: tasks });
+    }
+}
+
+Database.TeamManager.MessageManager = class {
+    static createMessage(messageData) {
+        addDoc(collection(db, "messages"), { ...messageData, createTime: serverTimestamp() });
+    }
+    static getMessages(teamId) {
+        return query(
+            collection(db, "messages"),
+            orderBy("createTime", "desc"),
+            where("teamId", "==", teamId),
+            limit(50)
+        );
     }
 }

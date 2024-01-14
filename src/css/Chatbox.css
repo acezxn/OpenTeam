@@ -1,0 +1,26 @@
+.chatbox {
+    background-color: var(--board-color);
+    height: 500px;
+    border-radius: 7px;
+}
+.messages {
+    overflow-y: scroll;
+    height: 444px;
+}
+.message {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    margin: 10px;
+    border-radius: 7px;
+}
+.message_sender {
+    display: inline-block;
+}
+.message_create_time {
+    float: right;
+}
+.message_body {
+    display: inline-block;
+    padding: 10px;
+    width: calc(100% - 100px);
+}

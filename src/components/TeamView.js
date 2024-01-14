@@ -12,11 +12,11 @@ import PeopleIcon from '@mui/icons-material/People';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import Database from "../utils/database";
-import "../css/TeamView.css"
 import { MembersModal } from "./modals/MembersModal";
 import { JoinRequestsModal } from "./modals/JoinRequestsModal";
 import { JoinModal } from "./modals/JoinModal";
 import { EditAnnouncementModal } from "./modals/EditAnnouncementModal";
+import "../css/TeamView.css"
 
 export const TeamView = (props) => {
     // loading states
@@ -75,21 +75,31 @@ export const TeamView = (props) => {
         setData(updatedData);
         Database.TeamManager.updateTeamLinks(props.teamId, links);
     }
-    const handleTeamInfoUpdate = (info) => {
-        let updatedData = data;
-        updatedData.title = info.title;
-        updatedData.description = info.description;
-        updatedData.publiclyVisible = info.publiclyVisible;
-        updatedData.joinable = info.joinable;
-        setData(updatedData);
-        Database.TeamManager.updateTeamInfo(props.teamId, info.title, info.description, info.publiclyVisible, info.joinable);
+    const handleTeamInfoUpdate = async (info) => {
+        try {
+            await Database.TeamManager.updateTeamInfo(props.teamId, info.title, info.description, info.publiclyVisible, info.joinable);
+            let updatedData = data;
+            updatedData.title = info.title;
+            updatedData.description = info.description;
+            updatedData.publiclyVisible = info.publiclyVisible;
+            updatedData.joinable = info.joinable;
+            setData(updatedData);
+        } catch (exception) {
+
+        }
+        handleSettingsClose();
     }
-    const handleAnnouncementUpdate = (content) => {
-        let updatedProtectedData = protectedData;
-        updatedProtectedData.announcement = content;
-        setProtectedData(updatedProtectedData);
-        setAnnouncement(content);
-        Database.TeamManager.updateProtectedTeamData(props.teamId, updatedProtectedData);
+    const handleAnnouncementUpdate = async (content) => {
+        try {
+            await Database.TeamManager.updateProtectedTeamData(props.teamId, updatedProtectedData);
+            let updatedProtectedData = protectedData;
+            updatedProtectedData.announcement = content;
+            setProtectedData(updatedProtectedData);
+            setAnnouncement(content);
+        } catch (exception) {
+
+        }
+        handleAnnouncementEditClose();
     }
     const handleJoin = (introduction) => {
         if (auth.currentUser.uid !== data.ownerUID && data.joinable) {
@@ -234,7 +244,7 @@ export const TeamView = (props) => {
                                     : <Typography>New members are not accepted</Typography>)
                             }
                             {
-                                auth.currentUser !== null && 
+                                auth.currentUser !== null &&
                                 auth.currentUser.uid !== data.ownerUID &&
                                 (data && data.joinable && !props.participants.includes(auth.currentUser.uid)) &&
                                 (
