@@ -1,8 +1,8 @@
 # OpenTeam
 
-An experimental project to facilitate communication between developers.
+An experimental project to facilitate communication between developers, allowing them to discover projects, contact project owners, and collaborate with other members.
 
-The purpose of this project is to experiment with technologies such as react js and firebase.
+The purpose of this project is mainly for experimentation.
 
 [Project Demo](https://openteam-330ce.web.app/login)
 
@@ -13,11 +13,12 @@ Features Implemented:
 - [x] Team management interface
   - [x] Team settings
   - [x] Join request creation
-  - [x] Member acception / rejection
+  - [x] Member acceptance / rejection
 - [x] Announcement board with markdown support
 - [x] Real time chat system
 - [ ] Task boards for every team
   - [x] Creating, editing, and deleting tasks
   - [x] Displaying task description
   - [ ] Real time updating for clients
+  - [ ] Create task category
   - [ ] Assign tasks to users
