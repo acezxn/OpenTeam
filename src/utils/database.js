@@ -1,4 +1,4 @@
-import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, limit, orderBy, query, where, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, limit, orderBy, query, where, serverTimestamp, setDoc, updateDoc, getDocs } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, db, storage } from "./firebase";
 
@@ -110,9 +110,17 @@ Database.TeamManager = class {
         await updateDoc(doc(db, "user_data", auth.currentUser.uid),
             { teams: arrayRemove(doc(db, 'teams', teamId)) }
         );
-        await deleteDoc(doc(db, "public_team_data", teamId));
         await deleteDoc(doc(db, "protected_team_data", teamId));
+        await deleteDoc(doc(db, "public_team_data", teamId));
         await deleteDoc(doc(db, "teams", teamId));
+        const q = query(
+            collection(db, "messages"),
+            where("teamId", "==", teamId)
+        );
+        const snapshot = await getDocs(q);
+        snapshot.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+        });
     }
     /**
      * Renames team
@@ -331,8 +339,7 @@ Database.TeamManager.MessageManager = class {
         return query(
             collection(db, "messages"),
             orderBy("createTime", "desc"),
-            where("teamId", "==", teamId),
-            limit(50)
+            where("teamId", "==", teamId)
         );
     }
 }

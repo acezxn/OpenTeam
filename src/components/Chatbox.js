@@ -1,5 +1,5 @@
 import { Button, TextField, Typography } from "@mui/material"
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { auth } from "../utils/firebase";
 import "../css/Chatbox.css"
 import Database from "../utils/database";
@@ -9,6 +9,9 @@ import { onSnapshot } from "firebase/firestore";
 export const Chatbox = (props) => {
     const [message, setMessage] = useState("");
     const [messageHistory, setMessageHistory] = useState([]);
+    const inputScroll = useRef();
+    const messageScroll = useRef();
+    const messageBox = useRef();
 
     const sendMessage = async (event) => {
         event.preventDefault();
@@ -24,6 +27,9 @@ export const Chatbox = (props) => {
             teamId: props.teamId
         });
         setMessage("");
+        messageScroll.current.scrollIntoView({ behavior: "smooth" });
+        inputScroll.current.scrollIntoView({ behavior: "smooth" });
+        console.log(messageScroll.current.offsetTop);
     };
 
     useEffect(() => {
@@ -39,13 +45,14 @@ export const Chatbox = (props) => {
                 );
                 setMessageHistory(sortedMessages);
             });
+            messageScroll.current.scrollIntoView({ behavior: "smooth" });
             return () => unsubscribe;
         }
     }, [props]);
 
     return (
         <div className="chatbox">
-            <div className="messages">
+            <div className="messages" ref={messageBox}>
                 {messageHistory.map((message, index) => (
                     <>
                         {
@@ -87,13 +94,14 @@ export const Chatbox = (props) => {
                             )
                         }
                     </>
-
                 ))}
+                <span ref={messageScroll}></span>
             </div>
             <form
                 className="message_form"
                 style={{ display: "flex", alignItems: "center" }}
-                onSubmit={(event) => sendMessage(event)}>
+                onSubmit={(event) => sendMessage(event)}
+                ref={inputScroll}>
                 <TextField
                     style={{ width: "calc(100% - 80px)" }}
                     value={message}
