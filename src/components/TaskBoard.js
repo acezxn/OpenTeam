@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import Database from "../utils/database";
 import { Button, IconButton, Menu, MenuItem, Modal, Typography } from "@mui/material";
@@ -49,7 +49,8 @@ export const TaskBoard = (props) => {
             const newCategoryName = destColumn.name;
             const taskToRemove = sourceItems[source.index];
 
-            Database.TeamManager.TasksManager.updateTaskData(props.teamId,
+            Database.TeamManager.TasksManager.changeTaskCategory(
+                props.teamId,
                 oldCategoryName,
                 newCategoryName,
                 taskToRemove
@@ -120,6 +121,7 @@ export const TaskBoard = (props) => {
         setColumns(columnsData);
         handleNewTaskModalClose();
     }
+
     const handleTaskRemove = (columnId, column, item) => {
         Database.TeamManager.TasksManager.removeTask(props.teamId, { category: column.name, ...item });
         setColumns({
@@ -133,6 +135,7 @@ export const TaskBoard = (props) => {
         });
     }
     const handleTaskUpdate = (taskData) => {
+        console.log(selectedTaskData, taskData);
         Database.TeamManager.TasksManager.updateTaskData(
             props.teamId,
             { ...selectedTaskData, category: selectedColumn.name },

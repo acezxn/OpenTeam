@@ -7,7 +7,7 @@ const modalStyle = {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: "max(50vw, 340px)",
-    height: "70vh",
+    height: "61vh",
     backgroundColor: 'var(--background-color)',
     borderRadius: 4,
     overflow: "hidden",
@@ -43,7 +43,8 @@ export const EditTaskModal = (props) => {
                         <br />
                         <Typography variant="h6" align="center">{title}</Typography>
                         <br />
-                        <div style={{ height: "50vh", overflowY: "scroll" }}>
+                        <Typography sx={{ fontWeight: 600 }}>Description:</Typography>
+                        <div style={{ height: "40vh", overflowY: "scroll" }}>
                             {description !== "" ? (
                                 <Typography sx={{ wordBreak: "break-word" }}>{description}</Typography>
                             ) : (

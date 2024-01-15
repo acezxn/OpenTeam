@@ -306,11 +306,17 @@ Database.TeamManager.TasksManager = class {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { tasks: arrayRemove({ id: taskData.id, title: taskData.title, description: taskData.description, category: taskData.category }) });
     }
-    static async updateTaskData(teamId, oldCategoryName, newCategoryName, taskData) {
+    static async changeTaskCategory(teamId, oldCategoryName, newCategoryName, taskData) {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { tasks: arrayRemove({ id: taskData.id, title: taskData.title, description: taskData.description, category: oldCategoryName }) });
         await updateDoc(doc(db, "protected_team_data", teamId),
             { tasks: arrayUnion({ id: taskData.id, title: taskData.title, description: taskData.description, category: newCategoryName }) });
+    }
+    static async updateTaskData(teamId, oldTaskData, newTaskData) {
+        await updateDoc(doc(db, "protected_team_data", teamId),
+            { tasks: arrayRemove({ id: oldTaskData.id, title: oldTaskData.title, description: oldTaskData.description, category: oldTaskData.category }) });
+        await updateDoc(doc(db, "protected_team_data", teamId),
+            { tasks: arrayUnion({ id: newTaskData.id, title: newTaskData.title, description: newTaskData.description, category: newTaskData.category }) });
     }
     static async createCategory(teamId, category) {
         await updateDoc(doc(db, "protected_team_data", teamId),
