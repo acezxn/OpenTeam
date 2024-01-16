@@ -1,4 +1,4 @@
-import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, limit, orderBy, query, where, serverTimestamp, setDoc, updateDoc, getDocs } from "firebase/firestore";
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, limit, orderBy, query, where, serverTimestamp, setDoc, updateDoc, getDocs, increment, FieldValue } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, db, storage } from "./firebase";
 
@@ -112,7 +112,6 @@ Database.TeamManager = class {
         );
         await deleteDoc(doc(db, "protected_team_data", teamId));
         await deleteDoc(doc(db, "public_team_data", teamId));
-        await deleteDoc(doc(db, "teams", teamId));
         const q = query(
             collection(db, "messages"),
             where("teamId", "==", teamId)
@@ -121,6 +120,7 @@ Database.TeamManager = class {
         snapshot.forEach(async (doc) => {
             await deleteDoc(doc.ref);
         });
+        await deleteDoc(doc(db, "teams", teamId));
     }
     /**
      * Renames team
@@ -140,7 +140,8 @@ Database.TeamManager = class {
     }
     static async updatePublicTeamData(teamId, teamData) {
         await updateDoc(doc(db, "public_team_data", teamId), {
-            participants: teamData.participants
+            participants: teamData.participants,
+            participantCount: teamData.participants.length
         });
     }
     /**
@@ -272,6 +273,9 @@ Database.TeamManager = class {
     static async addTeamMember(teamId, uid) {
         await updateDoc(doc(db, "public_team_data", teamId),
             { participants: arrayUnion(uid) });
+        const snapshot = await getDoc(doc(db, "public_team_data", teamId));
+        await updateDoc(doc(db, "public_team_data", teamId),
+            { participantCount: snapshot.data().participants.length });
     }
     /**
      * Removes team member from team data
@@ -285,6 +289,9 @@ Database.TeamManager = class {
         try {
             await updateDoc(doc(db, "public_team_data", teamId),
                 { participants: arrayRemove(uid) });
+            const snapshot = await getDoc(doc(db, "public_team_data", teamId));
+            await updateDoc(doc(db, "public_team_data", teamId),
+                { participantCount: snapshot.data().participants.length });
         } catch (exception) {
             console.log("permission error");
         }

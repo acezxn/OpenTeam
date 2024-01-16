@@ -1,4 +1,4 @@
-import { collection, doc, getDoc } from "firebase/firestore";
+import { arrayRemove, collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import Navbar from "../components/Navbar";
 import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
@@ -34,40 +34,54 @@ const Teams = () => {
         const snapshot = await getDoc(docRef);
         const data = snapshot.data();
         if (data !== null && data !== undefined) {
-            await getTeamData(snapshot.data());
+            await getTeamData(snapshot);
         }
         setLoading(false);
     }
-    async function getTeamData(data) {
+    async function getTeamData(snapshot) {
+        const data = snapshot.data();
         let teamItems = [];
         let joinedTeamItems = [];
         let pendingTeamItems = [];
         for (let teamDoc of data.teams) {
-            const teamSnapShot = await getDoc(teamDoc);
-            teamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
+            try {
+                const teamSnapShot = await getDoc(teamDoc);
+                teamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
+            } catch (exception) {
+                await updateDoc(doc(db, 'user_data', snapshot.id), { teams: arrayRemove(teamDoc) });
+            }
         }
-        
+
         for (let teamDoc of data.joinedTeams) {
-            const teamSnapShot = await getDoc(teamDoc);
-            const isMember = await Database.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
-            if (!isMember) {
-                Database.TeamManager.removeTeamsLink(teamDoc.id, auth.currentUser.uid);
-            } else {
-                joinedTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
+            try {
+                const teamSnapShot = await getDoc(teamDoc);
+                const isMember = await Database.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
+                if (!isMember) {
+                    Database.TeamManager.removeTeamsLink(teamDoc.id, auth.currentUser.uid);
+                } else {
+                    joinedTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
+                }
+            } catch (exception) {
+                await updateDoc(doc(db, 'user_data', snapshot.id), { joinedTeams: arrayRemove(teamDoc) });
             }
         }
-        
+
         for (let teamDoc of data.pendingTeams) {
-            const teamSnapShot = await getDoc(teamDoc);
-            const isMember = await Database.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
-            if (isMember) {
-                Database.TeamManager.createJoinedTeamsLink(teamDoc.id, auth.currentUser.uid);
-                joinedTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
-            } else {
-                pendingTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
+            var teamSnapShot;
+            try {
+                teamSnapShot = await getDoc(teamDoc);
+                const isMember = await Database.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
+                if (isMember) {
+                    Database.TeamManager.createJoinedTeamsLink(teamDoc.id, auth.currentUser.uid);
+                    joinedTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
+                } else {
+                    pendingTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data() });
+                }
+            } catch (exception) {
+                await updateDoc(doc(db, 'user_data', snapshot.id), { pendingTeams: arrayRemove(teamDoc) });
             }
         }
-        
+
         setOwnedTeams(teamItems);
         setJoinedTeams(joinedTeamItems);
         setPendingTeams(pendingTeamItems);
