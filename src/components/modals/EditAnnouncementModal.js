@@ -29,7 +29,7 @@ export const EditAnnouncementModal = (props) => {
                 <br />
                 <Typography variant="h6" align="center">Edit announcement</Typography>
                 <br />
-                <MDEditor height={400} value={announcement} onChange={setAnnouncement} visibleDragbar={false} />
+                <MDEditor height="calc(80vh - 200px)" value={announcement} onChange={setAnnouncement} visibleDragbar={false} />
                 <br />
                 <Button variant="contained" color="success" onClick={handleAnnouncementUpdate} disableElevation>Save</Button>
             </div>

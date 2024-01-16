@@ -9,6 +9,8 @@ import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { NewCategoryModal } from "./modals/NewCategoryModal";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../utils/firebase";
 var categoryToIdMap = {};
 
 export const TaskBoard = (props) => {
@@ -84,9 +86,7 @@ export const TaskBoard = (props) => {
         }
     };
 
-    const getTaskData = async () => {
-        let snapshot = await Database.TeamManager.getProtectedTeamData(props.teamId);
-        let data = snapshot.data();
+    const getTaskData = async (data) => {
         let columnsData = {};
         for (let index = 0; index < data.taskCategories.length; index++) {
             let categoryId = uuidv4();
@@ -181,7 +181,10 @@ export const TaskBoard = (props) => {
     }
 
     useEffect(() => {
-        getTaskData();
+        const unsubscribe = onSnapshot(doc(db, "protected_team_data", props.teamId), (snapshot) => {
+            getTaskData(snapshot.data());
+        });
+        return () => unsubscribe;
     }, [props]);
 
 

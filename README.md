@@ -19,6 +19,6 @@ Features Implemented:
 - [ ] Task boards for every team
   - [x] Creating, editing, and deleting tasks
   - [x] Displaying task description
-  - [ ] Real time updating for clients
-  - [ ] Create task category
+  - [x] Real time updating for clients
+  - [ ] Create task tags
   - [ ] Assign tasks to users

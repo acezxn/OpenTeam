@@ -44,7 +44,7 @@ export const EditTaskModal = (props) => {
                         <Typography variant="h6" align="center">{title}</Typography>
                         <br />
                         <Typography sx={{ fontWeight: 600 }}>Description:</Typography>
-                        <div style={{ height: "40vh", overflowY: "scroll" }}>
+                        <div style={{ height: "calc(61vh - 160px)", overflowY: "scroll" }}>
                             {description !== "" ? (
                                 <Typography sx={{ wordBreak: "break-word" }}>{description}</Typography>
                             ) : (
