@@ -4,7 +4,7 @@ An experimental project to facilitate communication between developers, allowing
 
 The purpose of this project is mainly for experimentation.
 
-[Project Demo](https://openteam-330ce.web.app/login)
+[Project Demo](https://openteam-330ce.web.app/)
 
 <img width="700" alt="Screen Shot 2024-01-15 at 1 27 14 PM" src="https://github.com/acezxn/OpenTeam/assets/14313049/ecfdc24a-89ee-418a-bbba-94f13fabbc0b">
 

@@ -4,6 +4,7 @@ import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Database from "../utils/database";
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ const Login = () => {
                 <Typography variant="h3" style={{ textAlign: "center" }}>Login</Typography>
                 <br />
                 <div style={{ display: "flex", alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
-                    <Button onClick={onLogin} disableElevation>Log in with Github</Button>
+                    <Button variant="contained" onClick={onLogin} startIcon={<GitHubIcon />} disableElevation>Log in with Github</Button>
                 </div>
             </div>
         </div>

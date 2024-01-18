@@ -23,16 +23,50 @@ code {
     monospace;
 }
 
+@keyframes changing_gradient {
+  0% {
+    background-position: 0% 0%
+  }
+
+  25% {
+    background-position: 100% 0%
+  }
+
+  50% {
+    background-position: 100% 100%
+  }
+
+  75% {
+    background-position: 0% 100%
+  }
+
+  100% {
+    background-position: 0% 0%
+  }
+}
+
+@keyframes example {
+  from {
+    background-color: red;
+  }
+
+  to {
+    background-color: yellow;
+  }
+}
+
 .gradient_background {
-  background: linear-gradient(45deg, rgba(2,0,36,1) 0%, rgb(24, 7, 27) 49%, rgb(17, 27, 103) 100%);
+  background: linear-gradient(207deg, rgb(92, 0, 141) 0%, rgba(0,48,139,1) 57%, rgba(25,25,117,1) 100%);
+  background-size: 200% 200%;
   height: 100vh;
   width: 100vw;
+  animation: changing_gradient 20s ease infinite;
 }
 
 .login-card {
   position: absolute;
-	top: 40%;
-	left: calc(50% - 20vw);
+  top: 40%;
+  left: calc(50% - 20vw);
   width: 40%;
   height: 25%;
   border-radius: 15px;

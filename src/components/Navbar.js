@@ -66,7 +66,7 @@ export default function Navbar() {
                     </MenuItem>
                 </Menu>
             </>}
-            <AppBar position="static" elevation={0} style={{ backgroundColor : "#0044aa" }}>
+            <AppBar position="static" elevation={0} style={{ backgroundColor : "#0044aa", zIndex : 1 }}>
                 <Toolbar variant="dense">
                     {small && (
                         <>
