@@ -8,17 +8,14 @@ The purpose of this project is mainly for experimentation.
 
 <img width="700" alt="Screen Shot 2024-01-15 at 1 27 14 PM" src="https://github.com/acezxn/OpenTeam/assets/14313049/ecfdc24a-89ee-418a-bbba-94f13fabbc0b">
 
-Features Implemented:
+## Features
 
-- [x] Team management interface
-  - [x] Team settings
-  - [x] Join request creation
-  - [x] Member acceptance / rejection
-- [x] Announcement board with markdown support
-- [x] Real time chat system
-- [ ] Task boards for every team
-  - [x] Creating, editing, and deleting tasks
-  - [x] Displaying task description
-  - [x] Real time updating for clients
-  - [ ] Create task tags
+- 🧑‍💻 Public and private teaming system for developers to connect with each other
+- 📜 Annoucement display with markdown support for teams to show general information
+- 📈 Real time task boards for every team to track work progress
+- 💬 Real time chat system for text communication
+
+Features working in progress:
+  - [ ] Create task tag system
   - [ ] Assign tasks to users
+  - [ ] Implement more functionalites in the chat system
