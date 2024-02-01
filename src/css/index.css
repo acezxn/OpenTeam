@@ -45,16 +45,6 @@ code {
   }
 }
 
-@keyframes example {
-  from {
-    background-color: red;
-  }
-
-  to {
-    background-color: yellow;
-  }
-}
-
 .gradient_background {
   background: linear-gradient(207deg, rgb(92, 0, 141) 0%, rgba(0,48,139,1) 57%, rgba(25,25,117,1) 100%);
   background-size: 200% 200%;

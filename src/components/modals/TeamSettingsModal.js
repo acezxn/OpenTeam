@@ -64,14 +64,14 @@ export const TeamSettingsModal = (props) => {
             <br />
             <Typography style={{ marginLeft: 10 }}>Team title</Typography>
             <TextField
-                style={{ marginLeft: 10, width: "max(40vw, 220px)" }}
+                style={{ marginLeft: 10, width: "calc(max(50vw, 340px) - 20px)" }}
                 helperText="Please enter team title"
                 onChange={(e) => { setTitle(e.target.value) }} 
                 inputProps={{ maxLength: 50 }}/>
 
             <Typography style={{ marginLeft: 10 }}>Team description</Typography>
             <TextField
-                style={{ marginLeft: 10, width: "max(40vw, 220px)" }}
+                style={{ marginLeft: 10, width: "calc(max(50vw, 340px) - 20px)" }}
                 helperText="Please enter team description"
                 onChange={(e) => { setDescription(e.target.value) }} 
                 inputProps={{ maxLength: 400 }} />
@@ -112,7 +112,7 @@ export const TeamSettingsModal = (props) => {
 
             <form onSubmit={handleNewLink}>
                 <TextField
-                    style={{ marginLeft: 10, width: "max(20vw, 220px)" }}
+                    style={{ marginLeft: 10, width: "calc(max(50vw, 340px) - 20px)" }}
                     helperText="New link"
                     onChange={(e) => { setNewLink(e.target.value) }}
                     required

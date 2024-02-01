@@ -135,7 +135,7 @@ export const TaskBoard = (props) => {
         });
     }
     const handleTaskUpdate = (taskData) => {
-        console.log(selectedTaskData, taskData);
+        setEditTaskModalOpen(false);
         Database.TeamManager.TasksManager.updateTaskData(
             props.teamId,
             { ...selectedTaskData, category: selectedColumn.name },

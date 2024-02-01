@@ -95,7 +95,8 @@ Database.TeamManager = class {
             tasks: []
         });
         await setDoc(doc(db, "public_team_data", ref.id), {
-            participants: [auth.currentUser.uid]
+            participants: [auth.currentUser.uid],
+            participantCount: 1
         });
     }
     /**

@@ -3,7 +3,10 @@ import Navbar from "../components/Navbar";
 import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
 import TeamCard from "../components/TeamCard";
-import { Typography } from "@mui/material";
+import { Divider, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { TeamSearchBar } from "../components/TeamSearchBar";
+
 
 
 const Explore = () => {
@@ -44,6 +47,8 @@ const Explore = () => {
         <>
             <Navbar />
             <div style={{ margin: 10 }}>
+                <TeamSearchBar />
+                <Divider style={{ paddingBottom: 10 }} />
                 <Typography variant="h4">Trending Teams</Typography>
                 {loading ? (
                     <>

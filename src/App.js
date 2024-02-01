@@ -12,6 +12,7 @@ import Teams from './pages/Teams';
 import Protected from './components/Protected';
 import { TeamsPage } from './pages/TeamsPage';
 import Explore from './pages/Explore';
+import { SearchPage } from './pages/SearchPage';
 
 const darkTheme = createTheme({
   palette: {
@@ -43,6 +44,9 @@ export default class App extends React.Component {
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route path="explore" element={<Explore />} />
+          <Route path="search/:teamName" element={
+            <SearchPage />
+          } />
           {/* <Route path="about" element={<About />} /> */}
           <Route path="login" element={<Login />} />
           <Route path="teams" element={
