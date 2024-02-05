@@ -11,12 +11,12 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { NewCategoryModal } from "./modals/NewCategoryModal";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../utils/firebase";
-var categoryToIdMap = {};
+var categoryToIdMap = Object.create(null);
 
 export const TaskBoard = (props) => {
-    const [columns, setColumns] = useState({});
-    const [selectedTaskData, setSelectedTaskData] = useState({});
-    const [selectedColumn, setSeletedColumn] = useState({});
+    const [columns, setColumns] = useState(Object.create(null));
+    const [selectedTaskData, setSelectedTaskData] = useState(Object.create(null));
+    const [selectedColumn, setSeletedColumn] = useState(Object.create(null));
     const [selectedColumnId, setSeletedColumnId] = useState("");
     const [anchorElement, setAnchorElement] = useState(null);
 
@@ -103,7 +103,8 @@ export const TaskBoard = (props) => {
                 title: data.tasks[index].title,
                 description: data.tasks[index].description,
             }
-            if (categoryToIdMap[category] !== undefined) {
+            if (categoryToIdMap[category] !== undefined && 
+                columnsData[categoryToIdMap[category]] !== undefined) {
                 columnsData[categoryToIdMap[category]].items.push(categoryData);
             }
         }
