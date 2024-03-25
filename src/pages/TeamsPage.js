@@ -1,10 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom"
 import Navbar from "../components/Navbar";
-import { collection, doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, updateDoc, arrayRemove } from "firebase/firestore";
 import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
-import { TeamView } from "../components/TeamView";
-import { TaskBoard } from "../components/TaskBoard";
 import Database from "../utils/database";
 import { TeamTabView } from "../components/TeamTabView";
 
@@ -13,18 +11,51 @@ export const TeamsPage = () => {
     const navigate = useNavigate();
     const [data, setData] = useState(null);
     const [participantData, setParticipantData] = useState([]);
-    const colletionRef = collection(db, 'teams');
-    const docRef = doc(colletionRef, teamId);
 
     async function refresh() {
-        setParticipantData((await Database.TeamManager.getPublicTeamData(teamId)).data().participants);
         try {
-            const snapshot = await getDoc(docRef);
-            const data = snapshot.data();
-            setData(data);
-            
+            setParticipantData((await Database.TeamManager.getPublicTeamData(teamId)).data().participants);
+            let teamSnapshot = await getDoc(doc(collection(db, 'teams'), teamId));
+            let teamSnapshotData = teamSnapshot.data();
+            setData(teamSnapshotData);
+
+            let userDataSnapshot = await getDoc(doc(collection(db, 'user_data'), auth.currentUser.uid));
+            let userDataSnapshotData = userDataSnapshot.data();
+            if (userDataSnapshotData) await updateTeamOwnershipData(userDataSnapshot);
         } catch (exception) {
             navigate("/login");
+        }
+    }
+
+    async function updateTeamOwnershipData(snapshot) {
+        const data = snapshot.data();
+        for (let teamDoc of data.teams) {
+            const teamSnapShot = await getDoc(teamDoc);
+            if (!teamSnapShot.data()) {
+                await updateDoc(doc(db, 'user_data', snapshot.id), { teams: arrayRemove(teamDoc) });
+            }
+        }
+
+        for (let teamDoc of data.joinedTeams) {
+            try {
+                const isMember = await Database.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
+                if (!isMember) {
+                    Database.TeamManager.removeTeamsLink(teamDoc.id, auth.currentUser.uid);
+                }
+            } catch (exception) {
+                await updateDoc(doc(db, 'user_data', snapshot.id), { joinedTeams: arrayRemove(teamDoc) });
+            }
+        }
+
+        for (let teamDoc of data.pendingTeams) {
+            try {
+                const isMember = await Database.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
+                if (isMember) {
+                    Database.TeamManager.createJoinedTeamsLink(teamDoc.id, auth.currentUser.uid);
+                }
+            } catch (exception) {
+                await updateDoc(doc(db, 'user_data', snapshot.id), { pendingTeams: arrayRemove(teamDoc) });
+            }
         }
     }
 
@@ -33,18 +64,11 @@ export const TeamsPage = () => {
     }, [auth.currentUser]);
     return (
         <>
-            <Navbar />
-            <TeamView
+            <Navbar />    
+            <TeamTabView
                 teamId={teamId}
                 participants={participantData}
                 data={data} />
-            {
-                auth.currentUser !== null && (((participantData && participantData.includes(auth.currentUser.uid)) ||
-                    (data && auth.currentUser.uid === data.ownerUID))) &&
-                <>
-                <TeamTabView teamId={teamId} />
-                </>
-            }
         </>
     )
 }

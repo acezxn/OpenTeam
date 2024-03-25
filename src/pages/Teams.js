@@ -33,9 +33,7 @@ const Teams = () => {
         const docRef = doc(collection(db, 'user_data'), auth.currentUser.uid);
         const snapshot = await getDoc(docRef);
         const data = snapshot.data();
-        if (data !== null && data !== undefined) {
-            await getTeamData(snapshot);
-        }
+        if (data) await getTeamData(snapshot);
         setLoading(false);
     }
     async function getTeamData(snapshot) {

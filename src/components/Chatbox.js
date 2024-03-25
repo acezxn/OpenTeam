@@ -9,8 +9,6 @@ import { onSnapshot } from "firebase/firestore";
 export const Chatbox = (props) => {
     const [message, setMessage] = useState("");
     const [messageHistory, setMessageHistory] = useState([]);
-    const inputScroll = useRef();
-    const messageScroll = useRef();
     const messageBox = useRef();
 
     const sendMessage = async (event) => {
@@ -27,9 +25,6 @@ export const Chatbox = (props) => {
             teamId: props.teamId
         });
         setMessage("");
-        messageScroll.current.scrollIntoView({ behavior: "smooth" });
-        inputScroll.current.scrollIntoView({ behavior: "smooth" });
-        console.log(messageScroll.current.offsetTop);
     };
 
     useEffect(() => {
@@ -44,12 +39,17 @@ export const Chatbox = (props) => {
                     (a, b) => a.createTime - b.createTime
                 );
                 setMessageHistory(sortedMessages);
+                messageBox.current.scrollTop = messageBox.current.scrollHeight;
             });
-            messageScroll.current.scrollIntoView({ behavior: "smooth" });
             return () => unsubscribe;
         }
     }, [props]);
 
+    useEffect(() => {
+        if (messageBox.current) {
+            messageBox.current.scrollTop = messageBox.current.scrollHeight;
+        }
+    }, [messageBox.current]);
     return (
         <div className="chatbox">
             <div className="messages" ref={messageBox}>
@@ -95,13 +95,11 @@ export const Chatbox = (props) => {
                         }
                     </>
                 ))}
-                <span ref={messageScroll}></span>
             </div>
             <form
                 className="message_form"
                 style={{ display: "flex", alignItems: "center" }}
-                onSubmit={(event) => sendMessage(event)}
-                ref={inputScroll}>
+                onSubmit={(event) => sendMessage(event)}>
                 <TextField
                     style={{ width: "calc(100% - 80px)" }}
                     value={message}

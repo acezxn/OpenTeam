@@ -89,11 +89,11 @@ export const MembersModal = (props) => {
                                     <ListItem>
                                         <ListItemText
                                             key={key}>
+                                            <img alt="profile_image" className="profile_image" src={membersPhotoURL[key]} />
+                                            <label>{membersEmail[key]}</label>
                                             <IconButton onClick={() => {handleRemoveMember(uid)}}>
                                                 <DeleteIcon />
                                             </IconButton>
-                                            <img alt="profile_image" className="profile_image" src={membersPhotoURL[key]} />
-                                            <label>{membersEmail[key]}</label>
                                         </ListItemText>
                                     </ListItem>
                                 </OutlinedList>

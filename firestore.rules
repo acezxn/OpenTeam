@@ -85,7 +85,13 @@ service cloud.firestore {
       allow create, delete: if request.auth != null && belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID);
     }
     match /messages/{document=**} {
-      allow list: if request.auth != null;
+      // only message owner and team members can read the message
+      allow list: if request.auth != null && 
+      (
+        belongsTo(resource.data.uid) || 
+        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID) ||
+        request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(resource.data.teamId)).data.participants
+      );
     }
     match /messages/{messageId} {
       // only message owner and team members can read the message

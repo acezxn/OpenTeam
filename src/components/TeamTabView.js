@@ -1,8 +1,10 @@
 
 import { Box, Tab, Tabs } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TaskBoard } from './TaskBoard';
 import { Chatbox } from './Chatbox';
+import { auth } from '../utils/firebase';
+import { TeamView } from './TeamView';
 
 export const TeamTabView = (props) => {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -30,15 +32,31 @@ export const TeamTabView = (props) => {
     };
 
     return (
-        <Box p={2}>
-            <Tabs value={selectedTab} onChange={handleChange} aria-label="basic tabs example">
-                <Tab label="Tasks" />
-                <Tab label="Chat" />
-            </Tabs>
+        <Box>
+            {
+                auth.currentUser !== null && (((props.participants && props.participants.includes(auth.currentUser.uid)) ||
+                    (props.data && auth.currentUser.uid === props.data.ownerUID))) ? (
+                        <Tabs value={selectedTab} onChange={handleChange}>
+                            <Tab label="Home" />
+                            <Tab label="Tasks" />
+                            <Tab label="Chat" />
+                        </Tabs> 
+                    ) : (
+                        <Tabs value={selectedTab} onChange={handleChange}>
+                            <Tab label="Home" />
+                        </Tabs> 
+                    )
+            }
             <TabPanel value={selectedTab} index={0}>
-                <TaskBoard teamId={props.teamId} />
+                <TeamView
+                    teamId={props.teamId}
+                    participants={props.participants}
+                    data={props.data} />
             </TabPanel>
             <TabPanel value={selectedTab} index={1}>
+                <TaskBoard teamId={props.teamId} />
+            </TabPanel>
+            <TabPanel value={selectedTab} index={2}>
                 <Chatbox teamId={props.teamId} />
             </TabPanel>
         </Box>

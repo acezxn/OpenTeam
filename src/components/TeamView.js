@@ -31,7 +31,7 @@ export const TeamView = (props) => {
 
     // component data states
     const [data, setData] = useState(null);
-    const [protectedData, setProtectedData] = useState({});
+    const [protectedData, setProtectedData] = useState(Object.create(null));
     const [participantData, setParticipantData] = useState([]);
     const [message, setMessage] = useState("");
     const [announcement, setAnnouncement] = useState("");
@@ -146,7 +146,7 @@ export const TeamView = (props) => {
                                         style={{
                                             position: "absolute",
                                             zIndex: 1,
-                                            top: 60,
+                                            top: 110,
                                             right: 10,
                                             color: "inherit",
                                         }}
@@ -158,7 +158,7 @@ export const TeamView = (props) => {
                                         style={{
                                             position: "absolute",
                                             zIndex: 1,
-                                            top: 60,
+                                            top: 110,
                                             right: 60,
                                             color: "inherit"
                                         }}
@@ -222,7 +222,7 @@ export const TeamView = (props) => {
                         )
                     }
 
-                    <div style={{ margin: 10 }}>
+                    <div style={{ marginLeft: 10, marginRight: 10 }}>
                         <div style={{ height: 100 }}></div>
                         <Typography variant="h2" className="team_title">{data.title}</Typography>
                         <div style={{ height: 30 }}></div>
