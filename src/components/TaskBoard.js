@@ -87,6 +87,9 @@ export const TaskBoard = (props) => {
     };
 
     const getTaskData = async (data) => {
+        if (!data) {
+            return;
+        }
         let columnsData = Object.create(null);
         for (let index = 0; index < data.taskCategories.length; index++) {
             let categoryId = uuidv4();

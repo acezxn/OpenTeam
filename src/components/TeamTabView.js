@@ -5,6 +5,7 @@ import { TaskBoard } from './TaskBoard';
 import { Chatbox } from './Chatbox';
 import { auth } from '../utils/firebase';
 import { TeamView } from './TeamView';
+import { DiscussionBoard } from './DiscussionBoard/DiscussionBoard';
 
 export const TeamTabView = (props) => {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -40,6 +41,7 @@ export const TeamTabView = (props) => {
                             <Tab label="Home" />
                             <Tab label="Tasks" />
                             <Tab label="Chat" />
+                            <Tab label="Discuss" />
                         </Tabs> 
                     ) : (
                         <Tabs value={selectedTab} onChange={handleChange}>
@@ -58,6 +60,9 @@ export const TeamTabView = (props) => {
             </TabPanel>
             <TabPanel value={selectedTab} index={2}>
                 <Chatbox teamId={props.teamId} />
+            </TabPanel>
+            <TabPanel value={selectedTab} index={3}>
+                <DiscussionBoard />
             </TabPanel>
         </Box>
     )

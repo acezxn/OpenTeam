@@ -39,7 +39,9 @@ export const Chatbox = (props) => {
                     (a, b) => a.createTime - b.createTime
                 );
                 setMessageHistory(sortedMessages);
-                messageBox.current.scrollTop = messageBox.current.scrollHeight;
+                if (messageBox.current) {
+                    messageBox.current.scrollTop = messageBox.current.scrollHeight;
+                }
             });
             return () => unsubscribe;
         }

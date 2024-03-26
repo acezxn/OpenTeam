@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Home from './pages/Home';
-import About from './pages/About';
+import { lime, purple } from '@mui/material/colors';
 import NoPage from './pages/NoPage';
 import './css/App.css';
 import Login from './pages/Login';
@@ -16,7 +16,10 @@ import { SearchPage } from './pages/SearchPage';
 
 const darkTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
+    primary: {
+      main: '#44dddd',
+    },
   },
 });
 
@@ -32,7 +35,7 @@ export default class App extends React.Component {
 
   componentDidMount() {
     auth.onAuthStateChanged((user) => {
-      this.setState({ user : user });
+      this.setState({ user: user });
     });
   }
 
