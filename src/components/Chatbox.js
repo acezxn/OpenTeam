@@ -1,9 +1,10 @@
-import { Button, TextField, Typography } from "@mui/material"
+import { Button, IconButton, TextField, Typography } from "@mui/material"
 import { useEffect, useRef, useState } from "react";
-import { auth } from "../utils/firebase";
+import { auth, db } from "../utils/firebase";
 import "../css/Chatbox.css"
 import Database from "../utils/database";
-import { onSnapshot } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
+import SendIcon from '@mui/icons-material/Send';
 
 
 export const Chatbox = (props) => {
@@ -32,8 +33,10 @@ export const Chatbox = (props) => {
             const snapshot = Database.TeamManager.MessageManager.getMessages(props.teamId);
             const unsubscribe = onSnapshot(snapshot, (querySnapshot) => {
                 const messages = [];
-                querySnapshot.forEach((doc) => {
-                    messages.push({ ...doc.data(), id: doc.id });
+                
+                querySnapshot.forEach(async (messageDoc) => {
+                    // const userDocData = (await getDoc(doc(db, "public_user_data", messageDoc.data().uid))).data();
+                    messages.push({ ...messageDoc.data(), id: messageDoc.id });
                 });
                 const sortedMessages = messages.sort(
                     (a, b) => a.createTime - b.createTime
@@ -103,11 +106,14 @@ export const Chatbox = (props) => {
                 style={{ display: "flex", alignItems: "center" }}
                 onSubmit={(event) => sendMessage(event)}>
                 <TextField
-                    style={{ width: "calc(100% - 80px)" }}
+                    style={{ width: "calc(100% - 50px)" }}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
+                    size="small"
                     placeholder="Type message here" />
-                <Button type="submit">Send</Button>
+                <IconButton type="submit" size="medium">
+                    <SendIcon />
+                </IconButton>
             </form>
         </div>
     )

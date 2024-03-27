@@ -1,4 +1,4 @@
-import { arrayRemove, collection, doc, getDoc, updateDoc } from "firebase/firestore";
+import { arrayRemove, collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import Navbar from "../components/Navbar";
 import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
@@ -80,6 +80,17 @@ const Teams = () => {
             }
         }
 
+        // remove invitation requests and add to joined teams
+        const querySnapshot = await getDocs(query(
+            collection(db, "invitation_requests"),
+            where("targetUid", "==", auth.currentUser.uid)
+        ));
+        for (let index = 0; index < querySnapshot.docs.length; index++) {
+            let snapshot = querySnapshot.docs[index];
+            Database.TeamManager.createJoinedTeamsLink(snapshot.data().teamId, auth.currentUser.uid);
+            Database.TeamManager.removeInvitationRequest(snapshot.id);
+        }
+
         setOwnedTeams(teamItems);
         setJoinedTeams(joinedTeamItems);
         setPendingTeams(pendingTeamItems);
@@ -118,10 +129,10 @@ const Teams = () => {
                     <>
                         <Typography variant="h6">Your teams</Typography>
                         <div style={{ display: "inline-block", padding: 5 }}>
-                            <Button color="inherit" variant="contained" onClick={onNewTeam} disableElevation>New team</Button>
+                            <Button color="primary" variant="outlined" onClick={onNewTeam} disableElevation>New team</Button>
                         </div>
                         <div style={{ display: "inline-block", padding: 5 }}>
-                            <Button color="inherit" variant="contained" onClick={onRefresh} disableElevation><RefreshIcon /></Button>
+                            <Button color="primary" variant="outlined" onClick={onRefresh} disableElevation><RefreshIcon /></Button>
                         </div>
                         <Divider style={{ paddingBottom: 10 }} />
                         <div style={{ marginTop: 10, overflow: "auto" }}>

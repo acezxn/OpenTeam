@@ -8,19 +8,32 @@ service cloud.firestore {
     function withinSizeLimit(content, size) {
       return content.size() <= size;
     }
+    // the collection for holding private user data
     match /user_data/{UID} {
       allow read, write: if request.auth != null && belongsTo(UID);
     }
+    // the collection for holding team invitation requests
+    match /invitation_requests/{document=**} {
+    	allow read: if request.auth != null;
+      allow create: if exists(/databases/$(database)/documents/user_data/$(request.resource.data.targetUid)) &&
+      /databases/$(database)/documents/teams/$(request.resource.data.teamId) in get(/databases/$(database)/documents/user_data/$(request.auth.uid)).data.teams;
+      allow update: if belongsTo(resource.data.invitatorUid) || belongsTo(resource.data.targetUid);
+      allow delete: if belongsTo(resource.data.invitatorUid) || belongsTo(resource.data.targetUid);
+    }
+    // the collection for holding user join requests
     match /join_requests/{teamId} {
-    	allow read;
-      allow create, update: if request.auth != null;
+    	allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && request.resource.data.requests.size() > resource.data.requests.size();
       allow write: if exists(/databases/$(database)/documents/user_data/$(request.auth.uid)) &&
       /databases/$(database)/documents/teams/$(teamId) in get(/databases/$(database)/documents/user_data/$(request.auth.uid)).data.teams;
     }
+    // the collection for holding public user data
     match /public_user_data/{UID} {
       allow write: if request.auth != null && belongsTo(UID);
       allow read;
     }
+    // the collection for holding private team data
     match /teams/{teamId} {
       allow read: if request.auth != null && 
       belongsTo(resource.data.ownerUID);
@@ -37,6 +50,7 @@ service cloud.firestore {
 
       allow create: if request.auth != null;
     }
+    // the collection for holding public team data
     match /public_team_data/{teamId} {
       allow read: if get(/databases/$(database)/documents/teams/$(teamId)).data.publiclyVisible || 
       /databases/$(database)/documents/teams/$(teamId) in get(/databases/$(database)/documents/user_data/$(request.auth.uid)).data.joinedTeams;
@@ -68,6 +82,7 @@ service cloud.firestore {
         )
       );
     }
+    // the collection for holding protected team data (public within members)
     match /protected_team_data/{teamId} {
       allow read: if request.auth != null && 
       (
@@ -84,6 +99,7 @@ service cloud.firestore {
        // only team owner can create and delete
       allow create, delete: if request.auth != null && belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID);
     }
+    // the collection for holding protected messages
     match /messages/{document=**} {
       // only message owner and team members can read the message
       allow list: if request.auth != null && 

@@ -9,6 +9,7 @@ const modalStyle = {
     width: "max(50vw, 340px)",
     height: "70vh",
     backgroundColor: 'var(--background-color)',
+    padding: 10,
     borderRadius: 4,
     overflow: "hidden",
     overflowY: "scroll",
@@ -26,7 +27,7 @@ export const NewTaskModal = (props) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         setMessage("Task created");
-        props.onNewTask({title: title, description: description, category: category});
+        props.onNewTask({ title: title, description: description, category: category });
     }
 
     useEffect(() => {
@@ -39,35 +40,33 @@ export const NewTaskModal = (props) => {
     }, [props]);
     return (
         <Box style={modalStyle}>
-            <div style={{ margin: 10 }}>
-                <form onSubmit={handleSubmit}>
-                    <br />
-                    <Typography variant="h6" align="center">New task</Typography>
-                    <br />
-                    <Typography>Task title</Typography>
-                    <TextField style={{ width: "max(40vw, 220px)" }} onChange={(e) => { setTitle(e.target.value) }} required />
-                    <Typography>Task description</Typography>
-                    <TextField style={{ width: "max(40vw, 220px)" }} onChange={(e) => { setDescription(e.target.value) }} rows={4} multiline required />
-                    <Typography>Task category</Typography>
-                    {
-                        availableCategories &&
-                        <Select
-                            onChange={(e) => { setCategory(e.target.value) }}
-                            style={{ width: "max(40vw, 220px)" }}
-                            required>
-                            {availableCategories.map((category, index) => {
-                                return (
-                                    <MenuItem key={index} value={category}>{category}</MenuItem>
-                                )
-                            })}
-                        </Select>
-                    }
-                    <br />
-                    <br />
-                    <Button type="submit" variant="contained" color="success" disableElevation>Create</Button>
-                    <Typography color="success.main">{message}</Typography>
-                </form>
-            </div>
+            <form onSubmit={handleSubmit}>
+                <br />
+                <Typography variant="h6" align="center">New task</Typography>
+                <br />
+                <Typography>Task title</Typography>
+                <TextField style={{ width: "max(50vw, 340px)" }} onChange={(e) => { setTitle(e.target.value) }} required />
+                <Typography>Task description</Typography>
+                <TextField style={{ width: "max(50vw, 340px)" }} onChange={(e) => { setDescription(e.target.value) }} rows={4} multiline required />
+                <Typography>Task category</Typography>
+                {
+                    availableCategories &&
+                    <Select
+                        onChange={(e) => { setCategory(e.target.value) }}
+                        style={{ width: "max(50vw, 340px)" }}
+                        required>
+                        {availableCategories.map((category, index) => {
+                            return (
+                                <MenuItem key={index} value={category}>{category}</MenuItem>
+                            )
+                        })}
+                    </Select>
+                }
+                <br />
+                <br />
+                <Button type="submit" variant="contained" color="success" disableElevation>Create</Button>
+                <Typography color="success.main">{message}</Typography>
+            </form>
         </Box>
     )
 }

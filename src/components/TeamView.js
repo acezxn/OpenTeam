@@ -1,4 +1,4 @@
-import { Button, Divider, IconButton, Modal, Typography } from "@mui/material";
+import { Button, IconButton, Modal, Typography } from "@mui/material";
 import { auth, db, storage } from "../utils/firebase";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { ref as storageRef, deleteObject } from "firebase/storage";
@@ -10,6 +10,7 @@ import ReactLoading from "react-loading";
 import SettingsIcon from '@mui/icons-material/Settings';
 import PeopleIcon from '@mui/icons-material/People';
 import AddIcon from '@mui/icons-material/Add';
+import ShareIcon from '@mui/icons-material/Share';
 import EditIcon from '@mui/icons-material/Edit';
 import Database from "../utils/database";
 import { MembersModal } from "./modals/MembersModal";
@@ -17,6 +18,7 @@ import { JoinRequestsModal } from "./modals/JoinRequestsModal";
 import { JoinModal } from "./modals/JoinModal";
 import { EditAnnouncementModal } from "./modals/EditAnnouncementModal";
 import "../css/TeamView.css"
+import { ShareTeamModal } from "./modals/ShareTeamModal";
 
 export const TeamView = (props) => {
     // loading states
@@ -24,6 +26,7 @@ export const TeamView = (props) => {
 
     // modal open states
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const [shareModalOpen, setShareModalOpen] = useState(false);
     const [joinRequestsModalOpen, setJoinRequestsModalOpen] = useState(false);
     const [joinModalOpen, setJoinModalOpen] = useState(false);
     const [membersOpen, setMembersOpen] = useState(false);
@@ -43,6 +46,8 @@ export const TeamView = (props) => {
     const handleJoinModalClose = () => setJoinModalOpen(false);
     const handleSettingsOpen = () => setSettingsOpen(true);
     const handleSettingsClose = () => setSettingsOpen(false);
+    const handleShareModalOpen = () => setShareModalOpen(true);
+    const handleShareModalClose = () => setShareModalOpen(false);
     const handleMembersOpen = () => setMembersOpen(true);
     const handleMembersClose = () => setMembersOpen(false);
     const handleAnnouncementEditOpen = () => setAnnouncementEditOpen(true);
@@ -147,6 +152,18 @@ export const TeamView = (props) => {
                                             position: "absolute",
                                             zIndex: 1,
                                             top: 110,
+                                            right: 110,
+                                            color: "inherit",
+                                        }}
+                                        onClick={handleShareModalOpen}>
+                                        <ShareIcon fontSize="large" />
+                                    </IconButton>
+                                    <IconButton
+                                        size="small"
+                                        style={{
+                                            position: "absolute",
+                                            zIndex: 1,
+                                            top: 110,
                                             right: 10,
                                             color: "inherit",
                                         }}
@@ -165,6 +182,11 @@ export const TeamView = (props) => {
                                         onClick={handleJoinRequestsModalOpen}>
                                         <PeopleIcon fontSize="large" />
                                     </IconButton>
+                                    <Modal
+                                        open={shareModalOpen}
+                                        onClose={handleShareModalClose}>
+                                            <ShareTeamModal teamId={props.teamId}/>
+                                        </Modal>
                                     <Modal
                                         open={settingsOpen}
                                         onClose={handleSettingsClose}>
@@ -314,7 +336,6 @@ export const TeamView = (props) => {
                                 </div>
                             </>
                         }
-                        <Divider style={{ paddingBottom: 10 }} />
                     </div>
                 </>
             )}

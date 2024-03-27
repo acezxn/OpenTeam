@@ -243,8 +243,8 @@ export const TaskBoard = (props) => {
                                                     ref={provided.innerRef}
                                                     style={{
                                                         background: snapshot.isDraggingOver
-                                                            ? "var(--board-focus-color)"
-                                                            : "var(--board-color)",
+                                                            ? "var(--board-dark-focus-color)"
+                                                            : "var(--board-dark-color)",
                                                         padding: 4,
                                                         borderRadius: 7,
                                                         width: 250,
@@ -272,8 +272,8 @@ export const TaskBoard = (props) => {
                                                                                 padding: 16,
                                                                                 margin: "0 0 8px 0",
                                                                                 backgroundColor: snapshot.isDragging
-                                                                                    ? "#1d2d33"
-                                                                                    : "#2d454f",
+                                                                                    ? "rgba(255, 255, 255, 0.2)"
+                                                                                    : "rgba(255, 255, 255, 0.1)",
                                                                                 color: "white",
                                                                                 borderRadius: 7,
                                                                                 overflow: "auto",

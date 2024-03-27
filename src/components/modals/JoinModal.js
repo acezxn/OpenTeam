@@ -12,6 +12,7 @@ const modalStyle = {
     width: "max(50vw, 340px)",
     height: "70vh",
     backgroundColor: 'var(--background-color)',
+    padding: 10,
     borderRadius: 4,
     overflow: "hidden",
     overflowY: "scroll",
@@ -43,9 +44,9 @@ export const JoinModal = (props) => {
             <form onSubmit={handleSubmit}>
                 <br />
                 <Typography variant="h6" align="center">Join Group</Typography>
-                <Typography style={{ marginLeft: 10 }}>A brief introduction of yourself</Typography>
+                <Typography>A brief introduction of yourself</Typography>
                 <TextField
-                    style={{ marginLeft: 10, width: "max(calc(50vw - 20px), 320px)" }}
+                    style={{ width: "max(50vw, 320px)" }}
                     onChange={(e) => { setIntroduction(e.target.value) }}
                     value={introduction}
                     rows={4}
@@ -58,7 +59,6 @@ export const JoinModal = (props) => {
                     color="inherit"
                     variant="contained"
                     startIcon={<AddIcon />}
-                    style={{ marginLeft: 10 }}
                     disableElevation>
                     Join
                 </Button>

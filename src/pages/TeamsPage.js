@@ -57,10 +57,19 @@ export const TeamsPage = () => {
                 await updateDoc(doc(db, 'user_data', snapshot.id), { pendingTeams: arrayRemove(teamDoc) });
             }
         }
+        // remove invitation requests and add to joined teams
+        const querySnapshot = await Database.TeamManager.queryInvitationRequest(teamId, auth.currentUser.uid);
+        for (let index = 0; index < querySnapshot.docs.length; index++) {
+            let snapshot = querySnapshot.docs[index];
+            Database.TeamManager.createJoinedTeamsLink(teamId, auth.currentUser.uid);
+            Database.TeamManager.removeInvitationRequest(snapshot.id);
+        }
     }
 
     useEffect(() => {
-        refresh();
+        if (auth.currentUser != null) {
+            refresh();
+        }
     }, [auth.currentUser]);
     return (
         <>

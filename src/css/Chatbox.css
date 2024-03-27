@@ -1,11 +1,12 @@
 .chatbox {
-    background-color: var(--board-color);
+    background-color: var(--board-dark-color);
     height: calc(100vh - 100px);
     border-radius: 7px;
 }
 .messages {
     overflow-y: scroll;
-    height: calc(100vh - 156px);
+    scroll-behavior: smooth;
+    height: calc(100vh - 140px);
 }
 .message {
     background-color: rgba(255, 255, 255, 0.1);

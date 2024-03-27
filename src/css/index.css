@@ -1,8 +1,11 @@
 :root {
   --background-color: rgb(17, 22, 27);
-  --board-color: #0d1117;
-  --board-focus-color: #19202b;
+  --board-dark-color: #0d1117;
+  --board-dark-focus-color: #19202b;
+  --board-color: #212b39;
+  --board-focus-color: #405470;
   --foreground-color: rgb(255, 255, 255);
+  --primary-color: rgb(109, 255, 211);
   --placeholder-color: rgb(157, 157, 157);
   --error-color: rgb(255, 103, 103);
 }
@@ -65,7 +68,7 @@ code {
 }
 
 .profile_image {
-  width: 38px;
+  width: 36px;
   border-radius: 30px;
   vertical-align: middle;
 }

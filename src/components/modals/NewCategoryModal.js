@@ -9,6 +9,7 @@ const modalStyle = {
     width: "max(50vw, 340px)",
     height: "40vh",
     backgroundColor: 'var(--background-color)',
+    padding: 10,
     borderRadius: 4,
     overflow: "hidden",
     overflowY: "scroll",
@@ -29,22 +30,20 @@ export const NewCategoryModal = (props) => {
     }, [props]);
     return (
         <Box style={modalStyle}>
-            <div style={{ margin: 10 }}>
-                <form onSubmit={handleSubmit}>
-                    <br />
-                    <Typography variant="h6" align="center">New category</Typography>
-                    <br />
-                    <Typography>Category name</Typography>
-                    <TextField
-                        style={{ width: "max(40vw, 220px)" }}
-                        onChange={(e) => { setCategory(e.target.value) }}
-                        inputProps={{ maxLength: 50 }}
-                        required />
-                    <br />
-                    <br />
-                    <Button type="submit" variant="contained" color="success" disableElevation>Create</Button>
-                </form>
-            </div>
+            <form onSubmit={handleSubmit}>
+                <br />
+                <Typography variant="h6" align="center">New category</Typography>
+                <br />
+                <Typography>Category name</Typography>
+                <TextField
+                    style={{ width: "max(50vw, 340px)" }}
+                    onChange={(e) => { setCategory(e.target.value) }}
+                    inputProps={{ maxLength: 50 }}
+                    required />
+                <br />
+                <br />
+                <Button type="submit" variant="contained" color="success" disableElevation>Create</Button>
+            </form>
         </Box>
     )
 }

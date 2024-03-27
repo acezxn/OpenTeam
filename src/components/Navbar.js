@@ -66,7 +66,7 @@ export default function Navbar() {
                     </MenuItem>
                 </Menu>
             </>}
-            <AppBar position="static" elevation={0} style={{ backgroundColor : "transparent", borderBottom : "1px solid rgba(255, 255, 255, 0.2)", borderTop : "3px solid #44dddd", zIndex : 1 }}>
+            <AppBar position="static" elevation={0} style={{ backgroundColor: "transparent", borderBottom: "1px solid rgba(255, 255, 255, 0.2)", borderTop: "3px solid var(--primary-color)", zIndex: 1 }}>
                 <Toolbar variant="dense">
                     {small && (
                         <>
@@ -146,7 +146,7 @@ export default function Navbar() {
                             {user && <>
                                 <Button color="inherit" onClick={handleUserMenuClick}>
                                     {user && <img className="profile_image" src={user.photoURL}></img>}
-                                    {user && user.email}
+                                    {user && <div style={{ paddingLeft: 10 }}>{user.email}</div>}
                                 </Button>
                             </>}
                         </>

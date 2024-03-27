@@ -1,4 +1,4 @@
-import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, limit, orderBy, query, where, serverTimestamp, setDoc, updateDoc, getDocs, increment, FieldValue } from "firebase/firestore";
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, orderBy, query, where, serverTimestamp, setDoc, updateDoc, getDocs } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, db, storage } from "./firebase";
 
@@ -63,6 +63,14 @@ Database.UserManager = class {
         const data = (await getDoc(doc(db, "public_team_data", teamId))).data();
         const participants = data.participants;
         return participants.includes(uid);
+    }
+
+    static async searchEmails(email) {
+        return getDocs(query(
+            collection(db, "public_user_data"),
+            where("email", '>=', email),
+            where("email", '<=', email + "\uf8ff"),
+        ));
     }
 }
 Database.TeamManager = class {
@@ -303,6 +311,23 @@ Database.TeamManager = class {
     static async updateProtectedTeamData(teamId, protectedData) {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { announcement: protectedData.announcement });
+    }
+    static async createInvitationRequest(teamId, invitatorUid, targetUid) {
+        await addDoc(collection(db, "invitation_requests"), {
+            teamId: teamId,
+            invitatorUid: invitatorUid,
+            targetUid: targetUid
+        });
+    }
+    static async removeInvitationRequest(invitationId) {
+        await deleteDoc(doc(db, "invitation_requests", invitationId));
+    }
+    static async queryInvitationRequest(teamId, targetUid) {
+        return getDocs(query(
+            collection(db, "invitation_requests"),
+            where("teamId", "==", teamId),
+            where("targetUid", "==", targetUid)
+        ));
     }
 }
 Database.TeamManager.TasksManager = class {

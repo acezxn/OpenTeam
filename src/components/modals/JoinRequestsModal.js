@@ -19,6 +19,7 @@ const modalStyle = {
     width: "max(50vw, 340px)",
     height: "70vh",
     backgroundColor: 'var(--background-color)',
+    padding: 10,
     borderRadius: 4,
     overflow: "hidden",
     overflowY: "scroll",
@@ -45,10 +46,7 @@ const AccordionSummary = styled((props) => (
     backgroundColor:
         theme.palette.mode === 'dark'
             ? 'rgb(17, 22, 27)'
-            : 'rgba(0, 0, 0, .03)',
-    '& .MuiAccordionSummary-content': {
-        marginLeft: theme.spacing(1),
-    },
+            : 'rgba(0, 0, 0, .03)'
 }));
 
 const AccordionDetails = styled((props) => (
@@ -60,10 +58,7 @@ const AccordionDetails = styled((props) => (
     backgroundColor:
         theme.palette.mode === 'dark'
             ? 'rgb(23, 28, 33)'
-            : 'rgba(0, 0, 0, .03)',
-    '& .MuiAccordionSummary-content': {
-        marginLeft: theme.spacing(1),
-    },
+            : 'rgba(0, 0, 0, .03)'
 }));
 
 export const JoinRequestsModal = (props) => {

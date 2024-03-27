@@ -46,7 +46,11 @@ export const EditTaskModal = (props) => {
                         <Typography sx={{ fontWeight: 600 }}>Description:</Typography>
                         <div style={{ height: "calc(61vh - 160px)", overflowY: "scroll" }}>
                             {description !== "" ? (
-                                <Typography sx={{ wordBreak: "break-word" }}>{description}</Typography>
+                                <Typography sx={{ wordBreak: "break-word" }}>
+                                    <pre style={{ fontFamily: 'inherit' }}>
+                                        {description}
+                                    </pre>
+                                </Typography>
                             ) : (
                                 <Typography sx={{ color: "var(--placeholder-color)", fontStyle: 'italic' }} align="center">No description provided</Typography>
                             )}

@@ -11,6 +11,7 @@ const modalStyle = {
     width: "max(50vw, 340px)",
     height: "70vh",
     backgroundColor: 'var(--background-color)',
+    padding: 10,
     borderRadius: 4,
     overflow: "hidden",
     overflowY: "scroll",
@@ -62,22 +63,22 @@ export const TeamSettingsModal = (props) => {
             <br />
             <Typography variant="h6" align="center">Settings</Typography>
             <br />
-            <Typography style={{ marginLeft: 10 }}>Team title</Typography>
+            <Typography>Team title</Typography>
             <TextField
-                style={{ marginLeft: 10, width: "calc(max(50vw, 340px) - 20px)" }}
+                style={{ width: "max(50vw, 340px)" }}
                 helperText="Please enter team title"
                 onChange={(e) => { setTitle(e.target.value) }} 
                 inputProps={{ maxLength: 50 }}/>
 
-            <Typography style={{ marginLeft: 10 }}>Team description</Typography>
+            <Typography>Team description</Typography>
             <TextField
-                style={{ marginLeft: 10, width: "calc(max(50vw, 340px) - 20px)" }}
+                style={{ width: "max(50vw, 340px)" }}
                 helperText="Please enter team description"
                 onChange={(e) => { setDescription(e.target.value) }} 
                 inputProps={{ maxLength: 400 }} />
 
-            <Typography style={{ marginLeft: 10 }}>Banner image</Typography>
-            <Button color="inherit" variant="contained" component="label" style={{ marginLeft: 10 }} disableElevation>
+            <Typography>Banner image</Typography>
+            <Button color="inherit" variant="contained" component="label" disableElevation>
                 Upload Image
                 <input
                     type="file"
@@ -85,11 +86,11 @@ export const TeamSettingsModal = (props) => {
                     onChange={handleNewImage}
                     hidden />
             </Button>
-            <Typography style={{ marginLeft: 10 }}>Visible to public</Typography>
+            <Typography>Visible to public</Typography>
             <Switch onChange={() => { setPubliclyVisible(!publiclyVisible) }} checked={publiclyVisible} />
-            <Typography style={{ marginLeft: 10 }}>Allow users to join</Typography>
+            <Typography>Allow users to join</Typography>
             <Switch onChange={() => { setJoinable(!joinable) }} checked={joinable} />
-            <Typography style={{ marginLeft: 10 }}>Related links</Typography>
+            <Typography>Related links</Typography>
             <List variant="outlined">
                 {links.map((link, key) => (
                     <OutlinedList>
@@ -100,10 +101,7 @@ export const TeamSettingsModal = (props) => {
                                     onClick={() => handleLinkDeletion(key)}>
                                     <DeleteIcon />
                                 </IconButton>
-                                <label
-                                    style={{
-                                        marginLeft: 10
-                                    }}>{link}</label>
+                                <label>{link}</label>
                             </ListItemText>
                         </ListItem>
                     </OutlinedList>
@@ -112,7 +110,7 @@ export const TeamSettingsModal = (props) => {
 
             <form onSubmit={handleNewLink}>
                 <TextField
-                    style={{ marginLeft: 10, width: "calc(max(50vw, 340px) - 20px)" }}
+                    style={{ width: "max(50vw, 340px)" }}
                     helperText="New link"
                     onChange={(e) => { setNewLink(e.target.value) }}
                     required
@@ -122,14 +120,12 @@ export const TeamSettingsModal = (props) => {
                     type="submit"
                     color="inherit"
                     variant="contained"
-                    style={{ marginLeft: 10 }}
                     disableElevation>New Link</Button>
             </form>
             <br />
 
-            <Typography style={{ marginLeft: 10 }} color="success.main">{message}</Typography>
+            <Typography color="success.main">{message}</Typography>
             <Button
-                style={{ marginLeft: 10 }}
                 color="success"
                 variant="contained"
                 onClick={handleSaveChanges}

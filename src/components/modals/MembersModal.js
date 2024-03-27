@@ -38,7 +38,6 @@ export const MembersModal = (props) => {
     const getMembers = async () => {
         let emails = [];
         let photoURLs = [];
-        console.log(props);
         for (let uid of props.participants) {
             let data = (await getDoc(doc(db, "public_user_data", uid))).data();
             emails.push(data.email);
@@ -48,8 +47,15 @@ export const MembersModal = (props) => {
         setMembersEmail(emails);
         setMembersPhotoURL(photoURLs);
     }
-    const handleRemoveMember = (uid) => {
+    const handleRemoveMember = async (uid) => {
+        // remove invitation requests
+        const querySnapshot = await Database.TeamManager.queryInvitationRequest(props.teamId, uid);
+        for (let index = 0; index < querySnapshot.docs.length; index++) {
+            Database.TeamManager.removeInvitationRequest(querySnapshot.docs[index].id);
+        }
+
         Database.TeamManager.removeTeamMember(props.teamId, uid);
+
         let index = membersUID.indexOf(uid);
         setMembersUID(membersUID.filter((uid, key) => {
             return key !== index;
@@ -79,7 +85,7 @@ export const MembersModal = (props) => {
                                         <ListItemText
                                             key={key}>
                                             <img alt="profile_image" className="profile_image" src={membersPhotoURL[key]} />
-                                            <label>{membersEmail[key]}</label>
+                                            <label style={{ padding: 10 }}>{membersEmail[key]}</label>
                                             <i style={{ color: "var(--placeholder-color)" }}> (owner)</i>
                                         </ListItemText>
                                     </ListItem>
@@ -90,10 +96,12 @@ export const MembersModal = (props) => {
                                         <ListItemText
                                             key={key}>
                                             <img alt="profile_image" className="profile_image" src={membersPhotoURL[key]} />
-                                            <label>{membersEmail[key]}</label>
-                                            <IconButton onClick={() => {handleRemoveMember(uid)}}>
-                                                <DeleteIcon />
-                                            </IconButton>
+                                            <label style={{ padding: 10 }}>{membersEmail[key]}</label>
+                                            <div style={{ float: "right" }}>
+                                                <IconButton onClick={() => { handleRemoveMember(uid) }}>
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </div>
                                         </ListItemText>
                                     </ListItem>
                                 </OutlinedList>
