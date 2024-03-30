@@ -4,7 +4,7 @@ import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
 import TeamCard from "../components/TeamCard";
 import { Divider, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import RingLoader from "react-spinners/RingLoader";
 import { TeamSearchBar } from "../components/TeamSearchBar";
 
 
@@ -50,11 +50,17 @@ const Explore = () => {
                 <TeamSearchBar />
                 <Divider style={{ paddingBottom: 10 }} />
                 <Typography variant="h4">Trending Teams</Typography>
-                {loading ? (
-                    <>
-                        <Typography variant="h6">Loading</Typography>
-                    </>
-                ) : (
+                <RingLoader
+                    color={"rgb(109, 255, 211)"}
+                    loading={loading}
+                    cssOverride={{
+                        position: "absolute",
+                        top: "calc(50vh - 50px)",
+                        left: "calc(50vw - 50px)"
+                    }}
+                    size={100}
+                />
+                {!loading && (
                     <div style={{ marginTop: 10, overflow: "auto" }}>
                         {
                             teams.length === 0 ? (

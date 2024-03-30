@@ -1,7 +1,8 @@
 import { Box, Button, IconButton, List, ListItem, ListItemText, Switch, TextField, Typography } from "@mui/material"
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { styled } from '@mui/material/styles';
+import RingLoader from "react-spinners/RingLoader";
 
 const modalStyle = {
     position: 'absolute',
@@ -17,6 +18,11 @@ const modalStyle = {
     overflowY: "scroll",
     zIndex: 1
 };
+const spinnerStyle = {
+    display: "inline-block",
+    marginLeft: 10,
+    verticalAlign: "middle"
+}
 
 const OutlinedList = styled(List)(({ theme }) => ({
     border: `1px solid ${theme.palette.divider}`,
@@ -36,7 +42,7 @@ export const TeamSettingsModal = (props) => {
     const [joinable, setJoinable] = useState(props.data.joinable);
     const [links, setLinks] = useState(props.data.links);
     const [newLink, setNewLink] = useState("");
-    const [message, setMessage] = useState("");
+    const [saving, setSaving] = useState(false);
 
     const handleLinkDeletion = (key) => { setLinks(links.filter((_, index) => index !== key)) }
     const handleNewImage = (e) => { setBannerImage(e.target.files[0]) }
@@ -45,6 +51,7 @@ export const TeamSettingsModal = (props) => {
         setLinks([...links, newLink]);
     }
     const handleSaveChanges = (e) => {
+        setSaving(true);
         if (bannerImage) {
             props.onBannerImageUpdate(bannerImage);
         }
@@ -53,10 +60,7 @@ export const TeamSettingsModal = (props) => {
             return;
         }
         props.onTeamInfoUpdate({ title: title, description: description, publiclyVisible: publiclyVisible, joinable: joinable });
-        setMessage("Changes Saved");
     }
-
-    useEffect(() => { setMessage("") }, [props, bannerImage, links, title, description, joinable, publiclyVisible]);
 
     return (
         <Box style={modalStyle}>
@@ -67,14 +71,14 @@ export const TeamSettingsModal = (props) => {
             <TextField
                 style={{ width: "max(50vw, 340px)" }}
                 helperText="Please enter team title"
-                onChange={(e) => { setTitle(e.target.value) }} 
-                inputProps={{ maxLength: 50 }}/>
+                onChange={(e) => { setTitle(e.target.value) }}
+                inputProps={{ maxLength: 50 }} />
 
             <Typography>Team description</Typography>
             <TextField
                 style={{ width: "max(50vw, 340px)" }}
                 helperText="Please enter team description"
-                onChange={(e) => { setDescription(e.target.value) }} 
+                onChange={(e) => { setDescription(e.target.value) }}
                 inputProps={{ maxLength: 400 }} />
 
             <Typography>Banner image</Typography>
@@ -124,14 +128,18 @@ export const TeamSettingsModal = (props) => {
             </form>
             <br />
 
-            <Typography color="success.main">{message}</Typography>
             <Button
-                color="success"
-                variant="contained"
+                variant="outlined"
                 onClick={handleSaveChanges}
                 disableElevation>
                 Save
             </Button>
+            <RingLoader
+                color={"rgb(109, 255, 211)"}
+                loading={saving}
+                cssOverride={spinnerStyle}
+                size={20}
+            />
         </Box>
     )
 }

@@ -2,7 +2,7 @@ import { arrayRemove, collection, doc, getDoc, getDocs, query, updateDoc, where 
 import Navbar from "../components/Navbar";
 import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
-import ReactLoading from "react-loading";
+import RingLoader from "react-spinners/RingLoader";
 import TeamCard from "../components/TeamCard";
 import { Button, Divider, Typography } from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -115,16 +115,19 @@ const Teams = () => {
         <>
             <Navbar />
             <div style={{ margin: 10 }}>
+
+                <RingLoader
+                    color={"rgb(109, 255, 211)"}
+                    loading={loading}
+                    cssOverride={{
+                        position: "absolute",
+                        top: "calc(50vh - 50px)",
+                        left: "calc(50vw - 50px)"
+                    }}
+                    size={100}
+                />
                 {loading ? (
-                    <>
-                        <h2>{loadingMessage}</h2>
-                        <ReactLoading
-                            type={"bars"}
-                            color={"#ffffff"}
-                            height={50}
-                            width={100}
-                        />
-                    </>
+                    <Typography variant="h5" align="center">{loadingMessage}</Typography>
                 ) : (
                     <>
                         <Typography variant="h6">Your teams</Typography>

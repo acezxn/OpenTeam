@@ -1,12 +1,12 @@
 import { Button, IconButton, Modal, Typography } from "@mui/material";
 import { auth, db, storage } from "../utils/firebase";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { ref as storageRef, deleteObject } from "firebase/storage";
 import { v4 as uuidv4 } from 'uuid';
 import { useEffect, useState } from "react";
 import { TeamSettingsModal } from "./modals/TeamSettingsModal";
 import MDEditor from "@uiw/react-md-editor";
-import ReactLoading from "react-loading";
+import RingLoader from "react-spinners/RingLoader";
 import SettingsIcon from '@mui/icons-material/Settings';
 import PeopleIcon from '@mui/icons-material/People';
 import AddIcon from '@mui/icons-material/Add';
@@ -137,14 +137,17 @@ export const TeamView = (props) => {
 
     return (
         <>
-            {loading ? (
-                <ReactLoading
-                    type={"bars"}
-                    color={"#ffffff"}
-                    height={50}
-                    width={100}
-                />
-            ) : (
+            <RingLoader
+                color={"rgb(109, 255, 211)"}
+                loading={loading}
+                cssOverride={{
+                    position: "absolute",
+                    top: "calc(50vh - 50px)",
+                    left: "calc(50vw - 50px)"
+                }}
+                size={100}
+            />
+            {!loading && (
                 <>
                     {
                         (auth.currentUser !== null && (data && auth.currentUser.uid === data.ownerUID)) ?

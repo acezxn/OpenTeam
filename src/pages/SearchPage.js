@@ -6,6 +6,8 @@ import { db } from "../utils/firebase";
 import { useEffect, useState } from "react";
 import TeamCard from "../components/TeamCard";
 import { TeamSearchBar } from "../components/TeamSearchBar";
+import RingLoader from "react-spinners/RingLoader";
+
 
 
 export const SearchPage = () => {
@@ -54,30 +56,34 @@ export const SearchPage = () => {
         <>
             <Navbar />
             <div style={{ margin: 10 }}>
-                <TeamSearchBar defaultValue={teamName}/>
+                <TeamSearchBar defaultValue={teamName} />
                 <Divider style={{ paddingBottom: 10 }} />
                 <div style={{ margin: 10 }}>
+                    <RingLoader
+                        color={"rgb(109, 255, 211)"}
+                        loading={loading}
+                        cssOverride={{
+                            position: "absolute",
+                            top: "calc(50vh - 50px)",
+                            left: "calc(50vw - 50px)"
+                        }}
+                        size={100}
+                    />
                     {
-                        loading ?
-                            (
-                                <>
-                                    <Typography align="center" sx={{ color: "var(--placeholder-color)", fontStyle: 'italic' }}>Still loading</Typography>
-                                </>
-                            ) :
-                            (
-                                <>
-                                    <Typography variant="h6">
-                                        {
-                                            teams.length === 1 ? `${teams.length} result:` : `${teams.length} results:`
-                                        }
-                                    </Typography>
+                        !loading && (
+                            <>
+                                <Typography variant="h6">
                                     {
-                                        teams.map((team, index) => (
-                                            <TeamCard key={index} name={team.title} id={team.id} />
-                                        ))
+                                        teams.length === 1 ? `${teams.length} result:` : `${teams.length} results:`
                                     }
-                                </>
-                            )
+                                </Typography>
+                                {
+                                    teams.map((team, index) => (
+                                        <TeamCard key={index} name={team.title} id={team.id} />
+                                    ))
+                                }
+                            </>
+                        )
                     }
                 </div>
             </div>
