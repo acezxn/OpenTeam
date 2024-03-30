@@ -97,14 +97,18 @@ const Teams = () => {
     }
 
     function handleTeamChange(message) {
-        if (message === "delete") {
+        if (message === "update_finished") {
+            refresh();
+        } else if (message === "delete_start") {
             setLoadingMessage("Deleting team");
-        } else if (message === "rename") {
+            setLoading(true);
+        } else if (message === "rename_start") {
             setLoadingMessage("Renaming team");
-        } else if (message === "leave") {
+            setLoading(true);
+        } else if (message === "leave_start") {
             setLoadingMessage("Leaving team");
+            setLoading(true);
         }
-        refresh();
     }
     useEffect(() => {
         refresh();
