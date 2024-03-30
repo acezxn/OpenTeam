@@ -4,7 +4,10 @@ An experimental project to facilitate communication between developers, allowing
 
 [Project Demo](https://openteam-330ce.web.app/)
 
-<img width="700" alt="Screen Shot 2024-01-15 at 1 27 14 PM" src="https://github.com/acezxn/OpenTeam/assets/14313049/ecfdc24a-89ee-418a-bbba-94f13fabbc0b">
+<img width="80%" alt="Screen Shot 2024-03-30 at 12 42 44 AM" src="https://github.com/acezxn/OpenTeam/assets/14313049/d7f88968-9f54-4a67-bed3-815929f6ad32">
+<br />
+<img width="40%" alt="Screen Shot 2024-03-30 at 12 44 36 AM" src="https://github.com/acezxn/OpenTeam/assets/14313049/49703313-dc0b-4bcd-9d99-122dfc8e2aa9">
+<img width="40%" alt="Screen Shot 2024-03-30 at 12 44 47 AM" src="https://github.com/acezxn/OpenTeam/assets/14313049/6ecab12c-79f2-40a8-a60c-32169a67cab4">
 
 ## Features
 
