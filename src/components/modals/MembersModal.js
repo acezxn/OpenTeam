@@ -43,6 +43,7 @@ export const MembersModal = (props) => {
             emails.push(data.email);
             photoURLs.push(data.photoURL);
         }
+        console.log(props.participants);
         setMembersUID(props.participants);
         setMembersEmail(emails);
         setMembersPhotoURL(photoURLs);
@@ -54,7 +55,7 @@ export const MembersModal = (props) => {
             Database.TeamManager.removeInvitationRequest(querySnapshot.docs[index].id);
         }
 
-        Database.TeamManager.removeTeamMember(props.teamId, uid);
+        await Database.TeamManager.removeTeamMember(props.teamId, uid);
 
         let index = membersUID.indexOf(uid);
         setMembersUID(membersUID.filter((uid, key) => {
@@ -67,6 +68,10 @@ export const MembersModal = (props) => {
             return key !== index;
         }));
     }
+    useEffect(() => {
+        console.log(membersUID);
+        props.onParticipantsUpdate(membersUID);
+    }, [membersUID])
     useEffect(() => {
         getMembers();
     }, [props]);

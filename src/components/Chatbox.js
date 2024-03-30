@@ -1,15 +1,20 @@
-import { Button, IconButton, TextField, Typography } from "@mui/material"
+import { Button, IconButton, Menu, MenuItem, TextField, Typography } from "@mui/material"
 import { useEffect, useRef, useState } from "react";
-import { auth, db } from "../utils/firebase";
+import { auth } from "../utils/firebase";
 import "../css/Chatbox.css"
 import Database from "../utils/database";
-import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
+import { onSnapshot } from "firebase/firestore";
 import SendIcon from '@mui/icons-material/Send';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 
 export const Chatbox = (props) => {
     const [message, setMessage] = useState("");
     const [messageHistory, setMessageHistory] = useState([]);
+    const [anchorElement, setAnchorElement] = useState(null);
+    const userMenuExpanded = Boolean(anchorElement);
+
+    const handleUserMenuClose = () => setAnchorElement(null);
     const messageBox = useRef();
 
     const sendMessage = async (event) => {
@@ -33,10 +38,8 @@ export const Chatbox = (props) => {
             const snapshot = Database.TeamManager.MessageManager.getMessages(props.teamId);
             const unsubscribe = onSnapshot(snapshot, (querySnapshot) => {
                 const messages = [];
-                
-                querySnapshot.forEach(async (messageDoc) => {
-                    // const userDocData = (await getDoc(doc(db, "public_user_data", messageDoc.data().uid))).data();
-                    messages.push({ ...messageDoc.data(), id: messageDoc.id });
+                querySnapshot.forEach((doc) => {
+                    messages.push({ ...doc.data(), id: doc.id });
                 });
                 const sortedMessages = messages.sort(
                     (a, b) => a.createTime - b.createTime
@@ -89,6 +92,15 @@ export const Chatbox = (props) => {
                                                         )
                                                     )
                                                 }
+                                                {
+                                                    (auth.currentUser.uid === message.uid || auth.currentUser.uid === props.data.ownerUID) && (
+
+                                                        <IconButton style={{ marginLeft: 10 }} onClick={(e) => { setAnchorElement(e.target) }}>
+                                                            <MoreVertIcon />
+                                                        </IconButton>
+
+                                                    )
+                                                }
                                             </Typography>
                                         </div>
                                         <div className="message_content">
@@ -115,6 +127,15 @@ export const Chatbox = (props) => {
                     <SendIcon />
                 </IconButton>
             </form>
+            <Menu
+                anchorEl={anchorElement}
+                open={userMenuExpanded}
+                onClose={handleUserMenuClose}
+            >
+                <MenuItem disableRipple>
+                    Delete message
+                </MenuItem>
+            </Menu>
         </div>
     )
 }

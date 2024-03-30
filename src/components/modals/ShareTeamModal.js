@@ -75,9 +75,10 @@ export const ShareTeamModal = (props) => {
             if (publicTeamData.participants.includes(selectedUser[index].uid)) {
                 continue;
             }
-            // TODO: create invitation requests
+            
             await Database.TeamManager.addTeamMember(props.teamId, selectedUser[index].uid);
             await Database.TeamManager.createInvitationRequest(props.teamId, auth.currentUser.uid, selectedUser[index].uid);
+            props.onParticipantsUpdate([...publicTeamData.participants, selectedUser[index].uid]);
         }
     }
 

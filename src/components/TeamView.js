@@ -35,6 +35,7 @@ export const TeamView = (props) => {
     // component data states
     const [data, setData] = useState(null);
     const [protectedData, setProtectedData] = useState(Object.create(null));
+    const [participants, setParticipants] = useState([]);
     const [participantData, setParticipantData] = useState([]);
     const [message, setMessage] = useState("");
     const [announcement, setAnnouncement] = useState("");
@@ -53,7 +54,8 @@ export const TeamView = (props) => {
     const handleAnnouncementEditOpen = () => setAnnouncementEditOpen(true);
     const handleAnnouncementEditClose = () => setAnnouncementEditOpen(false);
 
-    const getParticipants = async (participantUIDs) => {
+    const getParticipantsPublicData = async (participantUIDs) => {
+        console.log(participantUIDs);
         var participants = [];
         for (let participantUID of participantUIDs) {
             let snapshot = await getDoc(doc(db, "public_user_data", participantUID));
@@ -113,7 +115,8 @@ export const TeamView = (props) => {
         }
     }
     const handleParticipantsUpdate = (participants) => {
-        getParticipants(participants);
+        setParticipants(participants);
+        getParticipantsPublicData(participants);
     }
 
     useEffect(() => {
@@ -126,7 +129,8 @@ export const TeamView = (props) => {
                 .catch((exception) => {
                     console.log("Permission error");
                 });
-            getParticipants(props.participants);
+            getParticipantsPublicData(props.participants);
+            setParticipants(props.participants);
             setLoading(false);
         }
     }, [props]);
@@ -185,8 +189,8 @@ export const TeamView = (props) => {
                                     <Modal
                                         open={shareModalOpen}
                                         onClose={handleShareModalClose}>
-                                            <ShareTeamModal teamId={props.teamId}/>
-                                        </Modal>
+                                        <ShareTeamModal teamId={props.teamId} onParticipantsUpdate={(participants) => { handleParticipantsUpdate(participants) }} />
+                                    </Modal>
                                     <Modal
                                         open={settingsOpen}
                                         onClose={handleSettingsClose}>
@@ -199,7 +203,11 @@ export const TeamView = (props) => {
                                     <Modal
                                         open={membersOpen}
                                         onClose={handleMembersClose}>
-                                        <MembersModal data={data} participants={props.participants} teamId={props.teamId} />
+                                        <MembersModal
+                                            data={data}
+                                            participants={participants}
+                                            teamId={props.teamId}
+                                            onParticipantsUpdate={(participants) => { handleParticipantsUpdate(participants) }} />
                                     </Modal>
                                     <Modal
                                         open={joinRequestsModalOpen}
@@ -250,7 +258,7 @@ export const TeamView = (props) => {
                         <div style={{ height: 30 }}></div>
                         <div style={{
                             width: auth.currentUser !== null &&
-                                ((data && props.participants.includes(auth.currentUser.uid)) ||
+                                ((data && participants.includes(auth.currentUser.uid)) ||
                                     (data && auth.currentUser.uid === data.ownerUID)) ? "40vw" : "calc(100vw - 20px)", height: 240, display: "inline-block", verticalAlign: "top"
                         }}>
                             <Typography variant="h6">About:</Typography>
@@ -268,7 +276,7 @@ export const TeamView = (props) => {
                             {
                                 auth.currentUser !== null &&
                                 auth.currentUser.uid !== data.ownerUID &&
-                                (data && data.joinable && !props.participants.includes(auth.currentUser.uid)) &&
+                                (data && data.joinable && !participants.includes(auth.currentUser.uid)) &&
                                 (
                                     <>
                                         <Button
@@ -311,7 +319,7 @@ export const TeamView = (props) => {
                         </div>
                         {
                             auth.currentUser !== null &&
-                            ((data && props.participants.includes(auth.currentUser.uid)) ||
+                            ((data && participants.includes(auth.currentUser.uid)) ||
                                 (data && auth.currentUser.uid === data.ownerUID)) &&
                             <>
                                 <Modal
