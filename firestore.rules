@@ -136,6 +136,43 @@ service cloud.firestore {
         belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
       )
     }
+    // the collection for holding protected discussions
+    match /discussions/{document=**} {
+      // only message owner and team members can read the discussion
+      allow list: if request.auth != null && 
+      (
+        belongsTo(resource.data.uid) || 
+        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID) ||
+        request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(resource.data.teamId)).data.participants
+      );
+    }
+    match /discussions/{messageId} {
+      // only message owner and team members can read the discussion
+      allow read: if request.auth != null && 
+      (
+        belongsTo(resource.data.uid) || 
+        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID) ||
+        request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(resource.data.teamId)).data.participants
+      );
+
+      // only team members could create discussions
+      allow create: if request.auth != null &&
+      exists(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)) &&
+      request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)).data.participants;
+
+      // only team members and message owner could update discussions
+      allow update: if request.auth != null &&
+      exists(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)) &&
+      request.auth.uid == resource.data.uid &&
+      request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)).data.participants;
+
+      // only message owner or team owner could delete discussions
+      allow delete: if request.auth != null &&
+      (
+        request.auth.uid == resource.data.uid ||
+        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
+      )
+    }
   }
 }
 

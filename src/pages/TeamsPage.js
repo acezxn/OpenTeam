@@ -5,11 +5,13 @@ import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
 import Database from "../utils/database";
 import { TeamTabView } from "../components/TeamTabView";
+import { Typography } from "@mui/material";
 
 export const TeamsPage = () => {
     let { teamId } = useParams();
     const navigate = useNavigate();
     const [data, setData] = useState(null);
+    const [userModified, setUserModified] = useState(false);
     const [participantData, setParticipantData] = useState([]);
 
     async function refresh() {
@@ -70,14 +72,21 @@ export const TeamsPage = () => {
         if (auth.currentUser != null) {
             refresh();
         }
+        setUserModified(true);
     }, [auth.currentUser]);
     return (
         <>
-            <Navbar />    
-            <TeamTabView
-                teamId={teamId}
-                participants={participantData}
-                data={data} />
+            <Navbar />
+            {
+                userModified && auth.currentUser === null ? (
+                    <Typography variant="h5" align="center" style={{paddingTop: "30vh"}}>Please log in to get access to teams</Typography>
+                ) : (
+                    <TeamTabView
+                        teamId={teamId}
+                        participants={participantData}
+                        data={data} />
+                )
+            }
         </>
     )
 }

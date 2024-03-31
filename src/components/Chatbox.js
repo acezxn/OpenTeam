@@ -10,6 +10,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export const Chatbox = (props) => {
     const [message, setMessage] = useState("");
+    const [selectedMessageIndex, setSelectedMessageIndex] = useState(0);
     const [messageHistory, setMessageHistory] = useState([]);
     const [anchorElement, setAnchorElement] = useState(null);
     const userMenuExpanded = Boolean(anchorElement);
@@ -32,6 +33,15 @@ export const Chatbox = (props) => {
         });
         setMessage("");
     };
+    const selectMessage = (index, event) => {
+        setSelectedMessageIndex(index);
+        setAnchorElement(event.target);
+    }
+    const handleMessageDeletion = () => {
+        handleUserMenuClose();
+        console.log(selectedMessageIndex, messageHistory[selectedMessageIndex].id);
+        Database.TeamManager.MessageManager.deleteMessage(messageHistory[selectedMessageIndex].id);
+    }
 
     useEffect(() => {
         if (props) {
@@ -39,11 +49,16 @@ export const Chatbox = (props) => {
             const unsubscribe = onSnapshot(snapshot, (querySnapshot) => {
                 const messages = [];
                 querySnapshot.forEach((doc) => {
-                    messages.push({ ...doc.data(), id: doc.id });
+                    messages.unshift({ ...doc.data(), id: doc.id });
                 });
                 const sortedMessages = messages.sort(
-                    (a, b) => a.createTime - b.createTime
+                    (a, b) => {
+                        if (a.createTime === null) return 1;
+                        if (b.createTime === null) return -1;
+                        return a.createTime - b.createTime;
+                    }
                 );
+                console.log(sortedMessages);
                 setMessageHistory(sortedMessages);
                 if (messageBox.current) {
                     messageBox.current.scrollTop = messageBox.current.scrollHeight;
@@ -95,7 +110,7 @@ export const Chatbox = (props) => {
                                                 {
                                                     (auth.currentUser.uid === message.uid || auth.currentUser.uid === props.data.ownerUID) && (
 
-                                                        <IconButton style={{ marginLeft: 10 }} onClick={(e) => { setAnchorElement(e.target) }}>
+                                                        <IconButton style={{ marginLeft: 10 }} onClick={(e) => { selectMessage(index, e) }}>
                                                             <MoreVertIcon />
                                                         </IconButton>
 
@@ -132,7 +147,7 @@ export const Chatbox = (props) => {
                 open={userMenuExpanded}
                 onClose={handleUserMenuClose}
             >
-                <MenuItem disableRipple>
+                <MenuItem onClick={handleMessageDeletion} disableRipple>
                     Delete message
                 </MenuItem>
             </Menu>

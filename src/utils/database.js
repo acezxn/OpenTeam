@@ -371,8 +371,11 @@ Database.TeamManager.TasksManager = class {
 }
 
 Database.TeamManager.MessageManager = class {
-    static createMessage(messageData) {
-        addDoc(collection(db, "messages"), { ...messageData, createTime: serverTimestamp() });
+    static async createMessage(messageData) {
+        await addDoc(collection(db, "messages"), { ...messageData, createTime: serverTimestamp() });
+    }
+    static async deleteMessage(id) {
+        await deleteDoc(doc(db, "messages", id));
     }
     static getMessages(teamId) {
         return query(
