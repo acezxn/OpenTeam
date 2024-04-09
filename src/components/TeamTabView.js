@@ -62,7 +62,7 @@ export const TeamTabView = (props) => {
                 <Chatbox teamId={props.teamId} data={props.data} />
             </TabPanel>
             <TabPanel value={selectedTab} index={3}>
-                <DiscussionBoard />
+                <DiscussionBoard teamId={props.teamId}/>
             </TabPanel>
         </Box>
     )

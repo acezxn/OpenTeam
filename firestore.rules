@@ -146,7 +146,7 @@ service cloud.firestore {
         request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(resource.data.teamId)).data.participants
       );
     }
-    match /discussions/{messageId} {
+    match /discussions/{discussionId} {
       // only message owner and team members can read the discussion
       allow read: if request.auth != null && 
       (

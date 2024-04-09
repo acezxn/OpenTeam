@@ -39,7 +39,6 @@ export const Chatbox = (props) => {
     }
     const handleMessageDeletion = () => {
         handleUserMenuClose();
-        console.log(selectedMessageIndex, messageHistory[selectedMessageIndex].id);
         Database.TeamManager.MessageManager.deleteMessage(messageHistory[selectedMessageIndex].id);
     }
 
@@ -58,7 +57,6 @@ export const Chatbox = (props) => {
                         return a.createTime - b.createTime;
                     }
                 );
-                console.log(sortedMessages);
                 setMessageHistory(sortedMessages);
                 if (messageBox.current) {
                     messageBox.current.scrollTop = messageBox.current.scrollHeight;

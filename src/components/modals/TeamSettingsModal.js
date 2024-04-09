@@ -82,7 +82,7 @@ export const TeamSettingsModal = (props) => {
                 inputProps={{ maxLength: 400 }} />
 
             <Typography>Banner image</Typography>
-            <Button color="inherit" variant="contained" component="label" disableElevation>
+            <Button variant="outlined" component="label" disableElevation>
                 Upload Image
                 <input
                     type="file"
@@ -90,6 +90,18 @@ export const TeamSettingsModal = (props) => {
                     onChange={handleNewImage}
                     hidden />
             </Button>
+            {
+                bannerImage !== null ? (
+                    <Typography variant="body2">{bannerImage.name}</Typography>
+                ) : (
+                    <Typography
+                        variant="body2"
+                        sx={{ color: "var(--placeholder-color)", fontStyle: 'italic' }}>
+                        No image selected
+                    </Typography>
+                )
+            }
+            <br />
             <Typography>Visible to public</Typography>
             <Switch onChange={() => { setPubliclyVisible(!publiclyVisible) }} checked={publiclyVisible} />
             <Typography>Allow users to join</Typography>
@@ -122,8 +134,7 @@ export const TeamSettingsModal = (props) => {
                 <br />
                 <Button
                     type="submit"
-                    color="inherit"
-                    variant="contained"
+                    variant="outlined"
                     disableElevation>New Link</Button>
             </form>
             <br />

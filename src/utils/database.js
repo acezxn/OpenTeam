@@ -385,3 +385,18 @@ Database.TeamManager.MessageManager = class {
         );
     }
 }
+Database.TeamManager.DiscussionManager = class {
+    static async createDiscussion(discussionData) {
+        await addDoc(collection(db, "discussions"), { ...discussionData, createTime: serverTimestamp() });
+    }
+    static async deleteDiscussion(id) {
+        await deleteDoc(doc(db, "discussions", id));
+    }
+    static getDiscussions(teamId) {
+        return query(
+            collection(db, "discussions"),
+            orderBy("createTime", "desc"),
+            where("teamId", "==", teamId)
+        );
+    }
+}
