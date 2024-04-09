@@ -115,20 +115,41 @@ Database.TeamManager = class {
      * @memberof Database
      */
     static async removeTeam(teamId) {
+        // delete all join requests for the team
         await deleteDoc(doc(db, "join_requests", teamId));
+
+        // remove reference in private user data
         await updateDoc(doc(db, "user_data", auth.currentUser.uid),
             { teams: arrayRemove(doc(db, 'teams', teamId)) }
         );
+
+        // delete protected team data
         await deleteDoc(doc(db, "protected_team_data", teamId));
+
+        // delete public team data
         await deleteDoc(doc(db, "public_team_data", teamId));
-        const q = query(
+
+        // delete associated messages
+        const messagesQuery = query(
             collection(db, "messages"),
             where("teamId", "==", teamId)
         );
-        const snapshot = await getDocs(q);
-        snapshot.forEach(async (doc) => {
+        const messagesQuerySnapshot = await getDocs(messagesQuery);
+        messagesQuerySnapshot.forEach(async (doc) => {
             await deleteDoc(doc.ref);
         });
+
+        // delete associated discussions
+        const discussionsQuery = query(
+            collection(db, "discussions"),
+            where("teamId", "==", teamId)
+        );
+        const discussionsQuerySnapshot = await getDocs(discussionsQuery);
+        discussionsQuerySnapshot.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+        });
+
+        // delete the private team data
         await deleteDoc(doc(db, "teams", teamId));
     }
     /**

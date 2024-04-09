@@ -22,11 +22,9 @@ export const NewTaskModal = (props) => {
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState("");
     const [availableCategories, setAvailableCategories] = useState([]);
-    const [message, setMessage] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setMessage("Task created");
         props.onNewTask({ title: title, description: description, category: category });
     }
 
@@ -64,8 +62,7 @@ export const NewTaskModal = (props) => {
                 }
                 <br />
                 <br />
-                <Button type="submit" variant="contained" color="success" disableElevation>Create</Button>
-                <Typography color="success.main">{message}</Typography>
+                <Button type="submit" variant="outlined" disableElevation>Create</Button>
             </form>
         </Box>
     )
