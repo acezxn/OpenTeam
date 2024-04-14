@@ -149,11 +149,24 @@ Database.TeamManager = class {
             await deleteDoc(doc.ref);
         });
 
-        const imageRef = storageRef(storage, (await getDoc(doc(db, "teams", teamId))).data().bannerImageURL);
-        deleteObject(imageRef);
+        // delete associated comments
+        const commentsQuery = query(
+            collection(db, "comments"),
+            where("teamId", "==", teamId)
+        );
+        const commentsQuerySnapshot = await getDocs(commentsQuery);
+        commentsQuerySnapshot.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+        });
+
+        const bannerImageURL = (await getDoc(doc(db, "teams", teamId))).data().bannerImageURL;
+        if (bannerImageURL !== "") {
+            const imageRef = storageRef(storage, bannerImageURL);
+            await deleteObject(imageRef);
+        }
 
         // delete the private team data
-        await deleteDoc(doc(db, "teams", teamId));
+        deleteDoc(doc(db, "teams", teamId));
     }
     /**
      * Renames team
