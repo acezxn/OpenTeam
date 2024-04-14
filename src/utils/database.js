@@ -420,4 +420,17 @@ Database.TeamManager.DiscussionManager = class {
             where("teamId", "==", teamId)
         );
     }
+    static async createComment(commentData) {
+        await addDoc(collection(db, "comments"), { ...commentData, createTime: serverTimestamp() });
+    }
+    static async deleteComment(commentId) {
+        await deleteDoc(doc(db, "comments", commentId));
+    }
+    static getComments(discussionId) {
+        return query(
+            collection(db, "comments"),
+            where("discussionId", "==", discussionId),
+            orderBy("createTime", "desc")
+        );
+    }
 }

@@ -2,9 +2,9 @@ import { Box, Typography, List, ListItem, ListItemText, IconButton } from "@mui/
 import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../utils/firebase";
+import { db } from "../../../utils/firebase";
 import { useEffect, useState } from "react";
-import Database from "../../utils/database";
+import Database from "../../../utils/database";
 
 const modalStyle = {
     position: 'absolute',

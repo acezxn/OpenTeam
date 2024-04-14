@@ -1,5 +1,5 @@
 import { Button, IconButton, Modal, Typography } from "@mui/material";
-import { auth, db, storage } from "../utils/firebase";
+import { auth, db, storage } from "../../utils/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { ref as storageRef, deleteObject } from "firebase/storage";
 import { v4 as uuidv4 } from 'uuid';
@@ -12,12 +12,12 @@ import PeopleIcon from '@mui/icons-material/People';
 import AddIcon from '@mui/icons-material/Add';
 import ShareIcon from '@mui/icons-material/Share';
 import EditIcon from '@mui/icons-material/Edit';
-import Database from "../utils/database";
+import Database from "../../utils/database";
 import { MembersModal } from "./modals/MembersModal";
 import { JoinRequestsModal } from "./modals/JoinRequestsModal";
 import { JoinModal } from "./modals/JoinModal";
 import { EditAnnouncementModal } from "./modals/EditAnnouncementModal";
-import "../css/TeamView.css"
+import "../../css/TeamView.css"
 import { ShareTeamModal } from "./modals/ShareTeamModal";
 
 export const TeamView = (props) => {
@@ -55,7 +55,6 @@ export const TeamView = (props) => {
     const handleAnnouncementEditClose = () => setAnnouncementEditOpen(false);
 
     const getParticipantsPublicData = async (participantUIDs) => {
-        console.log(participantUIDs);
         var participants = [];
         for (let participantUID of participantUIDs) {
             let snapshot = await getDoc(doc(db, "public_user_data", participantUID));
@@ -265,11 +264,14 @@ export const TeamView = (props) => {
                                     (data && auth.currentUser.uid === data.ownerUID)) ? "40vw" : "calc(100vw - 20px)", height: 240, display: "inline-block", verticalAlign: "top"
                         }}>
                             <Typography variant="h6">About:</Typography>
-                            <Typography>
-                                {data.description === "" ?
+                            {
+                                data.description === "" ? (
                                     <Typography sx={{ color: "var(--placeholder-color)", fontStyle: 'italic' }}>No description provided</Typography>
-                                    : data.description}
-                            </Typography>
+                                ) : (
+                                    <Typography>{data.description}</Typography>
+                                )
+                            }
+
                             <br />
                             {
                                 data && (data.joinable ? (

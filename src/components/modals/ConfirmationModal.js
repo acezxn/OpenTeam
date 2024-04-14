@@ -16,16 +16,16 @@ const modalStyle = {
 };
 
 
-export const ConfirmationModal = (props) => {
+export const ConfirmationModal = ({ onAccept, onDecline }) => {
 
     const handleAccept = (e) => {
-        if (props.onAccept) {
-            props.onAccept();
+        if (onAccept) {
+            onAccept();
         }
     }
     const handleDecline = (e) => {
-        if (props.onDecline) {
-            props.onDecline();
+        if (onDecline) {
+            onDecline();
         }
     }
 
@@ -35,7 +35,7 @@ export const ConfirmationModal = (props) => {
             <Typography variant="h6" align="center">Are you sure</Typography>
             <br />
             <Button style={{ width: "max(15vw, 170px)" }} onClick={handleAccept} variant="outlined" disableElevation>Yes</Button>
-            <Button style={{ width: "max(15vw, 170px)" }} onClick={handleDecline} color="error" variant="outlined" disableElevation>No</Button>
+            <Button style={{ width: "max(15vw, 170px)" }} onClick={handleDecline} color="warning" variant="outlined" disableElevation>No</Button>
         </Box>
     )
 }

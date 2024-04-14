@@ -1,8 +1,8 @@
-import { Avatar, Box, Button, Chip, List, ListItem, ListItemText, Menu, MenuItem, Stack, TextField, Typography } from "@mui/material"
+import { Avatar, Box, Button, Chip, List, ListItem, ListItemText, Stack, TextField, Typography } from "@mui/material"
 import ShareIcon from '@mui/icons-material/Share';
 import { useEffect, useRef, useState } from "react";
-import Database from "../../utils/database";
-import { auth } from "../../utils/firebase";
+import Database from "../../../utils/database";
+import { auth } from "../../../utils/firebase";
 
 
 const modalStyle = {

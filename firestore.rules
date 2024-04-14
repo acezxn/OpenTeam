@@ -15,8 +15,10 @@ service cloud.firestore {
     // the collection for holding team invitation requests
     match /invitation_requests/{document=**} {
     	allow read: if request.auth != null;
+      // only team owner can create invitation request
       allow create: if exists(/databases/$(database)/documents/user_data/$(request.resource.data.targetUid)) &&
       /databases/$(database)/documents/teams/$(request.resource.data.teamId) in get(/databases/$(database)/documents/user_data/$(request.auth.uid)).data.teams;
+      // only target user or invitator can update and delete invitation request
       allow update: if belongsTo(resource.data.invitatorUid) || belongsTo(resource.data.targetUid);
       allow delete: if belongsTo(resource.data.invitatorUid) || belongsTo(resource.data.targetUid);
     }
@@ -101,13 +103,7 @@ service cloud.firestore {
     }
     // the collection for holding protected messages
     match /messages/{document=**} {
-      // only message owner and team members can read the message
-      allow list: if request.auth != null && 
-      (
-        belongsTo(resource.data.uid) || 
-        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID) ||
-        request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(resource.data.teamId)).data.participants
-      );
+      allow list: if request.auth != null;
     }
     match /messages/{messageId} {
       // only message owner and team members can read the message
@@ -123,11 +119,12 @@ service cloud.firestore {
       exists(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)) &&
       request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)).data.participants;
 
-      // only team members and message owner could update messages
+      // only message owner or team owner could update messages
       allow update: if request.auth != null &&
-      exists(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)) &&
-      request.auth.uid == resource.data.uid &&
-      request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)).data.participants;
+      (
+        request.auth.uid == resource.data.uid ||
+        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
+      )
 
       // only message owner or team owner could delete messages
       allow delete: if request.auth != null &&
@@ -138,16 +135,10 @@ service cloud.firestore {
     }
     // the collection for holding protected discussions
     match /discussions/{document=**} {
-      // only message owner and team members can read the discussion
-      allow list: if request.auth != null && 
-      (
-        belongsTo(resource.data.uid) || 
-        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID) ||
-        request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(resource.data.teamId)).data.participants
-      );
+      allow list: if request.auth != null;
     }
     match /discussions/{discussionId} {
-      // only message owner and team members can read the discussion
+      // only discussion owner and team members can read the discussion
       allow read: if request.auth != null && 
       (
         belongsTo(resource.data.uid) || 
@@ -160,13 +151,46 @@ service cloud.firestore {
       exists(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)) &&
       request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)).data.participants;
 
-      // only team members and message owner could update discussions
+      // only discussion owner or team owner could update discussions
       allow update: if request.auth != null &&
+      (
+        request.auth.uid == resource.data.uid ||
+        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
+      )
+
+      // only discussion owner or team owner could delete discussions
+      allow delete: if request.auth != null &&
+      (
+        request.auth.uid == resource.data.uid ||
+        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
+      )
+    }
+    
+    match /comments/{document=**} {
+      allow list: if request.auth != null;
+    }
+    match /comments/{discussionId} {
+      // only discussion owner and team members can read the discussion
+      allow read: if request.auth != null && 
+      (
+        belongsTo(resource.data.uid) || 
+        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID) ||
+        request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(resource.data.teamId)).data.participants
+      );
+
+      // only team members could create discussions
+      allow create: if request.auth != null &&
       exists(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)) &&
-      request.auth.uid == resource.data.uid &&
       request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)).data.participants;
 
-      // only message owner or team owner could delete discussions
+      // only discussion owner or team owner could update discussions
+      allow update: if request.auth != null &&
+      (
+        request.auth.uid == resource.data.uid ||
+        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
+      )
+
+      // only discussion owner or team owner could delete discussions
       allow delete: if request.auth != null &&
       (
         request.auth.uid == resource.data.uid ||

@@ -1,10 +1,10 @@
 
 import { Box, Tab, Tabs } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { TaskBoard } from './TaskBoard';
-import { Chatbox } from './Chatbox';
+import { TaskBoard } from './Taskboard/TaskBoard';
+import { Chatbox } from './Chatbox/Chatbox';
 import { auth } from '../utils/firebase';
-import { TeamView } from './TeamView';
+import { TeamView } from './TeamView/TeamView';
 import { DiscussionBoard } from './DiscussionBoard/DiscussionBoard';
 
 export const TeamTabView = (props) => {
@@ -62,7 +62,7 @@ export const TeamTabView = (props) => {
                 <Chatbox teamId={props.teamId} data={props.data} />
             </TabPanel>
             <TabPanel value={selectedTab} index={3}>
-                <DiscussionBoard teamId={props.teamId}/>
+                <DiscussionBoard teamId={props.teamId} data={props.data} />
             </TabPanel>
         </Box>
     )

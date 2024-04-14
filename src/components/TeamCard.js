@@ -81,6 +81,12 @@ const TeamCard = (props) => {
             {
                 props.permission === "owner" &&
                 <Menu
+                    PaperProps={{
+                        style: {
+                            backgroundColor: "var(--background-color)",
+                            color: "var(--foreground-color)"
+                        }
+                    }}
                     anchorEl={anchorElement}
                     open={menuOpened}
                     onClose={handleMenuClose}>

@@ -1,7 +1,7 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import Database from "../../utils/database";
-import { auth } from "../../utils/firebase";
+import Database from "../../../utils/database";
+import { auth } from "../../../utils/firebase";
 
 const modalStyle = {
     position: 'absolute',
@@ -40,9 +40,6 @@ export const NewDiscussionModal = (props) => {
         props.onModalClose();
     }
 
-    useEffect(() => {
-
-    }, [props]);
     return (
         <Box style={modalStyle}>
             <form onSubmit={handleSubmit}>

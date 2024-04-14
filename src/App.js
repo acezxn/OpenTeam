@@ -1,7 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Home from './pages/Home';
-import { lime, purple } from '@mui/material/colors';
 import NoPage from './pages/NoPage';
 import './css/App.css';
 import Login from './pages/Login';

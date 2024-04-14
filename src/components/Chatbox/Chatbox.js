@@ -1,8 +1,8 @@
 import { Button, IconButton, Menu, MenuItem, TextField, Typography } from "@mui/material"
 import { useEffect, useRef, useState } from "react";
-import { auth } from "../utils/firebase";
-import "../css/Chatbox.css"
-import Database from "../utils/database";
+import { auth } from "../../utils/firebase";
+import "../../css/Chatbox.css"
+import Database from "../../utils/database";
 import { onSnapshot } from "firebase/firestore";
 import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -141,6 +141,12 @@ export const Chatbox = (props) => {
                 </IconButton>
             </form>
             <Menu
+                PaperProps={{
+                    style: {
+                        backgroundColor: "var(--background-color)",
+                        color: "var(--foreground-color)"
+                    }
+                }}
                 anchorEl={anchorElement}
                 open={userMenuExpanded}
                 onClose={handleUserMenuClose}

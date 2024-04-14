@@ -54,6 +54,12 @@ export default function Navbar() {
         <>
             {user && <>
                 <Menu
+                    PaperProps={{
+                        style: {
+                            backgroundColor: "var(--background-color)",
+                            color: "var(--foreground-color)"
+                        }
+                    }}
                     anchorEl={anchorElement}
                     open={userMenuExpanded}
                     onClose={handleUserMenuClose}
@@ -116,7 +122,6 @@ export default function Navbar() {
                                         {user && <>
                                             <ListItem color="inherit" onClick={handleUserMenuClick}>
                                                 {user && <img className="profile_image" src={user.photoURL}></img>}
-                                                {user && user.dis}
                                             </ListItem>
                                         </>}
                                     </List>

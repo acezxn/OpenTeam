@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import Database from "../utils/database";
+import Database from "../../utils/database";
 import { Button, IconButton, Menu, MenuItem, Modal, Typography } from "@mui/material";
 import { NewTaskModal } from "./modals/NewTaskModal";
 import { v4 as uuidv4 } from 'uuid';
@@ -10,7 +10,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { NewCategoryModal } from "./modals/NewCategoryModal";
 import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "../utils/firebase";
+import { db } from "../../utils/firebase";
 var categoryToIdMap = Object.create(null);
 
 export const TaskBoard = (props) => {
@@ -195,6 +195,12 @@ export const TaskBoard = (props) => {
     return (
         <>
             <Menu
+                PaperProps={{
+                    style: {
+                        backgroundColor: "var(--board-color)",
+                        color: "var(--foreground-color)"
+                    }
+                }}
                 anchorEl={anchorElement}
                 open={menuOpen}
                 onClose={handleMenuClose}>
@@ -227,7 +233,7 @@ export const TaskBoard = (props) => {
                         {Object.entries(columns).map(([columnId, column], index) => {
                             return (
                                 <div key={columnId}>
-                                    <Typography variant="h6" style={{ display: "inline-block", marginLeft: 20, width: 200 }}>{column.name}</Typography>
+                                    <Typography variant="h6" style={{ display: "inline-block", marginLeft: 20, width: 200, overflow: "auto" }}>{column.name}</Typography>
                                     <IconButton onClick={(event) => {
                                         setSeletedColumn(column);
                                         setSeletedColumnId(columnId)

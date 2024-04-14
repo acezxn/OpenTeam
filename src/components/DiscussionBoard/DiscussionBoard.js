@@ -1,11 +1,13 @@
 import { Button, IconButton, List, ListItem, ListItemText, Menu, MenuItem, Modal, Typography } from "@mui/material"
 import AnnouncementIcon from '@mui/icons-material/Announcement';
-import { NewDiscussionModal } from "../modals/NewDiscussionModal";
+import { NewDiscussionModal } from "./modals/NewDiscussionModal";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useEffect, useState } from "react";
 import Database from "../../utils/database";
 import { onSnapshot } from "firebase/firestore";
 import { ConfirmationModal } from "../modals/ConfirmationModal";
+import { auth } from "../../utils/firebase";
+import { DiscussionDetailsModal } from "./modals/DiscussionDetailsModal";
 
 export const DiscussionBoard = (props) => {
     const [anchorElement, setAnchorElement] = useState(null);
@@ -13,16 +15,24 @@ export const DiscussionBoard = (props) => {
     const [discussionHistory, setDiscussionHistory] = useState([]);
     const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
     const [newDiscussionModalOpen, setNewDiscussionModalOpen] = useState(false);
+    const [discussionDetailsOpen, setDiscussionDetailsOpen] = useState(false);
     const handleDeleteConfirmModalOpen = () => setDeleteConfirmModalOpen(true);
     const handleDeleteConfirmModalClose = () => setDeleteConfirmModalOpen(false);
     const handleNewDiscussionModalOpen = () => setNewDiscussionModalOpen(true);
     const handleNewDiscussionModalClose = () => setNewDiscussionModalOpen(false);
+    const handleDiscussionDetailsOpen = () => setDiscussionDetailsOpen(true);
+    const handleDiscussionDetailsClose = () => setDiscussionDetailsOpen(false);
+
     const handleMenuClose = () => setAnchorElement(null);
     const menuExpanded = Boolean(anchorElement);
 
     const handleDiscussionDelete = () => {
         handleMenuClose();
         Database.TeamManager.DiscussionManager.deleteDiscussion(discussionHistory[selectedDiscussionIndex].id)
+    }
+
+    const handleDetailsModalOpen = () => {
+        handleDiscussionDetailsOpen();
     }
 
     useEffect(() => {
@@ -41,16 +51,12 @@ export const DiscussionBoard = (props) => {
                     }
                 );
                 setDiscussionHistory(sortedDiscussions);
-                // if (messageBox.current) {
-                //     messageBox.current.scrollTop = messageBox.current.scrollHeight;
-                // }
             });
             return () => unsubscribe;
         }
     }, [props]);
     return (
         <div style={{ marginLeft: 10, marginRight: 10 }}>
-            {/* <Typography>To be implemented</Typography> */}
             <Modal
                 open={newDiscussionModalOpen}
                 onClose={handleNewDiscussionModalClose}>
@@ -70,7 +76,18 @@ export const DiscussionBoard = (props) => {
                         handleMenuClose();
                     }} />
             </Modal>
+            <Modal
+                open={discussionDetailsOpen}
+                onClose={handleDiscussionDetailsClose}>
+                <DiscussionDetailsModal teamOwnerUid={props.data.ownerUID} data={discussionHistory[selectedDiscussionIndex]}/>
+            </Modal>
             <Menu
+                PaperProps={{
+                    style: {
+                        backgroundColor: "var(--background-color)",
+                        color: "var(--foreground-color)"
+                    }
+                }}
                 anchorEl={anchorElement}
                 open={menuExpanded}
                 onClose={handleMenuClose}
@@ -98,7 +115,10 @@ export const DiscussionBoard = (props) => {
                                         size="small"
                                         fullWidth={true}
                                         style={{ padding: 10, textTransform: "none", textAlign: "left" }}
-                                        onClick={() => { }}>
+                                        onClick={() => {
+                                            setSelectedDiscussionIndex(index);
+                                            handleDetailsModalOpen()
+                                        }}>
                                         <ListItemText>
                                             <AnnouncementIcon style={{ verticalAlign: "middle" }} />
                                             <label style={{ padding: 10 }}>{discussion.title}</label>
@@ -120,13 +140,17 @@ export const DiscussionBoard = (props) => {
                                             </label>
                                         </ListItemText>
                                     </Button>
-                                    <IconButton onClick={(e) => {
-                                        setSelectedDiscussionIndex(index);
-                                        setAnchorElement(e.target);
-                                    }}
-                                        style={{ float: "right", verticalAlign: "middle", padding: 10 }}>
-                                        <MoreVertIcon />
-                                    </IconButton>
+                                    {
+                                        (auth.currentUser.uid === discussion.uid || auth.currentUser.uid === props.data.ownerUID) && (
+                                            <IconButton onClick={(e) => {
+                                                setSelectedDiscussionIndex(index);
+                                                setAnchorElement(e.target);
+                                            }}
+                                                style={{ float: "right", verticalAlign: "middle", padding: 10 }}>
+                                                <MoreVertIcon />
+                                            </IconButton>
+                                        )
+                                    }
                                 </ListItem>
                             ))
                         }
