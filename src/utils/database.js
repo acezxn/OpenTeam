@@ -1,5 +1,5 @@
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, orderBy, query, where, serverTimestamp, setDoc, updateDoc, getDocs } from "firebase/firestore";
-import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { auth, db, storage } from "./firebase";
 
 
@@ -148,6 +148,9 @@ Database.TeamManager = class {
         discussionsQuerySnapshot.forEach(async (doc) => {
             await deleteDoc(doc.ref);
         });
+
+        const imageRef = storageRef(storage, (await getDoc(doc(db, "teams", teamId))).data().bannerImageURL);
+        deleteObject(imageRef);
 
         // delete the private team data
         await deleteDoc(doc(db, "teams", teamId));
