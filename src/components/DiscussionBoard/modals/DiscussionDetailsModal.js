@@ -194,7 +194,9 @@ export const DiscussionDetailsModal = (props) => {
                                                 </IconButton>
                                             )
                                         }
-                                        <Typography style={{ paddingLeft: 48, paddingTop: 2, paddingBottom: 2 }}>{comment.content}</Typography>
+                                        <Typography sx={{ paddingLeft: 6, paddingTop: 2, paddingBottom: 2, wordBreak: "break-word" }}>
+                                            {comment.content}
+                                        </Typography>
                                     </>
                                 ))
                             }
