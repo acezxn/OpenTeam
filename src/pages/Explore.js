@@ -69,7 +69,7 @@ const Explore = () => {
                                 <>
                                     {
                                         teams.map((team, index) => (
-                                            <TeamCard key={index} name={team.title} id={team.id} />
+                                            <TeamCard key={index} name={team.title} id={team.id} participantCount={team.participantCount} />
                                         ))
                                     }
                                 </>

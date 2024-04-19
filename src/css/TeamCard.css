@@ -1,6 +1,6 @@
 .card {
     padding: 10px 10px;
-    width: min(max(30vw, 100px), 200px);
+    width: min(max(30vw, 200px), 250px);
     border-radius: 8px;
     background-color: var(--board-color);
     overflow: auto;
