@@ -15,9 +15,9 @@ An experimental project to facilitate communication between developers, allowing
 - 📜 Annoucement display with markdown support for teams to show general information
 - 📈 Real time task boards for every team to track work progress
 - 💬 Real time chat system for text communication
+- 💡 Real time discussion system for questions answering
 
 Features working in progress:
-- 🫵 Team invitation system
 - 🏷 Create task tag system
 - 👨 Assign tasks to users
 - 🛠 Implement more functionalites in the chat system
