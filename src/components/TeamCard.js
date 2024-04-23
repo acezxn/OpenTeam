@@ -7,6 +7,7 @@ import { useState } from 'react';
 import Database from '../utils/database';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../utils/firebase';
+import { ConfirmationModal } from './modals/ConfirmationModal';
 
 const modalStyle = {
     position: 'absolute',
@@ -14,9 +15,10 @@ const modalStyle = {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: "max(10vw, 340px)",
-    height: "25vh",
-    backgroundColor: 'rgb(40, 40, 40)',
+    height: "200px",
+    backgroundColor: 'var(--background-color)',
     borderRadius: 4,
+    padding: 10,
     zIndex: "1"
 };
 
@@ -26,9 +28,12 @@ const TeamCard = (props) => {
     const [anchorElement, setAnchorElement] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [teamTitle, setTeamTitle] = useState("");
+    const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
     const menuOpened = Boolean(anchorElement)
     const handleModalOpen = () => setModalOpen(true);
     const handleModalClose = () => setModalOpen(false);
+    const handleDeleteConfirmModalOpen = () => setDeleteConfirmModalOpen(true);
+    const handleDeleteConfirmModalClose = () => setDeleteConfirmModalOpen(false);
 
     const handleMenuOpen = (event) => {
         setAnchorElement(event.currentTarget);
@@ -57,26 +62,43 @@ const TeamCard = (props) => {
     return (
         <div style={{ display: "inline-block", padding: 5 }}>
             {props.permission === "owner" && (
-                <Modal
-                    open={modalOpen}
-                    onClose={handleModalClose}>
-                    <Box style={modalStyle}>
-                        <br />
-                        <Typography variant="h6" align="center">Rename team</Typography>
-                        <br />
-                        <form onSubmit={handleTeamRename}>
-                            <div style={{ display: "flex" }}>
-                                <TextField
-                                    style={{ marginLeft: 10, width: "max(10vw, 220px)" }}
-                                    helperText="Please enter new name"
-                                    onChange={(e) => { setTeamTitle(e.target.value) }}
-                                    inputProps={{ maxLength: 50 }}
-                                    required />
-                                <Button type="submit" color="inherit" variant="contained" style={{ width: 100 }} disableElevation>Confirm</Button>
-                            </div>
-                        </form>
-                    </Box>
-                </Modal>
+                <>
+                    <Modal
+                        open={modalOpen}
+                        onClose={handleModalClose}>
+                        <Box style={modalStyle}>
+                            <br />
+                            <Typography variant="h6" align="center">Rename team</Typography>
+                            <br />
+                            <form onSubmit={handleTeamRename}>
+                            <TextField
+                                        size="small"
+                                        helperText="Please enter new name"
+                                        onChange={(e) => { setTeamTitle(e.target.value) }}
+                                        inputProps={{ maxLength: 50 }}
+                                        fullWidth
+                                        required />
+                                    <br />
+                                    <br />
+                                    <Button type="submit" variant="outlined" disableElevation>Confirm</Button>
+                            </form>
+                        </Box>
+                    </Modal>
+                    <Modal
+                        open={deleteConfirmModalOpen}
+                        onClose={handleDeleteConfirmModalClose}>
+                        <ConfirmationModal
+                            onDecline={() => {
+                                handleDeleteConfirmModalClose();
+                                handleMenuClose();
+                            }}
+                            onAccept={() => {
+                                onRemoveTeam();
+                                handleDeleteConfirmModalClose();
+                                handleMenuClose();
+                            }} />
+                    </Modal>
+                </>
             )}
 
             {
@@ -92,7 +114,7 @@ const TeamCard = (props) => {
                     open={menuOpened}
                     onClose={handleMenuClose}>
                     <MenuItem onClick={handleModalOpen}>Rename team</MenuItem>
-                    <MenuItem onClick={onRemoveTeam}>Delete team</MenuItem>
+                    <MenuItem onClick={handleDeleteConfirmModalOpen}>Delete team</MenuItem>
                 </Menu>
             }
             {

@@ -42,7 +42,7 @@ export const NewCategoryModal = (props) => {
                     required />
                 <br />
                 <br />
-                <Button type="submit" variant="contained" color="success" disableElevation>Create</Button>
+                <Button type="submit" variant="outlined" disableElevation>Create</Button>
             </form>
         </Box>
     )

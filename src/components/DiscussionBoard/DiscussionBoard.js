@@ -64,7 +64,7 @@ export const DiscussionBoard = (props) => {
             </Modal>
             <Modal
                 open={deleteConfirmModalOpen}
-                onClose={handleDeleteConfirmModalOpen}>
+                onClose={handleDeleteConfirmModalClose}>
                 <ConfirmationModal
                     onDecline={() => {
                         handleDeleteConfirmModalClose();

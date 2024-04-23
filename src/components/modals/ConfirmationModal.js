@@ -34,8 +34,10 @@ export const ConfirmationModal = ({ onAccept, onDecline }) => {
             <br />
             <Typography variant="h6" align="center">Are you sure</Typography>
             <br />
-            <Button style={{ width: "max(15vw, 170px)" }} onClick={handleAccept} variant="outlined" disableElevation>Yes</Button>
-            <Button style={{ width: "max(15vw, 170px)" }} onClick={handleDecline} color="warning" variant="outlined" disableElevation>No</Button>
+            <Button onClick={handleAccept} color="error" variant="outlined" fullWidth disableElevation>Yes</Button>
+            <br />
+            <br />
+            <Button onClick={handleDecline} color="warning" variant="outlined" fullWidth disableElevation>No</Button>
         </Box>
     )
 }

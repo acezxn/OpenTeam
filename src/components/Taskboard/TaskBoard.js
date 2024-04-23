@@ -11,6 +11,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { NewCategoryModal } from "./modals/NewCategoryModal";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../utils/firebase";
+import { ConfirmationModal } from "../modals/ConfirmationModal";
 var categoryToIdMap = Object.create(null);
 
 export const TaskBoard = (props) => {
@@ -24,6 +25,7 @@ export const TaskBoard = (props) => {
     const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
     const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
     const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
+    const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
 
     const handleNewTaskModalOpen = () => setNewTaskModalOpen(true);
@@ -32,6 +34,8 @@ export const TaskBoard = (props) => {
     const handleNewCategoryModalClose = () => setNewCategoryModalOpen(false);
     const handleEditTaskModalOpen = () => setEditTaskModalOpen(true);
     const handleEditTaskModalClose = () => setEditTaskModalOpen(false);
+    const handleDeleteConfirmModalOpen = () => setDeleteConfirmModalOpen(true);
+    const handleDeleteConfirmModalClose = () => setDeleteConfirmModalOpen(false);
     const handleMenuOpen = (e) => {
         setAnchorElement(e.target);
         setMenuOpen(true)
@@ -204,8 +208,22 @@ export const TaskBoard = (props) => {
                 anchorEl={anchorElement}
                 open={menuOpen}
                 onClose={handleMenuClose}>
-                <MenuItem onClick={handleCategoryRemove}>Delete</MenuItem>
+                <MenuItem onClick={handleDeleteConfirmModalOpen}>Delete</MenuItem>
             </Menu>
+            <Modal
+                open={deleteConfirmModalOpen}
+                onClose={handleDeleteConfirmModalClose}>
+                <ConfirmationModal
+                    onDecline={() => {
+                        handleDeleteConfirmModalClose();
+                        handleMenuClose();
+                    }}
+                    onAccept={() => {
+                        handleCategoryRemove();
+                        handleDeleteConfirmModalClose();
+                        handleMenuClose();
+                    }} />
+            </Modal>
             <Modal open={newTaskModalOpen} onClose={handleNewTaskModalClose}>
                 <NewTaskModal columns={columns} onNewTask={handleNewTask} />
             </Modal>
