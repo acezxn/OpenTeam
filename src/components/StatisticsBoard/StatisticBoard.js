@@ -33,7 +33,10 @@ export const StatisticBoard = (props) => {
             <Modal
                 open={addRepositoryModalOpen}
                 onClose={handleAddRepositoryModalClose}>
-                <AddRepositoryModal />
+                <AddRepositoryModal teamId={props.teamId} onClose={() => {
+                    handleAddRepositoryModalClose();
+                    getProtectedTeamData();
+                }}/>
             </Modal>
             <Typography variant="h6">Statistics</Typography>
             {

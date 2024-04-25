@@ -223,6 +223,10 @@ Database.TeamManager = class {
         await updateDoc(doc(db, "teams", teamId),
             { links: links });
     }
+    static async updateRepositoryURL(teamId, url) {
+        await updateDoc(doc(db, "protected_team_data", teamId),
+            { repositoryURL: url });
+    }
     /**
      * Updates team information
      *

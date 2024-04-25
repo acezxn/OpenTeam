@@ -1,5 +1,5 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Database from "../../../utils/database";
 
 const modalStyle = {
@@ -25,8 +25,9 @@ export const AddRepositoryModal = (props) => {
     const [infoMessage, setInfoMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const verifyReporitoryURL = async () => {
+        setRepositoryUser("");
+        setRepositoryName("");
         var url;
         try {
             url = new URL(repositoryURL);
@@ -60,11 +61,25 @@ export const AddRepositoryModal = (props) => {
                     setErrorMessage("");
                 }
             } catch (exception) {
+                console.log(exception)
                 setErrorMessage("Repository not found");
                 setInfoMessage("");
             }
         }
     }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (infoMessage === "Repository exists") {
+            await Database.TeamManager.updateRepositoryURL(props.teamId, repositoryURL);
+        }
+        props.onClose();
+    }
+
+    useEffect(() => {
+        if (repositoryURL !== "") {
+            verifyReporitoryURL();
+        }
+    }, [repositoryURL])
 
     return (
         <form onSubmit={handleSubmit}>
