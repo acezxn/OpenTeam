@@ -41,6 +41,9 @@ Database.UserManager = class {
         let data = await getDoc(userDoc);
         if (data.data() === undefined) {
             await setDoc(userDoc, {
+                githubAccesToken: ""
+            });
+            await updateDoc(userDoc, {
                 teams: []
             });
             await updateDoc(userDoc, {
@@ -57,6 +60,15 @@ Database.UserManager = class {
                 photoURL: auth.currentUser.photoURL
             });
         }
+    }
+    static async updateGithubAccessToken(uid, token) {
+        const userDoc = doc(db, "user_data", uid);
+        await updateDoc(userDoc, {
+            githubAccesToken: token
+        });
+    }
+    static async getGithubAccessToken(uid) {
+        return (await getDoc(doc(db, "user_data", uid))).data().githubAccesToken;
     }
     /**
      * Checks whether a user is a member of the team

@@ -16,6 +16,7 @@ export const TeamsPage = () => {
 
     async function refresh() {
         try {
+            Database.initializeOctokit(await Database.UserManager.getGithubAccessToken(auth.currentUser.uid));
             setParticipantData((await Database.TeamManager.getPublicTeamData(teamId)).data().participants);
             let teamSnapshot = await getDoc(doc(collection(db, 'teams'), teamId));
             let teamSnapshotData = teamSnapshot.data();

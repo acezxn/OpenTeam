@@ -16,10 +16,8 @@ const Login = () => {
             const result = await signInWithGithubPopup();
             const credential = GithubAuthProvider.credentialFromResult(result);
             const token = credential.accessToken;
-            Database.initializeOctokit(token);
-            const data = await Database.getOctokit().request("/repos/acezxn/OpenTeam");
-            console.log(data);
             Database.UserManager.createUserData(auth.currentUser.uid);
+            Database.UserManager.updateGithubAccessToken(auth.currentUser.uid, token);
             navigate("/teams");
         } catch (exception) {
 
