@@ -6,7 +6,7 @@ const NoPage = () => {
         <>
             <Navbar />
             <div style={{margin: 10}}>
-                <Typography variant="h1" align="center">Page not found</Typography>
+                <Typography variant="h4" align="center">Page not found</Typography>
             </div>
         </>
     );

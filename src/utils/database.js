@@ -1,9 +1,17 @@
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, orderBy, query, where, serverTimestamp, setDoc, updateDoc, getDocs } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { auth, db, storage } from "./firebase";
+import { Octokit } from "@octokit/core";
 
 
 export default class Database {
+    static #octokit = null;
+    static initializeOctokit(token) {
+        Database.#octokit = new Octokit({ auth: token });
+    }
+    static getOctokit() {
+        return Database.#octokit;
+    }
     /**
      * Upload image to firebase storage
      *
@@ -100,7 +108,8 @@ Database.TeamManager = class {
         await setDoc(doc(db, "protected_team_data", ref.id), {
             announcement: "",
             taskCategories: ["Not started", "In progress", "Done"],
-            tasks: []
+            tasks: [],
+            repositoryURL: ""
         });
         await setDoc(doc(db, "public_team_data", ref.id), {
             participants: [auth.currentUser.uid],
