@@ -16,8 +16,10 @@ const Login = () => {
             const result = await signInWithGithubPopup();
             const credential = GithubAuthProvider.credentialFromResult(result);
             const token = credential.accessToken;
-            Database.UserManager.createUserData(auth.currentUser.uid);
-            Database.UserManager.updateGithubAccessToken(auth.currentUser.uid, token);
+            await Database.UserManager.createUserData(auth.currentUser.uid);
+            if (Database.UserManager.getGithubAccessToken(auth.currentUser.uid) === "") {
+                await Database.UserManager.updateGithubAccessToken(auth.currentUser.uid, token);
+            }
             navigate("/teams");
         } catch (exception) {
 

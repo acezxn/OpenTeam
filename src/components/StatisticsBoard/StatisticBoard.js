@@ -38,7 +38,6 @@ export const StatisticBoard = (props) => {
                     getProtectedTeamData();
                 }}/>
             </Modal>
-            <Typography variant="h6">Statistics</Typography>
             {
                 repositoryURL === "" ? (
                     <>
@@ -46,7 +45,7 @@ export const StatisticBoard = (props) => {
                         <Button variant="outlined" onClick={handleAddRepositoryModalOpen}>Add repository</Button>
                     </>
                 ) : (
-                    <Typography>{repositoryUser}/{repositoryName}</Typography>
+                    <Typography variant="h6">Statistics of repository {repositoryUser}/{repositoryName}</Typography>
                 )
             }
         </div>

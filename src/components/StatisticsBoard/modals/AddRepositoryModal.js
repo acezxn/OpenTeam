@@ -1,6 +1,9 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import { Modal } from "@material-ui/core";
+import { GHTokenUpdateModal } from "../../modals/GHTokenUpdateModal";
 import Database from "../../../utils/database";
+import { auth } from "../../../utils/firebase";
 
 const modalStyle = {
     position: 'absolute',
@@ -24,6 +27,9 @@ export const AddRepositoryModal = (props) => {
     const [repositoryURL, setRepositoryURL] = useState("");
     const [infoMessage, setInfoMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [tokenUpdateModalOpen, setTokenUpdateModalOpen] = useState(false);
+    const handleTokenUpdateModalOpen = () => setTokenUpdateModalOpen(true);
+    const handleTokenUpdateModalClose = () => setTokenUpdateModalOpen(false);
 
     const verifyReporitoryURL = async () => {
         setRepositoryUser("");
@@ -61,7 +67,6 @@ export const AddRepositoryModal = (props) => {
                     setErrorMessage("");
                 }
             } catch (exception) {
-                console.log(exception)
                 setErrorMessage("Repository not found");
                 setInfoMessage("");
             }
@@ -82,32 +87,49 @@ export const AddRepositoryModal = (props) => {
     }, [repositoryURL])
 
     return (
-        <form onSubmit={handleSubmit}>
-            <Box style={modalStyle}>
-                <br />
-                <Typography variant="h6" align="center">Add repository</Typography>
-                <br />
-                <Typography>Enter repository URL</Typography>
-                <TextField
-                    style={{ width: "max(50vw, 340px)" }}
-                    size="small"
-                    value={repositoryURL}
-                    onInput={(e) => { setRepositoryURL(e.target.value) }}
-                    placeholder="https://github.com/USER/REPO"
-                    required />
-                <br />
-                {
-                    infoMessage !== "" && (
-                        <Typography color="success.main">{infoMessage}</Typography>
-                    )
-                }
-                {
-                    errorMessage !== "" && (
-                        <Typography color="error">{errorMessage}</Typography>
-                    )
-                }
-                <Button type="submit" variant="outlined" disableElevation>Add</Button>
-            </Box>
-        </form>
+        <>
+            <Modal
+                open={tokenUpdateModalOpen}
+                onClose={handleTokenUpdateModalClose}>
+                <GHTokenUpdateModal onClose={async () => {
+                    await Database.initializeOctokit(await Database.UserManager.getGithubAccessToken(auth.currentUser.uid));
+                    handleTokenUpdateModalClose();
+                    verifyReporitoryURL();
+                }} />
+            </Modal>
+            <form onSubmit={handleSubmit}>
+                <Box style={modalStyle}>
+                    <br />
+                    <Typography variant="h6" align="center">Add repository</Typography>
+                    <br />
+                    <Typography>Enter repository URL</Typography>
+                    <TextField
+                        style={{ width: "max(50vw, 340px)" }}
+                        size="small"
+                        value={repositoryURL}
+                        onInput={(e) => { setRepositoryURL(e.target.value) }}
+                        placeholder="https://github.com/USER/REPO"
+                        required />
+                    <br />
+                    {
+                        infoMessage !== "" && (
+                            <Typography color="success.main">{infoMessage}</Typography>
+                        )
+                    }
+                    {
+                        errorMessage !== "" && (
+                            <Typography color="error">{errorMessage}</Typography>
+                        )
+                    }
+                    <Typography>Repository not found? Try updating your github access token.</Typography>
+                    <Button color='secondary' variant="outlined" onClick={handleTokenUpdateModalOpen}>
+                        Update access token
+                    </Button>
+                    <br />
+                    <br />
+                    <Button type="submit" variant="outlined" disableElevation>Add</Button>
+                </Box>
+            </form>
+        </>
     )
 }
