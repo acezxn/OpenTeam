@@ -31,20 +31,23 @@ export const AddRepositoryModal = (props) => {
         try {
             url = new URL(repositoryURL);
         } catch (exception) {
-            console.log(exception);
             setErrorMessage("Invalid repository URL");
             setInfoMessage("");
+            return;
         }
         if (url.hostname !== "github.com") {
             setErrorMessage("Only github repository is supported");
             setInfoMessage("");
+            return;
         }
         if (url.pathname.split("/").length <= 2) {
             setErrorMessage("Invalid repository URL");
             setInfoMessage("");
+            return;
         } else if (url.pathname.split("/")[2] === "") {
             setErrorMessage("Invalid repository URL");
             setInfoMessage("");
+            return;
         } else {
             try {
                 const user = url.pathname.split("/")[1];
