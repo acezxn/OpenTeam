@@ -33,19 +33,26 @@ export const StatisticBoard = (props) => {
         }
     }
 
+    const getRepositoryData = async () => {
+        if (repositoryUser !== "" && repositoryName !== "") {
+            while (true) {
+                const result = await Database.getOctokit().request(`/repos/${repositoryUser}/${repositoryName}/stats/contributors`);
+                if (Array.isArray(result.data)) {
+                    setContributorData(result.data);
+                    setLoading(false);
+                    break;
+                }
+            }
+        }
+    }
+
     useEffect(() => {
         setLoading(true);
         getProtectedTeamData();
     }, [props]);
 
     useEffect(() => {
-        if (repositoryUser !== "" && repositoryName !== "") {
-            Database.getOctokit().request(`/repos/${repositoryUser}/${repositoryName}/stats/contributors`)
-                .then((result) => {
-                    setContributorData(result.data);
-                    setLoading(false);
-                });
-        }
+        getRepositoryData();
     }, [repositoryName, repositoryUser]);
 
     useEffect(() => {
