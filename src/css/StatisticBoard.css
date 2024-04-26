@@ -1,0 +1,20 @@
+.contributor_board {
+    background-color: var(--board-dark-color);
+    border-radius: 4px;
+    width: 50vw;
+    height: 50vh;
+    overflow: scroll;
+}
+
+.contributor_card {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    margin: 10px;
+    padding: 10px;
+}
+
+.contributor_chart {
+    width: calc(max(50vw, 100px) - 40px);
+    height: calc(max(30vh, 100px) - 40px);
+    overflow: scroll;
+}
