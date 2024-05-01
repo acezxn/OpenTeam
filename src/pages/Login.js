@@ -17,12 +17,12 @@ const Login = () => {
             const credential = GithubAuthProvider.credentialFromResult(result);
             const token = credential.accessToken;
             await Database.UserManager.createUserData(auth.currentUser.uid);
-            if (Database.UserManager.getGithubAccessToken(auth.currentUser.uid) === "") {
+            if ((await Database.UserManager.getGithubAccessToken(auth.currentUser.uid)) === "") {
                 await Database.UserManager.updateGithubAccessToken(auth.currentUser.uid, token);
             }
             navigate("/teams");
         } catch (exception) {
-
+            console.log("An error occured in login");
         }
     }
 
