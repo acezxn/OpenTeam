@@ -7,6 +7,9 @@ import RingLoader from "react-spinners/RingLoader";
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-moment';
 import "../../css/StatisticBoard.css"
+import { StatisticChart } from "./StatisticCharts";
+import { CommitLog } from "./CommitLog";
+
 
 export const StatisticBoard = (props) => {
     const [loading, setLoading] = useState(false);
@@ -22,6 +25,7 @@ export const StatisticBoard = (props) => {
     const handleAddRepositoryModalClose = () => setAddRepositoryModalOpen(false);
 
     const getProtectedTeamData = async () => {
+        setLoading(true);
         const protectedTeamData = (await Database.TeamManager.getProtectedTeamData(props.teamId)).data();
         setRepositoryURL(protectedTeamData.repositoryURL);
 
@@ -31,95 +35,15 @@ export const StatisticBoard = (props) => {
             setRepositoryUser(url.pathname.split("/")[1]);
             setRepositoryName(url.pathname.split("/")[2]);
         }
-    }
-
-    const getRepositoryData = async () => {
-        if (repositoryUser !== "" && repositoryName !== "") {
-            while (true) {
-                const result = await Database.getOctokit().request(`/repos/${repositoryUser}/${repositoryName}/stats/contributors`);
-                if (Array.isArray(result.data)) {
-                    setContributorData(result.data);
-                    setLoading(false);
-                    break;
-                }
-            }
-        }
+        setLoading(false);
     }
 
     useEffect(() => {
-        setLoading(true);
         getProtectedTeamData();
     }, [props]);
 
-    useEffect(() => {
-        getRepositoryData();
-    }, [repositoryName, repositoryUser]);
-
-    useEffect(() => {
-        if (contributorData.length !== 0) {
-            var charts = [];
-            for (let chart of contribCharts) {
-                chart.destroy();
-            }
-            for (let data of contributorData) {
-                var additionData = data.weeks.map((week) => (
-                    {
-                        x: new Date(week.w * 1000),
-                        y: week.a
-                    }
-                ));
-                var deletionData = data.weeks.map((week) => (
-                    {
-                        x: new Date(week.w * 1000),
-                        y: week.d
-                    }
-                ));
-                var commitData = data.weeks.map((week) => (
-                    {
-                        x: new Date(week.w * 1000),
-                        y: week.c
-                    }
-                ));
-                const ctx = document.getElementById(`contrib_${data.author.id}`).getContext('2d');
-                charts.push(new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: [],
-                        datasets: [
-                            {
-                                data: additionData,
-                                label: "Additions",
-                                borderColor: "#aadd55",
-                                fill: false
-                            },
-                            {
-                                data: deletionData,
-                                label: "Deletions",
-                                borderColor: "#ff5555",
-                                fill: false
-                            },
-                            {
-                                data: commitData,
-                                label: "Commits",
-                                borderColor: "#00cc00",
-                                fill: false
-                            }
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            x: {
-                                type: "time"
-                            }
-                        },
-                    }
-                }));
-            }
-            setContribCharts(charts);
-        }
-    }, [contributorData]);
     return (
-        <div style={{ marginLeft: 10, marginRight: 10 }}>
+        <>
             {
                 loading ? (
                     <RingLoader
@@ -144,25 +68,27 @@ export const StatisticBoard = (props) => {
                         </Modal>
                         {
                             repositoryURL === "" ? (
-                                <>
+                                <div style={{ margin: 10 }}>
                                     <Typography>Repository not specified</Typography>
                                     <Button variant="outlined" onClick={handleAddRepositoryModalOpen}>Add repository</Button>
-                                </>
+                                </div>
                             ) : (
                                 <>
-                                    <Typography variant="h5" align="center">{repositoryUser}/{repositoryName}</Typography>
-                                    <Typography variant="h6">Contributors</Typography>
-                                    <div className="contributor_board">
-                                        {
-                                            contributorData.map((data, index) => (
-                                                <div className="contributor_card">
-                                                    <Typography>{data.author.login}</Typography>
-                                                    <div class="contributor_chart">
-                                                        <canvas id={`contrib_${data.author.id}`}></canvas>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        }
+                                    <div style={{ textAlign: "center" }}>
+                                        <Typography variant="h5" style={{ display: "inline-block", verticalAlign: "middle" }}>
+                                            {repositoryUser}/{repositoryName}
+                                        </Typography>
+                                        <Button
+                                            sx={{ marginLeft: 1, verticalAlign: "middle" }}
+                                            onClick={handleAddRepositoryModalOpen}>Change</Button>
+                                    </div>
+                                    <div style={{ display: "flex" }}>
+                                        <StatisticChart
+                                            repositoryName={repositoryName}
+                                            repositoryUser={repositoryUser} />
+                                        <CommitLog
+                                            repositoryName={repositoryName}
+                                            repositoryUser={repositoryUser} />
                                     </div>
                                 </>
                             )
@@ -170,6 +96,6 @@ export const StatisticBoard = (props) => {
                     </>
                 )
             }
-        </div>
+        </>
     )
 }

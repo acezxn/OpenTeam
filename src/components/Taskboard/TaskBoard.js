@@ -272,7 +272,7 @@ export const TaskBoard = (props) => {
                                                         padding: 4,
                                                         borderRadius: 7,
                                                         width: 250,
-                                                        height: 500,
+                                                        height: "calc(100vh - 220px)",
                                                         overflow: "scroll",
                                                         margin: 8
                                                     }}

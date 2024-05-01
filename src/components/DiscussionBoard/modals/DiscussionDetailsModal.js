@@ -1,5 +1,5 @@
 import { Box, Button, TextField, ThemeProvider, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Database from "../../../utils/database";
 import { auth } from "../../../utils/firebase";
 import { IconButton, Menu, MenuItem, Modal } from "@material-ui/core";
@@ -35,8 +35,11 @@ export const DiscussionDetailsModal = (props) => {
     const handleDeleteConfirmModalClose = () => setDeleteConfirmModalOpen(false);
     const handleMenuClose = () => setAnchorElement(null);
 
+    const submitButtonRef = useRef(null);
+
     const handleSubmitComment = (e) => {
         e.preventDefault();
+        submitButtonRef.current.disabled = true;
         setCommentInputVisible(false);
         const { uid, email, photoURL } = auth.currentUser;
         Database.TeamManager.DiscussionManager.createComment({
@@ -48,6 +51,7 @@ export const DiscussionDetailsModal = (props) => {
             content: comment,
         });
         setComment("");
+        submitButtonRef.current.disabled = false;
     }
     useEffect(() => {
         if (props) {
@@ -134,7 +138,7 @@ export const DiscussionDetailsModal = (props) => {
                                 fullWidth multiline required />
                             <br />
                             <br />
-                            <Button type="submit" variant="outlined">Post</Button>
+                            <Button type="submit" variant="outlined" ref={submitButtonRef} >Post</Button>
                             <div style={{ display: "inline-block", width: 10 }}></div>
                             <Button variant="outlined" color="warning" onClick={() => setCommentInputVisible(false)}>Cancel</Button>
                         </form>

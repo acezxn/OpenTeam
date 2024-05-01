@@ -1,5 +1,5 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Database from "../../../utils/database";
 import { auth } from "../../../utils/firebase";
 
@@ -24,9 +24,12 @@ export const NewDiscussionModal = (props) => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
 
+    const submitButtonRef = useRef(null);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+        submitButtonRef.current.disabled = true;
         const { uid, email, photoURL } = auth.currentUser;
         await Database.TeamManager.DiscussionManager.createDiscussion({
             uid: uid,
@@ -37,6 +40,7 @@ export const NewDiscussionModal = (props) => {
             content: content
         });
         setLoading(false);
+        submitButtonRef.current.disabled = false;
         props.onModalClose();
     }
 
@@ -60,7 +64,7 @@ export const NewDiscussionModal = (props) => {
                     rows={6} multiline required />
                 <br />
                 <br />
-                <Button type="submit" variant="outlined" disableElevation>Create</Button>
+                <Button type="submit" variant="outlined" ref={submitButtonRef} disableElevation>Create</Button>
             </form>
         </Box>
     )
