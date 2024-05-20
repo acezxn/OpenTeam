@@ -13,17 +13,17 @@ export default class Database {
         return Database.#octokit;
     }
     /**
-     * Upload image to firebase storage
+     * Upload file to firebase storage
      *
      * @static
-     * @param {File} img image file
+     * @param {File} file file
      * @param {string} path storage path
-     * @return {string} download url for the image
+     * @return {string} download url for the file
      * @memberof Database
      */
-    static async uploadImage(img, path) {
+    static async uploadFile(file, path) {
         const imageRef = storageRef(storage, path);
-        const snapshot = await uploadBytes(imageRef, img);
+        const snapshot = await uploadBytes(imageRef, file);
         return await getDownloadURL(snapshot.ref)
     }
 }
@@ -437,6 +437,11 @@ Database.TeamManager.MessageManager = class {
         await addDoc(collection(db, "messages"), { ...messageData, createTime: serverTimestamp() });
     }
     static async deleteMessage(id) {
+        const attachmentURL = (await getDoc(doc(db, "messages", id))).data().attachments;
+        for (let url of attachmentURL) {
+            const fileRef = storageRef(storage, url);
+            await deleteObject(fileRef);
+        }
         await deleteDoc(doc(db, "messages", id));
     }
     static getMessages(teamId) {

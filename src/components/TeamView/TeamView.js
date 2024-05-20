@@ -68,7 +68,7 @@ export const TeamView = (props) => {
                 const prevImageRef = storageRef(storage, data.bannerImageURL);
                 deleteObject(prevImageRef);
             }
-            const newURL = await Database.uploadImage(img, `user/${auth.currentUser.uid}/public/images/${uuidv4()}-${img.name}`);
+            const newURL = await Database.uploadFile(img, `user/${auth.currentUser.uid}/public/images/${uuidv4()}-${img.name}`);
             let updatedData = data;
             updatedData.bannerImageURL = newURL;
             setData(updatedData);
