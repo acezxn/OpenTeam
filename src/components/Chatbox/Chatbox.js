@@ -9,12 +9,13 @@ import UploadIcon from '@mui/icons-material/Upload';
 import ClearIcon from '@mui/icons-material/Clear';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import RingLoader from "react-spinners/RingLoader";
 import { v4 as uuidv4 } from 'uuid';
 
 
 
 export const Chatbox = (props) => {
-    const [isSending, setIsSending] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [selectedMessageIndex, setSelectedMessageIndex] = useState(0);
     const [messageHistory, setMessageHistory] = useState([]);
@@ -28,48 +29,45 @@ export const Chatbox = (props) => {
 
     const sendMessage = async (event) => {
         event.preventDefault();
-        if (isSending) {
+        if (loading) {
             return;
         }
 
-        setIsSending(true);
+        setLoading(true);
         if (message.trim() === "" && files.length === 0) {
             return;
         }
 
-        var fileUrls = [];
-        var filenames = [];
-        var filetypes = [];
-
-        for (let file of files) {
-            const url = await Database.uploadFile(file, `teams/${props.teamId}/protected/attachments/${uuidv4()}-${file.name}`);
-            fileUrls.push(url);
-            filenames.push(file.name);
-            filetypes.push(file.type);
-        }
-
         const { uid, email, photoURL } = auth.currentUser;
-        Database.TeamManager.MessageManager.createMessage({
+        const messageDoc = await Database.TeamManager.MessageManager.createMessage({
             uid: uid,
             email: email,
             photoURL: photoURL,
             message: message,
-            attachments: fileUrls,
-            filenames: filenames,
-            filetypes: filetypes,
+            attachments: [],
+            filenames: [],
+            filetypes: [],
             teamId: props.teamId
         });
+
+        let tmpfiles = files;
         setMessage("");
         setFiles([]);
-        setIsSending(false);
+        for (let file of files) {
+            let url = await Database.uploadFile(file, `teams/${props.teamId}/protected/attachments/${uuidv4()}-${file.name}`);
+            await Database.TeamManager.MessageManager.addMessageAttachments(messageDoc.id, url, file.name, file.type);
+        }
+        setLoading(false);
     };
     const selectMessage = (index, event) => {
         setSelectedMessageIndex(index);
         setAnchorElement(event.target);
     }
-    const handleMessageDeletion = () => {
+    const handleMessageDeletion = async () => {
         handleUserMenuClose();
-        Database.TeamManager.MessageManager.deleteMessage(messageHistory[selectedMessageIndex].id);
+        setLoading(true);
+        await Database.TeamManager.MessageManager.deleteMessage(messageHistory[selectedMessageIndex].id);
+        setLoading(false);
     }
 
     const handleFileChange = (e) => {
@@ -172,6 +170,7 @@ export const Chatbox = (props) => {
                                                                     </a>
                                                                 )
                                                             }
+                                                            <br />
                                                         </>
                                                     )
                                                 })
@@ -190,9 +189,11 @@ export const Chatbox = (props) => {
                         position: "absolute",
                         top: "calc(100vh - 268px)",
                         padding: 10,
-                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        backgroundColor: "#191e24",
                         borderRadius: 4,
-                        width: "calc(100vw - 20px)"
+                        width: "calc(100vw - 20px)",
+                        height: 210,
+                        overflow: "scroll"
                     }}>
                         {
                             files.map((file, index) => {
@@ -225,6 +226,20 @@ export const Chatbox = (props) => {
                             })
                         }
                     </div>
+                )
+            }
+            {
+                loading && (
+                    <RingLoader
+                        color={"rgb(109, 255, 211)"}
+                        loading={loading}
+                        cssOverride={{
+                            position: "absolute",
+                            top: "calc(50vh - 50px)",
+                            left: "calc(50vw - 50px)"
+                        }}
+                        size={100}
+                    />
                 )
             }
             <form

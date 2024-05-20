@@ -434,15 +434,33 @@ Database.TeamManager.TasksManager = class {
 
 Database.TeamManager.MessageManager = class {
     static async createMessage(messageData) {
-        await addDoc(collection(db, "messages"), { ...messageData, createTime: serverTimestamp() });
+        return await addDoc(collection(db, "messages"), { ...messageData, createTime: serverTimestamp() });
     }
     static async deleteMessage(id) {
-        const attachmentURL = (await getDoc(doc(db, "messages", id))).data().attachments;
-        for (let url of attachmentURL) {
-            const fileRef = storageRef(storage, url);
-            await deleteObject(fileRef);
+        const attachmentUrls = (await getDoc(doc(db, "messages", id))).data().attachments;
+        for (let url of attachmentUrls) {
+            try {
+                const fileRef = storageRef(storage, url);
+                await deleteObject(fileRef);
+            } catch (exception) {
+                console.log("Warning: attachment not found");
+            }
         }
+        
         await deleteDoc(doc(db, "messages", id));
+    }
+    static async addMessageAttachments(id, url, filename, filetype) {
+        const message = (await getDoc(doc(db, "messages", id))).data();
+        const urls = message.attachments;
+        const filenames = message.filenames;
+        const filetypes = message.filetypes;
+        await updateDoc(doc(db, "messages", id),
+            {
+                attachments: [...urls, url],
+                filenames: [...filenames, filename],
+                filetypes: [...filetypes, filetype]
+            }
+        );
     }
     static getMessages(teamId) {
         return query(
