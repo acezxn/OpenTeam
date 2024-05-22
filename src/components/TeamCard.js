@@ -131,9 +131,9 @@ const TeamCard = (props) => {
                     <div className="card">
                         <div style={{ display: "inline-block" }} onClick={() => { navigate(`/teams-page/${cardId}`) }}>
                             <SchemaIcon style={{ verticalAlign: "middle" }} fontSize='medium' />
-                            <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "calc(min(max(30vw, 200px), 250px) - 150px)", marginLeft: 10 }}>{props.name}</Typography>
+                            <Typography style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 10, marginRight: 10 }}>{props.name}</Typography>
                             <PeopleIcon style={{ verticalAlign: "middle" }} fontSize='small' />
-                            <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "20px", marginLeft: 10 }}>{props.participantCount}</Typography>
+                            <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "20px", marginLeft: 10, marginRight: 10 }}>{props.participantCount}</Typography>
                         </div>
                         <Button onClick={handleMenuOpen} size="small"><MoreVertIcon fontSize='medium' /></Button>
                     </div>
@@ -144,17 +144,17 @@ const TeamCard = (props) => {
                                 <div className="card">
                                     <div style={{ display: "inline-block" }} onClick={() => { navigate(`/teams-page/${cardId}`) }}>
                                         <SchemaIcon style={{ verticalAlign: "middle" }} fontSize='medium' />
-                                        <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "min(max(16vw, 1px), 100px)", marginLeft: 10 }}>{props.name}</Typography>
+                                        <Typography style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 10, marginRight: 10 }}>{props.name}</Typography>
                                         <PeopleIcon style={{ verticalAlign: "middle" }} fontSize='small' />
                                         <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "20px", marginLeft: 10 }}>{props.participantCount}</Typography>
                                     </div>
                                     <Button onClick={handleMenuOpen} size="small"><MoreVertIcon fontSize='medium' /></Button>
                                 </div>
                             ) : (
-                                <div className="card" style={{ width: "min(max(30vw, 150px), 200px)" }} onClick={() => { navigate(`/teams-page/${cardId}`) }}>
+                                <div className="card" onClick={() => { navigate(`/teams-page/${cardId}`) }}>
                                     <div style={{ display: "inline-block" }}>
                                         <SchemaIcon style={{ verticalAlign: "middle" }} fontSize='medium' />
-                                        <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "min(max(16vw, 1px), 100px)", marginLeft: 10 }}>{props.name}</Typography>
+                                        <Typography style={{ display: "inline-block", verticalAlign: "middle", marginLeft: 10, marginRight: 10 }}>{props.name}</Typography>
                                         <PeopleIcon style={{ verticalAlign: "middle" }} fontSize='small' />
                                         <Typography style={{ display: "inline-block", verticalAlign: "middle", width: "20px", marginLeft: 10 }}>{props.participantCount}</Typography>
                                     </div>
