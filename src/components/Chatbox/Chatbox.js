@@ -10,9 +10,9 @@ import ClearIcon from '@mui/icons-material/Clear';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import RingLoader from "react-spinners/RingLoader";
-import { v4 as uuidv4 } from 'uuid';
+import AsyncLock from "async-lock";
 
-
+var lock = new AsyncLock();
 
 export const Chatbox = (props) => {
     const [loading, setLoading] = useState(false);
@@ -50,12 +50,32 @@ export const Chatbox = (props) => {
             teamId: props.teamId
         });
 
-        let tmpfiles = files;
         setMessage("");
         setFiles([]);
+        let filesLoaded = 0;
         for (let file of files) {
-            let url = await Database.uploadFile(file, `teams/${props.teamId}/protected/attachments/${uuidv4()}-${file.name}`);
-            await Database.TeamManager.MessageManager.addMessageAttachments(messageDoc.id, url, file.name, file.type);
+            const fr = new FileReader();
+            fr.readAsDataURL(file);
+
+            fr.addEventListener('load', async () => {
+                await lock.acquire('key', function () {
+                    let messageFilesPendingUpload = JSON.parse(localStorage.getItem("messageFilesPendingUpload"));
+                    if (messageFilesPendingUpload) {
+                        if (messageFilesPendingUpload[messageDoc.id]) {
+                            messageFilesPendingUpload[messageDoc.id].push({url: fr.result, name: file.name, type: file.type, teamId: props.teamId});
+                        } else {
+                            messageFilesPendingUpload[messageDoc.id] = [{url: fr.result, name: file.name, type: file.type, teamId: props.teamId}];
+                        }
+                    } else {
+                        messageFilesPendingUpload = { [messageDoc.id]: [{url: fr.result, name: file.name, type: file.type, teamId: props.teamId}] };
+                    }
+                    localStorage.setItem("messageFilesPendingUpload", JSON.stringify(messageFilesPendingUpload));
+                    filesLoaded++;
+                    if (filesLoaded === files.length) {
+                        window.dispatchEvent(new Event("uploadFromStorage"));
+                    }
+                });
+            });
         }
         setLoading(false);
     };

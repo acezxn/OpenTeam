@@ -26,6 +26,21 @@ export default class Database {
         const snapshot = await uploadBytes(imageRef, file);
         return await getDownloadURL(snapshot.ref)
     }
+    /**
+     * Remove file to firebase storage
+     *
+     * @static
+     * @param {string} url url
+     * @memberof Database
+     */
+    static async removeFile(url) {
+        try {
+            const fileRef = storageRef(storage, url);
+            await deleteObject(fileRef);
+        } catch (exception) {
+            console.log("Warning: attachment not found");
+        }
+    }
 }
 Database.UserManager = class {
     /**
@@ -157,7 +172,7 @@ Database.TeamManager = class {
         );
         const messagesQuerySnapshot = await getDocs(messagesQuery);
         messagesQuerySnapshot.forEach(async (doc) => {
-            await deleteDoc(doc.ref);
+            await Database.TeamManager.MessageManager.deleteMessage(doc.id);
         });
 
         // delete associated discussions
@@ -438,14 +453,20 @@ Database.TeamManager.MessageManager = class {
     }
     static async deleteMessage(id) {
         const attachmentUrls = (await getDoc(doc(db, "messages", id))).data().attachments;
+        let messageFilesPendingRemoval = JSON.parse(localStorage.getItem("messageFilesPendingRemoval"));
         for (let url of attachmentUrls) {
-            try {
-                const fileRef = storageRef(storage, url);
-                await deleteObject(fileRef);
-            } catch (exception) {
-                console.log("Warning: attachment not found");
+            if (messageFilesPendingRemoval) {
+                if (messageFilesPendingRemoval[id]) {
+                    messageFilesPendingRemoval[id].push(url);
+                } else {
+                    messageFilesPendingRemoval[id] = [url];
+                }
+            } else {
+                messageFilesPendingRemoval = { [id]: [url] };
             }
         }
+        localStorage.setItem("messageFilesPendingRemoval", JSON.stringify(messageFilesPendingRemoval));
+        window.dispatchEvent(new Event("removeFromStorage"));
         
         await deleteDoc(doc(db, "messages", id));
     }
