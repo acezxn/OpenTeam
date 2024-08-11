@@ -1,9 +1,8 @@
 .contributor_board {
     background-color: var(--board-dark-color);
     border-radius: 4px;
-    width: calc(50vw - 20px);
+    width: auto;
     height: calc(100vh - 152px);
-    margin: 10px;
     overflow: scroll;
 }
 

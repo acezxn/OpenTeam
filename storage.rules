@@ -9,8 +9,10 @@ service firebase.storage {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     match /teams/{teamId}/protected/{allPaths=**} {
-      allow read: if request.auth != null && request.auth.uid in firestore.get(/databases/(default)/documents/public_team_data/$(teamId)).data.participants;
-      allow write: if request.auth != null && request.auth.uid == firestore.get(/databases/(default)/documents/teams/$(teamId)).data.ownerUID;
+      // all team members can read and create protected files
+      allow read, create: if request.auth != null && request.auth.uid in firestore.get(/databases/(default)/documents/public_team_data/$(teamId)).data.participants;      
+      // only team owners can update and delete protected files
+      allow update, delete: if request.auth != null && request.auth.uid == firestore.get(/databases/(default)/documents/teams/$(teamId)).data.ownerUID;
     }
     match /user/{userId}/public/{allPaths=**} {
       allow read;

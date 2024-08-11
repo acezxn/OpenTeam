@@ -2,6 +2,7 @@ import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, or
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { auth, db, storage } from "./firebase";
 import { Octokit } from "@octokit/core";
+import DatabaseManager from "./databaseManager";
 
 
 export default class Database {
@@ -453,20 +454,13 @@ Database.TeamManager.MessageManager = class {
     }
     static async deleteMessage(id) {
         const attachmentUrls = (await getDoc(doc(db, "messages", id))).data().attachments;
-        let messageFilesPendingRemoval = JSON.parse(localStorage.getItem("messageFilesPendingRemoval"));
+
+        // creates jobs for deletion and wait for all of them to finish deleting
+        let deletionJobs = [];
         for (let url of attachmentUrls) {
-            if (messageFilesPendingRemoval) {
-                if (messageFilesPendingRemoval[id]) {
-                    messageFilesPendingRemoval[id].push(url);
-                } else {
-                    messageFilesPendingRemoval[id] = [url];
-                }
-            } else {
-                messageFilesPendingRemoval = { [id]: [url] };
-            }
+            deletionJobs.push(DatabaseManager.removeMessageAttachment(url, id));
         }
-        localStorage.setItem("messageFilesPendingRemoval", JSON.stringify(messageFilesPendingRemoval));
-        window.dispatchEvent(new Event("removeFromStorage"));
+        await Promise.all(deletionJobs);
         
         await deleteDoc(doc(db, "messages", id));
     }

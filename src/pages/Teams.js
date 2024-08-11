@@ -7,6 +7,7 @@ import TeamCard from "../components/TeamCard";
 import { Button, Divider, Typography } from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Database from "../utils/database";
+import DatabaseManager from "../utils/databaseManager";
 
 
 const Teams = () => {
@@ -55,7 +56,7 @@ const Teams = () => {
             try {
                 const teamSnapShot = await getDoc(teamDoc);
                 const publicDataSnapshot = await getDoc(doc(db, "public_team_data", teamDoc.id));
-                const isMember = await Database.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
+                const isMember = await DatabaseManager.UserManager.checkIsMember(teamDoc.id);
                 if (!isMember) {
                     Database.TeamManager.removeTeamsLink(teamDoc.id, auth.currentUser.uid);
                 } else {
@@ -70,7 +71,7 @@ const Teams = () => {
             try {
                 const teamSnapShot = await getDoc(teamDoc);
                 const publicDataSnapshot = await getDoc(doc(db, "public_team_data", teamDoc.id));
-                const isMember = await Database.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
+                const isMember = await DatabaseManager.UserManager.checkIsMember(teamDoc.id);
                 if (isMember) {
                     Database.TeamManager.createJoinedTeamsLink(teamDoc.id, auth.currentUser.uid);
                     joinedTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data(), participantCount: publicDataSnapshot.data().participantCount });

@@ -82,7 +82,7 @@ export const StatisticBoard = (props) => {
                                             sx={{ marginLeft: 1, verticalAlign: "middle" }}
                                             onClick={handleAddRepositoryModalOpen}>Change</Button>
                                     </div>
-                                    <div style={{ display: "flex" }}>
+                                    <div style={{ display: "grid", gridTemplateColumns: "auto auto", gap: 10, padding: 10 }}>
                                         <StatisticChart
                                             repositoryName={repositoryName}
                                             repositoryUser={repositoryUser} />

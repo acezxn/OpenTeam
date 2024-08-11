@@ -13,6 +13,7 @@ import Explore from './pages/Explore';
 import { SearchPage } from './pages/SearchPage';
 import Database from './utils/database';
 import { v4 as uuidv4 } from 'uuid';
+import DatabaseManager from './utils/databaseManager';
 
 
 const darkTheme = createTheme({
@@ -26,41 +27,11 @@ const darkTheme = createTheme({
 
 export default function App() {
     const [user, setUser] = useState(null);
-    async function uploadFilesFromLocalStorage() {
-        const messageFilesPendingUpload = JSON.parse(localStorage.getItem("messageFilesPendingUpload"));
 
-        if (messageFilesPendingUpload) {
-            for (let id of Object.keys(messageFilesPendingUpload)) {
-                for (let index = 0; index < messageFilesPendingUpload[id].length; index++) {
-                    const fileData = messageFilesPendingUpload[id][index];
-                    const { url, name, type, teamId } = fileData;
-                    const response = await fetch(url);
-                    const data = await response.blob();
-                    let metadata = {
-                        type: type
-                    };
-                    let file = new File([data], name, metadata);
-                    let uploadedUrl = await Database.uploadFile(file, `teams/${teamId}/protected/attachments/${uuidv4()}-${name}`);
-                    await Database.TeamManager.MessageManager.addMessageAttachments(id, uploadedUrl, name, type);
-                    messageFilesPendingUpload[id].splice(index, 1);
-                    localStorage.setItem("messageFilesPendingUpload", JSON.stringify(messageFilesPendingUpload));
-                    index--;
-                }
-            }
-        }
-        localStorage.removeItem("messageFilesPendingUpload");
-    }
+    async function uploadFile(file, name, type, teamId, messageId) {
+        let uploadedUrl = await Database.uploadFile(file, `teams/${teamId}/protected/attachments/${uuidv4()}-${name}`);
 
-    async function removeFilesFromLocalStorage() {
-        const messageFilesPendingRemoval = JSON.parse(localStorage.getItem("messageFilesPendingRemoval"));
-        if (messageFilesPendingRemoval) {
-            for (let id of Object.keys(messageFilesPendingRemoval)) {
-                for (let url of messageFilesPendingRemoval[id]) {
-                    await Database.removeFile(url);
-                }
-            }
-        }
-        localStorage.removeItem("messageFilesPendingRemoval");
+        await Database.TeamManager.MessageManager.addMessageAttachments(messageId, uploadedUrl, name, type);
     }
 
     useEffect(() => {
@@ -68,15 +39,6 @@ export default function App() {
             setUser({ user: user });
         });
     }, []);
-
-    useEffect(() => {
-        if (auth.currentUser) {
-            uploadFilesFromLocalStorage();
-            removeFilesFromLocalStorage();
-            window.addEventListener("uploadFromStorage", uploadFilesFromLocalStorage);
-            window.addEventListener("removeFromStorage", removeFilesFromLocalStorage);
-        }
-    }, [auth.currentUser]);
 
     return (
         <ThemeProvider theme={darkTheme}>

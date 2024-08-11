@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Database from "../utils/database";
 import GitHubIcon from '@mui/icons-material/GitHub';
+import DatabaseManager from "../utils/databaseManager";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -16,9 +17,9 @@ const Login = () => {
             const result = await signInWithGithubPopup();
             const credential = GithubAuthProvider.credentialFromResult(result);
             const token = credential.accessToken;
-            await Database.UserManager.createUserData(auth.currentUser.uid);
-            if ((await Database.UserManager.getGithubAccessToken(auth.currentUser.uid)) === "") {
-                await Database.UserManager.updateGithubAccessToken(auth.currentUser.uid, token);
+            await DatabaseManager.UserManager.createUserData();
+            if ((await DatabaseManager.UserManager.getGithubAccessToken()) === "") {
+                await DatabaseManager.UserManager.updateGithubAccessToken(token);
             }
             navigate("/teams");
         } catch (exception) {

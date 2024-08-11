@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { connectStorageEmulator, getStorage } from "firebase/storage";
+import { connectFunctionsEmulator, getFunctions } from "firebase/functions";
 
 
 const firebaseConfig = {
@@ -18,6 +19,7 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage();
+export const functions = getFunctions();
 
 if (window.location.hostname === "localhost") {
     console.log(
@@ -25,4 +27,5 @@ if (window.location.hostname === "localhost") {
     );
     connectFirestoreEmulator(db, "127.0.0.1", 8080);
     connectStorageEmulator(storage, "127.0.0.1", 9199);
+    connectFunctionsEmulator(functions, "127.0.0.1", 5001);
 }

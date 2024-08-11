@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Database from "../utils/database";
 import { TeamTabView } from "../components/TeamTabView";
 import { Typography } from "@mui/material";
+import DatabaseManager from "../utils/databaseManager";
 
 export const TeamsPage = () => {
     let { teamId } = useParams();
@@ -41,7 +42,7 @@ export const TeamsPage = () => {
 
         for (let teamDoc of data.joinedTeams) {
             try {
-                const isMember = await Database.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
+                const isMember = await DatabaseManager.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
                 if (!isMember) {
                     Database.TeamManager.removeTeamsLink(teamDoc.id, auth.currentUser.uid);
                 }
@@ -52,7 +53,7 @@ export const TeamsPage = () => {
 
         for (let teamDoc of data.pendingTeams) {
             try {
-                const isMember = await Database.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
+                const isMember = await DatabaseManager.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
                 if (isMember) {
                     Database.TeamManager.createJoinedTeamsLink(teamDoc.id, auth.currentUser.uid);
                 }

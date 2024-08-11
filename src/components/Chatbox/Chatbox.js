@@ -10,9 +10,9 @@ import ClearIcon from '@mui/icons-material/Clear';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import RingLoader from "react-spinners/RingLoader";
-import AsyncLock from "async-lock";
+import { v4 as uuidv4 } from 'uuid';
 
-var lock = new AsyncLock();
+
 
 export const Chatbox = (props) => {
     const [loading, setLoading] = useState(false);
@@ -26,6 +26,11 @@ export const Chatbox = (props) => {
     const handleUserMenuClose = () => setAnchorElement(null);
     const messageBox = useRef();
     const imageTypes = ['image/gif', 'image/jpeg', 'image/png'];
+
+    const uploadMessageAttachment = async (file, name, type, teamId, messageId) => {
+        let uploadedUrl = await Database.uploadFile(file, `teams/${teamId}/protected/attachments/${uuidv4()}-${name}`);
+        await Database.TeamManager.MessageManager.addMessageAttachments(messageId, uploadedUrl, name, type);
+    }
 
     const sendMessage = async (event) => {
         event.preventDefault();
@@ -50,33 +55,13 @@ export const Chatbox = (props) => {
             teamId: props.teamId
         });
 
+        // creates upload tasks and wait for them to finish uploading
+        for (let file of files) {
+            await uploadMessageAttachment(file, file.name, file.type, props.teamId, messageDoc.id);
+        }
+
         setMessage("");
         setFiles([]);
-        let filesLoaded = 0;
-        for (let file of files) {
-            const fr = new FileReader();
-            fr.readAsDataURL(file);
-
-            fr.addEventListener('load', async () => {
-                await lock.acquire('key', function () {
-                    let messageFilesPendingUpload = JSON.parse(localStorage.getItem("messageFilesPendingUpload"));
-                    if (messageFilesPendingUpload) {
-                        if (messageFilesPendingUpload[messageDoc.id]) {
-                            messageFilesPendingUpload[messageDoc.id].push({url: fr.result, name: file.name, type: file.type, teamId: props.teamId});
-                        } else {
-                            messageFilesPendingUpload[messageDoc.id] = [{url: fr.result, name: file.name, type: file.type, teamId: props.teamId}];
-                        }
-                    } else {
-                        messageFilesPendingUpload = { [messageDoc.id]: [{url: fr.result, name: file.name, type: file.type, teamId: props.teamId}] };
-                    }
-                    localStorage.setItem("messageFilesPendingUpload", JSON.stringify(messageFilesPendingUpload));
-                    filesLoaded++;
-                    if (filesLoaded === files.length) {
-                        window.dispatchEvent(new Event("uploadFromStorage"));
-                    }
-                });
-            });
-        }
         setLoading(false);
     };
     const selectMessage = (index, event) => {
