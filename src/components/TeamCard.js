@@ -8,6 +8,7 @@ import Database from '../utils/database';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../utils/firebase';
 import { ConfirmationModal } from './modals/ConfirmationModal';
+import DatabaseManager from '../utils/databaseManager';
 
 const modalStyle = {
     position: 'absolute',
@@ -50,7 +51,7 @@ const TeamCard = (props) => {
     }
     async function onRemoveTeam() {
         props.onChange("delete_start");
-        await Database.TeamManager.removeTeam(cardId);
+        await DatabaseManager.TeamManager.removeTeam(cardId);
         props.onChange("update_finished");
     }
     async function onLeaveTeam() {

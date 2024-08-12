@@ -20,7 +20,7 @@ const Teams = () => {
     async function onNewTeam() {
         setLoadingMessage("Creating new team")
         setLoading(true);
-        await Database.TeamManager.createTeam();
+        await DatabaseManager.TeamManager.createTeam();
         refresh();
     }
 

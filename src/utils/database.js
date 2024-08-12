@@ -26,7 +26,7 @@ export default class Database {
         const imageRef = storageRef(storage, path);
         const snapshot = await uploadBytes(imageRef, file);
         return await getDownloadURL(snapshot.ref)
-    }
+    } // left client side
     /**
      * Remove file to firebase storage
      *
@@ -41,7 +41,7 @@ export default class Database {
         } catch (exception) {
             console.log("Warning: attachment not found");
         }
-    }
+    } // implemented function
 }
 Database.UserManager = class {
     /**
@@ -76,16 +76,16 @@ Database.UserManager = class {
                 photoURL: auth.currentUser.photoURL
             });
         }
-    }
+    } // implemented function
     static async updateGithubAccessToken(uid, token) {
         const userDoc = doc(db, "user_data", uid);
         await updateDoc(userDoc, {
             githubAccesToken: token
         });
-    }
+    } // implemented function
     static async getGithubAccessToken(uid) {
         return (await getDoc(doc(db, "user_data", uid))).data().githubAccesToken;
-    }
+    } // implemented function
     /**
      * Checks whether a user is a member of the team
      *
@@ -99,7 +99,7 @@ Database.UserManager = class {
         const data = (await getDoc(doc(db, "public_team_data", teamId))).data();
         const participants = data.participants;
         return participants.includes(uid);
-    }
+    } // implemented function
 
     static async searchEmails(email) {
         return getDocs(query(
@@ -107,7 +107,7 @@ Database.UserManager = class {
             where("email", '>=', email),
             where("email", '<=', email + "\uf8ff"),
         ));
-    }
+    } // left client side
 }
 Database.TeamManager = class {
     /**
@@ -143,7 +143,7 @@ Database.TeamManager = class {
             participants: [auth.currentUser.uid],
             participantCount: 1
         });
-    }
+    } // implemented function
     /**
      * Removes team data
      *
@@ -220,7 +220,7 @@ Database.TeamManager = class {
     }
     static async getPublicTeamData(teamId) {
         return getDoc(doc(db, "public_team_data", teamId));
-    }
+    } // left client side
     static async updatePublicTeamData(teamId, teamData) {
         await updateDoc(doc(db, "public_team_data", teamId), {
             participants: teamData.participants,
@@ -385,7 +385,7 @@ Database.TeamManager = class {
     }
     static async getProtectedTeamData(teamId) {
         return await getDoc(doc(db, "protected_team_data", teamId));
-    }
+    } // left client side
     static async updateProtectedTeamData(teamId, protectedData) {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { announcement: protectedData.announcement });
@@ -406,7 +406,7 @@ Database.TeamManager = class {
             where("teamId", "==", teamId),
             where("targetUid", "==", targetUid)
         ));
-    }
+    } // left client side
 }
 Database.TeamManager.TasksManager = class {
     static async createNewTask(teamId, taskData) {
@@ -458,7 +458,7 @@ Database.TeamManager.MessageManager = class {
         // creates jobs for deletion and wait for all of them to finish deleting
         let deletionJobs = [];
         for (let url of attachmentUrls) {
-            deletionJobs.push(DatabaseManager.removeMessageAttachment(url, id));
+            deletionJobs.push(DatabaseManager.TeamManager.MessageManager.removeMessageAttachment(url, id));
         }
         await Promise.all(deletionJobs);
         
@@ -483,7 +483,7 @@ Database.TeamManager.MessageManager = class {
             orderBy("createTime", "desc"),
             where("teamId", "==", teamId)
         );
-    }
+    } // left client side
 }
 Database.TeamManager.DiscussionManager = class {
     static async createDiscussion(discussionData) {
@@ -498,7 +498,7 @@ Database.TeamManager.DiscussionManager = class {
             orderBy("createTime", "desc"),
             where("teamId", "==", teamId)
         );
-    }
+    } // left client side
     static async createComment(commentData) {
         await addDoc(collection(db, "comments"), { ...commentData, createTime: serverTimestamp() });
     }
@@ -511,5 +511,5 @@ Database.TeamManager.DiscussionManager = class {
             where("discussionId", "==", discussionId),
             orderBy("createTime", "desc")
         );
-    }
+    } // left client side
 }

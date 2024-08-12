@@ -12,11 +12,6 @@ export default class DatabaseManager {
     static getOctokit() {
         return DatabaseManager.#octokit;
     }
-
-    static async removeMessageAttachment(url, messageId) {
-        const callCloudFunction = httpsCallable(functions, "removeMessageAttachment");
-        await callCloudFunction({ url: url, messageId: messageId });
-    }
 }
 
 DatabaseManager.UserManager = class {
@@ -27,22 +22,46 @@ DatabaseManager.UserManager = class {
      * @memberof Database
      */
     static async createUserData() {
-        const callCloudFunction = httpsCallable(functions, "userManagerFunctions-createUserData");
+        const callCloudFunction = httpsCallable(functions, "userManager-createUserData");
         await callCloudFunction();
     }
 
     static async getGithubAccessToken() {
-        const callCloudFunction = httpsCallable(functions, "userManagerFunctions-getGithubAccessToken");
+        const callCloudFunction = httpsCallable(functions, "userManager-getGithubAccessToken");
         return (await callCloudFunction()).data;
     }
 
     static async updateGithubAccessToken(ghToken) {
-        const callCloudFunction = httpsCallable(functions, "userManagerFunctions-updateGithubAccessToken");
+        const callCloudFunction = httpsCallable(functions, "userManager-updateGithubAccessToken");
         await callCloudFunction({ ghToken: ghToken });
     }
 
     static async checkIsMember(teamId) {
-        const callCloudFunction = httpsCallable(functions, "userManagerFunctions-checkIsMember");
+        const callCloudFunction = httpsCallable(functions, "userManager-checkIsMember");
         return (await callCloudFunction({ teamId: teamId })).data;
+    }
+}
+
+DatabaseManager.TeamManager = class {
+    static async createTeam() {
+        const callCloudFunction = httpsCallable(functions, "teamManager-createTeam");
+        return (await callCloudFunction()).data;
+    }
+
+    static async removeTeam(teamId) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-removeTeam");
+        return (await callCloudFunction({teamId: teamId})).data;
+    }
+}
+
+DatabaseManager.TeamManager.MessageManager = class {
+    static async deleteMessage(id) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-messageManager-removeTeam");
+        return (await callCloudFunction({messageId: id})).data;
+    }
+
+    static async removeMessageAttachment(url, messageId) {
+        const callCloudFunction = httpsCallable(functions, "removeMessageAttachment");
+        await callCloudFunction({ url: url, messageId: messageId });
     }
 }
