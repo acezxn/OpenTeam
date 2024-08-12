@@ -61,7 +61,7 @@ DatabaseManager.TeamManager.MessageManager = class {
     }
 
     static async removeMessageAttachment(url, messageId) {
-        const callCloudFunction = httpsCallable(functions, "removeMessageAttachment");
+        const callCloudFunction = httpsCallable(functions, "teamManager-messageManager-removeMessageAttachment");
         await callCloudFunction({ url: url, messageId: messageId });
     }
 }
