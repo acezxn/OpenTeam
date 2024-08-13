@@ -6,8 +6,7 @@ exports.createUserData = functions.https.onCall(async (data, context) => {
         return false;
     }
     try {
-        await Database.UserManager.createUserData(context.auth.uid);
-        return true;
+        return await Database.UserManager.createUserData(context.auth.uid);
     } catch (exception) {
         return false;
     }
@@ -19,8 +18,7 @@ exports.updateGithubAccessToken = functions.https.onCall(async (data, context) =
         return;
     }
     try {
-        await Database.UserManager.updateGithubAccessToken(context.auth.uid, data.ghToken);
-        return true;
+        return await Database.UserManager.updateGithubAccessToken(context.auth.uid, data.ghToken);
     } catch (exception) {
         return false;
     }

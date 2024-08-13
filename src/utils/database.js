@@ -204,7 +204,7 @@ Database.TeamManager = class {
 
         // delete the private team data
         deleteDoc(doc(db, "teams", teamId));
-    }
+    } // implemented function
     /**
      * Renames team
      *
@@ -217,16 +217,18 @@ Database.TeamManager = class {
         await setDoc(doc(db, "teams", teamId),
             { title: title },
             { merge: true });
-    }
+    } // implemented function
+
     static async getPublicTeamData(teamId) {
         return getDoc(doc(db, "public_team_data", teamId));
     } // left client side
+
     static async updatePublicTeamData(teamId, teamData) {
         await updateDoc(doc(db, "public_team_data", teamId), {
             participants: teamData.participants,
             participantCount: teamData.participants.length
         });
-    }
+    } // implemented function
     /**
      * Update team related links
      *
@@ -239,6 +241,7 @@ Database.TeamManager = class {
         await updateDoc(doc(db, "teams", teamId),
             { links: links });
     }
+    
     static async updateRepositoryURL(teamId, url) {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { repositoryURL: url });
@@ -463,7 +466,7 @@ Database.TeamManager.MessageManager = class {
         await Promise.all(deletionJobs);
         
         await deleteDoc(doc(db, "messages", id));
-    }
+    } // implemented function
     static async addMessageAttachments(id, url, filename, filetype) {
         const message = (await getDoc(doc(db, "messages", id))).data();
         const urls = message.attachments;

@@ -50,14 +50,29 @@ DatabaseManager.TeamManager = class {
 
     static async removeTeam(teamId) {
         const callCloudFunction = httpsCallable(functions, "teamManager-removeTeam");
-        return (await callCloudFunction({teamId: teamId})).data;
+        return (await callCloudFunction({ teamId: teamId })).data;
+    }
+
+    static async renameTeam(teamId, title) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-renameTeam");
+        return (await callCloudFunction({ teamId: teamId, title: title })).data;
+    }
+
+    static async updatePublicTeamData(teamId, teamData) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-updatePublicTeamData");
+        return (await callCloudFunction({ teamId: teamId, teamData: teamData })).data;
+    }
+
+    static async updateTeamLinks(teamId, links) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-updateTeamLinks");
+        return (await callCloudFunction({ teamId: teamId, links: links })).data;
     }
 }
 
 DatabaseManager.TeamManager.MessageManager = class {
     static async deleteMessage(id) {
         const callCloudFunction = httpsCallable(functions, "teamManager-messageManager-removeTeam");
-        return (await callCloudFunction({messageId: id})).data;
+        return (await callCloudFunction({ messageId: id })).data;
     }
 
     static async removeMessageAttachment(url, messageId) {

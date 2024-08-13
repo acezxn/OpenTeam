@@ -45,7 +45,7 @@ const TeamCard = (props) => {
     async function handleTeamRename(event) {
         event.preventDefault();
         props.onChange("rename_start");
-        await Database.TeamManager.renameTeam(cardId, teamTitle);
+        await DatabaseManager.TeamManager.renameTeam(cardId, teamTitle);
         handleModalClose();
         props.onChange("update_finished");
     }

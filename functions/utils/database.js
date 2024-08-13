@@ -8,6 +8,7 @@ Database.UserManager = class {
      *
      * @static
      * @param {string} uid User id
+     * @returns {boolean} Whether the operation succeeded
      * @memberof Database
      */
     static async createUserData(uid) {
@@ -34,6 +35,7 @@ Database.UserManager = class {
                 photoURL: currentUser.photoURL
             });
         }
+        return true;
     }
 
     static async updateGithubAccessToken(uid, token) {
@@ -41,6 +43,7 @@ Database.UserManager = class {
         await userDoc.update({
             githubAccesToken: token
         });
+        return true;
     }
 
     static async getGithubAccessToken(uid) {
@@ -68,7 +71,8 @@ Database.TeamManager = class {
      * Creates team data
      *
      * @static
-     * @param {string} uid User
+     * @param {string} uid User id
+     * @returns {boolean} Whether the operation succeeded
      * @memberof Database
      */
     static async createTeam(uid) {
@@ -95,6 +99,7 @@ Database.TeamManager = class {
             participants: [uid],
             participantCount: 1
         });
+        return true;
     }
 
     /**
@@ -102,13 +107,14 @@ Database.TeamManager = class {
      *
      * @static
      * @param {string} teamId Team id
+     * @returns {boolean} Whether the operation succeeded
      * @memberof Database
      */
     static async removeTeam(teamId, uid) {
         const targetTeamData = (await db.collection("teams").doc(teamId).get()).data();
         // not the owner of the team
         if (uid !== targetTeamData.ownerUID) {
-            return;
+            return false;
         }
 
         // delete all join requests for the team
@@ -155,6 +161,53 @@ Database.TeamManager = class {
 
         // delete the private team data
         await db.collection("teams").doc(teamId).delete();
+        return true;
+    }
+
+    /**
+     * Renames team
+     *
+     * @static
+     * @param {string} teamId Team id
+     * @param {string} uid User id
+     * @param {string} title Team title
+     * @returns {boolean} Whether the operation succeeded
+     * @memberof Database
+     */
+    static async renameTeam(teamId, uid, title) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+        if (uid !== (await teamDocRef.get()).data().ownerUID) {
+            return false;
+        }
+
+        await teamDocRef.set({ title: title }, { merge: true });
+        return true;
+    }
+
+    static async updatePublicTeamData(teamId, uid, teamData) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+        const publicTeamDocRef = db.collection("public_team_data").doc(teamId);
+        if (
+            uid !== (await teamDocRef.get()).data().ownerUID &&
+            !(await publicTeamDocRef.get()).data().participants.includes(uid)
+        ) {
+            return false;
+        }
+        await publicTeamDocRef.update({
+            participants: teamData.participants,
+            participantCount: teamData.participants.length
+        });
+        return true;
+    }
+
+    static async updateTeamLinks(teamId, uid, links) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+        if (uid !== (await teamDocRef.get()).data().ownerUID) {
+            return false;
+        }
+        
+        await teamDocRef.update({ links: links });
+        return true;
     }
 }
 
@@ -180,6 +233,7 @@ Database.TeamManager.MessageManager = class {
         await Promise.all(deletionJobs);
 
         await targetMessageDoc.delete();
+        return true;
     }
 
     static async removeMessageAttachment(messageId, url, uid) {
@@ -188,12 +242,12 @@ Database.TeamManager.MessageManager = class {
 
         // exits if specified url is not an attachment
         if (!messageData.attachments.includes(url)) {
-            return;
+            return false;
         }
 
         // exits if current user is not the message owner or team owner
         if (uid !== messageData.uid && uid !== teamData.ownerUID) {
-            return;
+            return false;
         }
 
         // tries to delete the file
@@ -204,8 +258,10 @@ Database.TeamManager.MessageManager = class {
             const file = storage.bucket().file(decodedFilePath);
 
             await file.delete();
+            return true;
         } catch (exception) {
             console.log("Warning: attachment not found");
+            return false;
         }
     }
 }

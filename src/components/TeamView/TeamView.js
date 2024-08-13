@@ -19,6 +19,7 @@ import { JoinModal } from "./modals/JoinModal";
 import { EditAnnouncementModal } from "./modals/EditAnnouncementModal";
 import "../../css/TeamView.css"
 import { ShareTeamModal } from "./modals/ShareTeamModal";
+import DatabaseManager from "../../utils/databaseManager";
 
 export const TeamView = (props) => {
     // loading states
@@ -79,7 +80,7 @@ export const TeamView = (props) => {
         let updatedData = data;
         updatedData.links = links;
         setData(updatedData);
-        Database.TeamManager.updateTeamLinks(props.teamId, links);
+        DatabaseManager.TeamManager.updateTeamLinks(props.teamId, links);
     }
     const handleTeamInfoUpdate = async (info) => {
         try {
