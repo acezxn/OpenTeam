@@ -93,6 +93,16 @@ DatabaseManager.TeamManager = class {
         const callCloudFunction = httpsCallable(functions, "teamManager-addPendingParticipant");
         return (await callCloudFunction({ teamId: teamId, introduction: introduction })).data;
     }
+
+    static async removePendingParticipant(teamId, targetUID, introduction) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-removePendingParticipant");
+        return (await callCloudFunction({ teamId: teamId, targetUID: targetUID, introduction: introduction })).data;
+    }
+
+    static async removeTeamsLink(teamId) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-removeTeamsLink");
+        return (await callCloudFunction({ teamId: teamId })).data;
+    }
 }
 
 DatabaseManager.TeamManager.MessageManager = class {

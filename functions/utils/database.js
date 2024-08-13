@@ -250,6 +250,8 @@ Database.TeamManager = class {
     static async addPendingParticipant(teamId, uid, introduction) {
         const joinRequestsDoc = db.collection("join_requests").doc(teamId);
         const teamDoc = db.collection("teams").doc(teamId);
+
+        // exits if team not joinable
         if (!(await teamDoc.get()).data().joinable) {
             return false;
         }
@@ -274,6 +276,30 @@ Database.TeamManager = class {
         }
         await db.collection("user_data").doc(uid).update({
             pendingTeams: FieldValue.arrayUnion(teamDoc)
+        });
+        return true;
+    }
+
+    static async removePendingParticipant(teamId, currentUID, targetUID, introduction) {
+        const targetTeamDoc = db.collection("teams").doc(teamId);
+        const targetJoinRequestDoc = db.collection("join_requests").doc(teamId);
+
+        // not the owner of the team
+        if (currentUID !== (await targetTeamDoc.get()).data().ownerUID) {
+            return false;
+        }
+
+        await targetJoinRequestDoc.update({ requests: FieldValue.arrayRemove({ uid: targetUID, introduction: introduction })});
+        return true;
+    }
+
+    static async removeTeamsLink(teamId, uid) {
+        console.log(teamId, uid);
+        const teamDocRef = db.collection("teams").doc(teamId);
+        const userDocRef = db.collection("user_data").doc(uid);
+        await userDocRef.update({
+            pendingTeams: FieldValue.arrayRemove(teamDocRef),
+            joinedTeams: FieldValue.arrayRemove(teamDocRef)
         });
         return true;
     }

@@ -10,6 +10,7 @@ import { styled } from '@mui/material/styles';
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../utils/firebase";
 import Database from "../../../utils/database";
+import DatabaseManager from "../../../utils/databaseManager";
 
 const modalStyle = {
     position: 'absolute',
@@ -70,7 +71,7 @@ export const JoinRequestsModal = (props) => {
     const [loading, setLoading] = useState(true);
 
     const handleAccept = (index) => {
-        Database.TeamManager.removePendingParticipant(props.teamId, participantsUID[index], participantIntroduction[index]);
+        DatabaseManager.TeamManager.removePendingParticipant(props.teamId, participantsUID[index], participantIntroduction[index]);
         Database.TeamManager.addTeamMember(props.teamId, participantsUID[index]);
         setParticipantsUID(participantsUID.filter((uid, key) => {
             return key !== index;
@@ -85,7 +86,7 @@ export const JoinRequestsModal = (props) => {
     }
 
     const handleDecline = (index) => {
-        Database.TeamManager.removePendingParticipant(props.teamId, participantsUID[index], participantIntroduction[index]);
+        DatabaseManager.TeamManager.removePendingParticipant(props.teamId, participantsUID[index], participantIntroduction[index]);
         setParticipantsUID(participantsUID.filter((uid, key) => {
             return key !== index;
         }));

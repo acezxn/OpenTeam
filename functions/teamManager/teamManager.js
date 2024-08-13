@@ -90,3 +90,23 @@ exports.addPendingParticipant = functions.https.onCall(async (data, context) => 
         return false;
     }
 });
+
+exports.removePendingParticipant = functions.https.onCall(async (data, context) => {
+    if (!context.auth) return false;
+    try {
+        const { teamId, targetUID, introduction } = data;
+        return await Database.TeamManager.removePendingParticipant(teamId, context.auth.uid, targetUID, introduction);
+    } catch (exception) {
+        return false;
+    }
+});
+
+exports.removeTeamsLink = functions.https.onCall(async (data, context) => {
+    if (!context.auth) return false;
+    try {
+        const { teamId } = data;
+        return await Database.TeamManager.removeTeamsLink(teamId, context.auth.uid);
+    } catch (exception) {
+        return false;
+    }
+});

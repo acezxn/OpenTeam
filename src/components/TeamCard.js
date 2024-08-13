@@ -56,7 +56,7 @@ const TeamCard = (props) => {
     }
     async function onLeaveTeam() {
         props.onChange("leave_start");
-        await Database.TeamManager.removeTeamsLink(cardId, auth.currentUser.uid);
+        await DatabaseManager.TeamManager.removeTeamsLink(cardId);
         await Database.TeamManager.removeTeamMember(cardId, auth.currentUser.uid);
         props.onChange("update_finished");
     }

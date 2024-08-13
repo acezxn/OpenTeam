@@ -44,7 +44,7 @@ export const TeamsPage = () => {
             try {
                 const isMember = await DatabaseManager.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
                 if (!isMember) {
-                    Database.TeamManager.removeTeamsLink(teamDoc.id, auth.currentUser.uid);
+                    DatabaseManager.TeamManager.removeTeamsLink(teamDoc.id);
                 }
             } catch (exception) {
                 await updateDoc(doc(db, 'user_data', snapshot.id), { joinedTeams: arrayRemove(teamDoc) });

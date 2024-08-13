@@ -58,7 +58,7 @@ const Teams = () => {
                 const publicDataSnapshot = await getDoc(doc(db, "public_team_data", teamDoc.id));
                 const isMember = await DatabaseManager.UserManager.checkIsMember(teamDoc.id);
                 if (!isMember) {
-                    Database.TeamManager.removeTeamsLink(teamDoc.id, auth.currentUser.uid);
+                    DatabaseManager.TeamManager.removeTeamsLink(teamDoc.id);
                 } else {
                     joinedTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data(), participantCount: publicDataSnapshot.data().participantCount });
                 }

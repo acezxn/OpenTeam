@@ -311,6 +311,7 @@ Database.TeamManager = class {
         await updateDoc(doc(db, "user_data", uid),
             { pendingTeams: arrayUnion(doc(db, "teams", teamId)) });
     } // implemented function
+
     /**
      * Removes join requests of pending participants
      *
@@ -323,7 +324,8 @@ Database.TeamManager = class {
     static async removePendingParticipant(teamId, uid, introduction) {
         await updateDoc(doc(db, "join_requests", teamId),
             { requests: arrayRemove({ uid: uid, introduction: introduction }) });
-    }
+    } // implemented function
+
     /**
      * Removes pending and joined team linkage from user data
      *
@@ -337,7 +339,8 @@ Database.TeamManager = class {
             { pendingTeams: arrayRemove(doc(db, "teams", teamId)) });
         updateDoc(doc(db, "user_data", uid),
             { joinedTeams: arrayRemove(doc(db, "teams", teamId)) });
-    }
+    } // implemented function
+
     /**
      * Records joined team linkage to user data, and removes pending team linkage
      *
