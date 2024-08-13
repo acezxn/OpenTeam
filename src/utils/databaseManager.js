@@ -67,6 +67,32 @@ DatabaseManager.TeamManager = class {
         const callCloudFunction = httpsCallable(functions, "teamManager-updateTeamLinks");
         return (await callCloudFunction({ teamId: teamId, links: links })).data;
     }
+
+    static async updateRepositoryURL(teamId, url) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-updateRepositoryURL");
+        return (await callCloudFunction({ teamId: teamId, url: url })).data;
+    }
+
+    static async updateTeamInfo(teamId, title, description, publiclyVisible, joinable) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-updateTeamInfo");
+        return (await callCloudFunction({
+            teamId: teamId,
+            title: title,
+            description: description,
+            publiclyVisible: publiclyVisible,
+            joinable: joinable
+        })).data;
+    }
+
+    static async updateTeamBannerImageURL(teamId, url) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-updateTeamBannerImageURL");
+        return (await callCloudFunction({ teamId: teamId, url: url })).data;
+    }
+
+    static async addPendingParticipant(teamId, introduction) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-addPendingParticipant");
+        return (await callCloudFunction({ teamId: teamId, introduction: introduction })).data;
+    }
 }
 
 DatabaseManager.TeamManager.MessageManager = class {

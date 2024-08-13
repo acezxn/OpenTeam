@@ -240,12 +240,12 @@ Database.TeamManager = class {
     static async updateTeamLinks(teamId, links) {
         await updateDoc(doc(db, "teams", teamId),
             { links: links });
-    }
-    
+    } // implemented function
+
     static async updateRepositoryURL(teamId, url) {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { repositoryURL: url });
-    }
+    } // implemented function
     /**
      * Updates team information
      *
@@ -266,7 +266,7 @@ Database.TeamManager = class {
             { title: title });
         await updateDoc(doc(db, "teams", teamId),
             { description: description });
-    }
+    } // implemented function
     /**
      * Updates team banner image url
      *
@@ -278,7 +278,7 @@ Database.TeamManager = class {
     static async updateTeamBannerImageURL(teamId, url) {
         await updateDoc(doc(db, "teams", teamId),
             { bannerImageURL: url });
-    }
+    } // implemented function
     /**
      * Records join requests of pending participants, and add pending team linkage in user data
      *
@@ -310,7 +310,7 @@ Database.TeamManager = class {
         }
         await updateDoc(doc(db, "user_data", uid),
             { pendingTeams: arrayUnion(doc(db, "teams", teamId)) });
-    }
+    } // implemented function
     /**
      * Removes join requests of pending participants
      *

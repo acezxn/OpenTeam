@@ -50,3 +50,43 @@ exports.updateTeamLinks = functions.https.onCall(async (data, context) => {
         return false;
     }
 });
+
+exports.updateRepositoryURL = functions.https.onCall(async (data, context) => {
+    if (!context.auth) return false;
+    try {
+        const { teamId, url } = data;
+        return await Database.TeamManager.updateRepositoryURL(teamId, context.auth.uid, url);
+    } catch (exception) {
+        return false;
+    }
+});
+
+exports.updateTeamInfo = functions.https.onCall(async (data, context) => {
+    if (!context.auth) return false;
+    try {
+        const { teamId, title, description, publiclyVisible, joinable } = data;
+        return await Database.TeamManager.updateTeamInfo(teamId, context.auth.uid, title, description, publiclyVisible, joinable);
+    } catch (exception) {
+        return false;
+    }
+});
+
+exports.updateTeamBannerImageURL = functions.https.onCall(async (data, context) => {
+    if (!context.auth) return false;
+    try {
+        const { teamId, url } = data;
+        return await Database.TeamManager.updateTeamBannerImageURL(teamId, context.auth.uid, url);
+    } catch (exception) {
+        return false;
+    }
+});
+
+exports.addPendingParticipant = functions.https.onCall(async (data, context) => {
+    if (!context.auth) return false;
+    try {
+        const { teamId, introduction } = data;
+        return await Database.TeamManager.addPendingParticipant(teamId, context.auth.uid, introduction);
+    } catch (exception) {
+        return false;
+    }
+});

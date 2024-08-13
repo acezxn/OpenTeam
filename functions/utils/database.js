@@ -149,7 +149,6 @@ Database.TeamManager = class {
             await doc.ref.delete();
         });
 
-
         const bannerImageURL = (await db.collection("teams").doc(teamId).get()).data().bannerImageURL;
         if (bannerImageURL !== "") {
             const bucketName = storage.bucket().name;
@@ -205,8 +204,77 @@ Database.TeamManager = class {
         if (uid !== (await teamDocRef.get()).data().ownerUID) {
             return false;
         }
-        
+
         await teamDocRef.update({ links: links });
+        return true;
+    }
+
+    static async updateRepositoryURL(teamId, uid, url) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+        const publicTeamDocRef = db.collection("public_team_data").doc(teamId);
+        if (
+            uid !== (await teamDocRef.get()).data().ownerUID &&
+            !(await publicTeamDocRef.get()).data().participants.includes(uid)
+        ) {
+            return false;
+        }
+        await db.collection("protected_team_data").doc(teamId).update({ repositoryURL: url });
+        return true;
+    }
+
+    static async updateTeamInfo(teamId, uid, title, description, publiclyVisible, joinable) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+        if (uid !== (await teamDocRef.get()).data().ownerUID) {
+            return false;
+        }
+
+        await teamDocRef.update({
+            publiclyVisible: publiclyVisible,
+            joinable: joinable,
+            title: title,
+            description: description
+        });
+
+        return true;
+    }
+
+    static async updateTeamBannerImageURL(teamId, uid, url) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+        if (uid !== (await teamDocRef.get()).data().ownerUID) {
+            return false;
+        }
+        await teamDocRef.update({ bannerImageURL: url });
+        return true;
+    }
+
+    static async addPendingParticipant(teamId, uid, introduction) {
+        const joinRequestsDoc = db.collection("join_requests").doc(teamId);
+        const teamDoc = db.collection("teams").doc(teamId);
+        if (!(await teamDoc.get()).data().joinable) {
+            return false;
+        }
+
+        const data = (await joinRequestsDoc.get()).data();
+        const requests = data.requests;
+        let recordExist = false;
+        let recordIndex = -1;
+        for (let index = 0; index < requests.length; index++) {
+            if (requests[index].uid === uid) {
+                recordExist = true;
+                recordIndex = index;
+                break;
+            }
+        }
+
+        if (!recordExist) {
+            await joinRequestsDoc.update({ requests: FieldValue.arrayUnion({ uid: uid, introduction: introduction }) });
+        } else {
+            requests[recordIndex].introduction = introduction;
+            await joinRequestsDoc.update({ requests: requests });
+        }
+        await db.collection("user_data").doc(uid).update({
+            pendingTeams: FieldValue.arrayUnion(teamDoc)
+        });
         return true;
     }
 }

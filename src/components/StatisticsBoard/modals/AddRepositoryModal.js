@@ -4,6 +4,7 @@ import { Modal } from "@material-ui/core";
 import { GHTokenUpdateModal } from "../../modals/GHTokenUpdateModal";
 import Database from "../../../utils/database";
 import { auth } from "../../../utils/firebase";
+import DatabaseManager from "../../../utils/databaseManager";
 
 const modalStyle = {
     position: 'absolute',
@@ -75,7 +76,7 @@ export const AddRepositoryModal = (props) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (infoMessage === "Repository exists") {
-            await Database.TeamManager.updateRepositoryURL(props.teamId, repositoryURL);
+            await DatabaseManager.TeamManager.updateRepositoryURL(props.teamId, repositoryURL);
         }
         props.onClose();
     }

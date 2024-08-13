@@ -73,7 +73,7 @@ export const TeamView = (props) => {
             let updatedData = data;
             updatedData.bannerImageURL = newURL;
             setData(updatedData);
-            Database.TeamManager.updateTeamBannerImageURL(props.teamId, newURL);
+            DatabaseManager.TeamManager.updateTeamBannerImageURL(props.teamId, newURL);
         }
     }
     const handleLinkUpdate = (links) => {
@@ -90,7 +90,7 @@ export const TeamView = (props) => {
             updatedData.publiclyVisible = info.publiclyVisible;
             updatedData.joinable = info.joinable;
             setData(updatedData);
-            await Database.TeamManager.updateTeamInfo(props.teamId, info.title, info.description, info.publiclyVisible, info.joinable);
+            await DatabaseManager.TeamManager.updateTeamInfo(props.teamId, info.title, info.description, info.publiclyVisible, info.joinable);
         } catch (exception) {
 
         }
@@ -110,7 +110,7 @@ export const TeamView = (props) => {
     }
     const handleJoin = (introduction) => {
         if (auth.currentUser.uid !== data.ownerUID && data.joinable) {
-            Database.TeamManager.addPendingParticipant(props.teamId, auth.currentUser.uid, introduction);
+            DatabaseManager.TeamManager.addPendingParticipant(props.teamId, introduction);
             setMessage("Join request initiated");
         }
     }
