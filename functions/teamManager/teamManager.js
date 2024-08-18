@@ -110,3 +110,33 @@ exports.removeTeamsLink = functions.https.onCall(async (data, context) => {
         return false;
     }
 });
+
+exports.createJoinedTeamsLink = functions.https.onCall(async (data, context) => {
+    if (!context.auth) return false;
+    try {
+        const { teamId } = data;
+        return await Database.TeamManager.createJoinedTeamsLink(teamId, context.auth.uid);
+    } catch (exception) {
+        return false;
+    }
+});
+
+exports.addTeamMember = functions.https.onCall(async (data, context) => {
+    if (!context.auth) return false;
+    try {
+        const { teamId, targetUID } = data;
+        return await Database.TeamManager.addTeamMember(teamId, context.auth.uid, targetUID);
+    } catch (exception) {
+        return false;
+    }
+});
+
+exports.removeTeamMember = functions.https.onCall(async (data, context) => {
+    if (!context.auth) return false;
+    try {
+        const { teamId, targetUID } = data;
+        return await Database.TeamManager.removeTeamMember(teamId, context.auth.uid, targetUID);
+    } catch (exception) {
+        return false;
+    }
+});

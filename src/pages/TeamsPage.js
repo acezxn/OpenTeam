@@ -55,7 +55,7 @@ export const TeamsPage = () => {
             try {
                 const isMember = await DatabaseManager.UserManager.checkIsMember(teamDoc.id, auth.currentUser.uid);
                 if (isMember) {
-                    Database.TeamManager.createJoinedTeamsLink(teamDoc.id, auth.currentUser.uid);
+                    DatabaseManager.TeamManager.createJoinedTeamsLink(teamDoc.id, auth.currentUser.uid);
                 }
             } catch (exception) {
                 await updateDoc(doc(db, 'user_data', snapshot.id), { pendingTeams: arrayRemove(teamDoc) });
@@ -65,7 +65,7 @@ export const TeamsPage = () => {
         const querySnapshot = await Database.TeamManager.queryInvitationRequest(teamId, auth.currentUser.uid);
         for (let index = 0; index < querySnapshot.docs.length; index++) {
             let snapshot = querySnapshot.docs[index];
-            Database.TeamManager.createJoinedTeamsLink(teamId, auth.currentUser.uid);
+            DatabaseManager.TeamManager.createJoinedTeamsLink(teamId, auth.currentUser.uid);
             Database.TeamManager.removeInvitationRequest(snapshot.id);
         }
     }

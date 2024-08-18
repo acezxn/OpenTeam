@@ -73,7 +73,7 @@ const Teams = () => {
                 const publicDataSnapshot = await getDoc(doc(db, "public_team_data", teamDoc.id));
                 const isMember = await DatabaseManager.UserManager.checkIsMember(teamDoc.id);
                 if (isMember) {
-                    Database.TeamManager.createJoinedTeamsLink(teamDoc.id, auth.currentUser.uid);
+                    DatabaseManager.TeamManager.createJoinedTeamsLink(teamDoc.id, auth.currentUser.uid);
                     joinedTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data(), participantCount: publicDataSnapshot.data().participantCount });
                 } else {
                     pendingTeamItems.push({ teamId: teamDoc.id, data: teamSnapShot.data(), participantCount: publicDataSnapshot.data().participantCount });
@@ -90,7 +90,7 @@ const Teams = () => {
         ));
         for (let index = 0; index < querySnapshot.docs.length; index++) {
             let snapshot = querySnapshot.docs[index];
-            Database.TeamManager.createJoinedTeamsLink(snapshot.data().teamId, auth.currentUser.uid);
+            DatabaseManager.TeamManager.createJoinedTeamsLink(snapshot.data().teamId, auth.currentUser.uid);
             Database.TeamManager.removeInvitationRequest(snapshot.id);
         }
 

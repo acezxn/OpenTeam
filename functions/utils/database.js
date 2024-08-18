@@ -294,7 +294,6 @@ Database.TeamManager = class {
     }
 
     static async removeTeamsLink(teamId, uid) {
-        console.log(teamId, uid);
         const teamDocRef = db.collection("teams").doc(teamId);
         const userDocRef = db.collection("user_data").doc(uid);
         await userDocRef.update({
@@ -302,6 +301,50 @@ Database.TeamManager = class {
             joinedTeams: FieldValue.arrayRemove(teamDocRef)
         });
         return true;
+    }
+
+    static async createJoinedTeamsLink(teamId, uid) {
+        const userDocRef = db.collection("user_data").doc(uid);
+        const teamDocRef = db.collection("teams").doc(teamId);
+        await userDocRef.update({
+            pendingTeams: FieldValue.arrayRemove(teamDocRef),
+            joinedTeams: FieldValue.arrayUnion(teamDocRef)
+        });
+        return true;
+    }
+
+    static async addTeamMember(teamId, uid, targetUID) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+
+        // not the owner of the team
+        if (uid !== (await teamDocRef.get()).data().ownerUID) {
+            return false;
+        }
+
+        const publicTeamDocRef = db.collection("public_team_data").doc(teamId);
+        const snapshot = await publicTeamDocRef.get();
+
+        await publicTeamDocRef.update({
+            participants: FieldValue.arrayUnion(targetUID),
+            participantCount: snapshot.data().participants.length + 1
+        });
+    }
+
+    static async removeTeamMember(teamId, uid, targetUID) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+
+        // not removing the requested user itself in the team
+        if (uid !== targetUID) {
+            return false;
+        }
+
+        const publicTeamDocRef = db.collection("public_team_data").doc(teamId);
+        const snapshot = await publicTeamDocRef.get();
+
+        await publicTeamDocRef.update({
+            participants: FieldValue.arrayRemove(targetUID),
+            participantCount: snapshot.data().participants.length + 1
+        });
     }
 }
 

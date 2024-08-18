@@ -5,6 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../utils/firebase";
 import { useEffect, useState } from "react";
 import Database from "../../../utils/database";
+import DatabaseManager from "../../../utils/databaseManager";
 
 const modalStyle = {
     position: 'absolute',
@@ -55,7 +56,7 @@ export const MembersModal = (props) => {
             Database.TeamManager.removeInvitationRequest(querySnapshot.docs[index].id);
         }
 
-        await Database.TeamManager.removeTeamMember(props.teamId, uid);
+        await DatabaseManager.TeamManager.removeTeamMember(props.teamId, uid);
 
         let index = membersUID.indexOf(uid);
         setMembersUID(membersUID.filter((uid, key) => {

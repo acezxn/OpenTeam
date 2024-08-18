@@ -3,6 +3,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import { useEffect, useRef, useState } from "react";
 import Database from "../../../utils/database";
 import { auth } from "../../../utils/firebase";
+import DatabaseManager from "../../../utils/databaseManager";
 
 
 const modalStyle = {
@@ -76,7 +77,7 @@ export const ShareTeamModal = (props) => {
                 continue;
             }
             
-            await Database.TeamManager.addTeamMember(props.teamId, selectedUser[index].uid);
+            await DatabaseManager.TeamManager.addTeamMember(props.teamId, selectedUser[index].uid);
             await Database.TeamManager.createInvitationRequest(props.teamId, auth.currentUser.uid, selectedUser[index].uid);
             props.onParticipantsUpdate([...publicTeamData.participants, selectedUser[index].uid]);
         }

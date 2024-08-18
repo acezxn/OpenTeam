@@ -103,6 +103,21 @@ DatabaseManager.TeamManager = class {
         const callCloudFunction = httpsCallable(functions, "teamManager-removeTeamsLink");
         return (await callCloudFunction({ teamId: teamId })).data;
     }
+
+    static async createJoinedTeamsLink(teamId) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-createJoinedTeamsLink");
+        return (await callCloudFunction({ teamId: teamId })).data;
+    }
+
+    static async addTeamMember(teamId, targetUID) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-addTeamMember");
+        return (await callCloudFunction({ teamId: teamId, targetUID: targetUID })).data;
+    }
+
+    static async removeTeamMember(teamId, targetUID) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-removeTeamMember");
+        return (await callCloudFunction({ teamId: teamId, targetUID: targetUID })).data;
+    }
 }
 
 DatabaseManager.TeamManager.MessageManager = class {

@@ -354,7 +354,7 @@ Database.TeamManager = class {
             { pendingTeams: arrayRemove(doc(db, "teams", teamId)) });
         updateDoc(doc(db, "user_data", uid),
             { joinedTeams: arrayUnion(doc(db, "teams", teamId)) });
-    }
+    } // implemented function
     /**
      * Adds new team member to team data
      *
@@ -369,7 +369,7 @@ Database.TeamManager = class {
         const snapshot = await getDoc(doc(db, "public_team_data", teamId));
         await updateDoc(doc(db, "public_team_data", teamId),
             { participantCount: snapshot.data().participants.length });
-    }
+    } // implemented function
     /**
      * Removes team member from team data
      *
@@ -388,7 +388,7 @@ Database.TeamManager = class {
         } catch (exception) {
             console.log("permission error");
         }
-    }
+    } // implemented function
     static async getProtectedTeamData(teamId) {
         return await getDoc(doc(db, "protected_team_data", teamId));
     } // left client side

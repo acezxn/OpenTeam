@@ -72,7 +72,7 @@ export const JoinRequestsModal = (props) => {
 
     const handleAccept = (index) => {
         DatabaseManager.TeamManager.removePendingParticipant(props.teamId, participantsUID[index], participantIntroduction[index]);
-        Database.TeamManager.addTeamMember(props.teamId, participantsUID[index]);
+        DatabaseManager.TeamManager.addTeamMember(props.teamId, participantsUID[index]);
         setParticipantsUID(participantsUID.filter((uid, key) => {
             return key !== index;
         }));
