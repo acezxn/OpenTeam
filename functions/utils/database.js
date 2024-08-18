@@ -343,7 +343,7 @@ Database.TeamManager = class {
 
         await publicTeamDocRef.update({
             participants: FieldValue.arrayRemove(targetUID),
-            participantCount: snapshot.data().participants.length + 1
+            participantCount: snapshot.data().participants.length - 1
         });
     }
 }
