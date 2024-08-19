@@ -333,8 +333,8 @@ Database.TeamManager = class {
     static async removeTeamMember(teamId, uid, targetUID) {
         const teamDocRef = db.collection("teams").doc(teamId);
 
-        // not removing the requested user itself in the team
-        if (uid !== targetUID) {
+        // not team owner and trying to remove other team member
+        if (uid !== (await teamDocRef.get()).data().ownerUID && uid !== targetUID) {
             return false;
         }
 
@@ -345,6 +345,37 @@ Database.TeamManager = class {
             participants: FieldValue.arrayRemove(targetUID),
             participantCount: snapshot.data().participants.length - 1
         });
+    }
+
+    static async updateAnnouncement(teamId, uid, announcement) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+        const publicTeamDocRef = db.collection("public_team_data").doc(teamId);
+        if (
+            uid !== (await teamDocRef.get()).data().ownerUID &&
+            !(await publicTeamDocRef.get()).data().participants.includes(uid)
+        ) {
+            return false;
+        }
+
+        await db.collection("protected_team_data").doc(teamId).update({ announcement: announcement });
+        return true;
+    }
+
+    static async createInvitationRequest(teamId, invitatorUid, targetUid) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+
+        // not the owner of the team
+        if (invitatorUid !== (await teamDocRef.get()).data().ownerUID) {
+            return false;
+        }
+
+        await db.collection("invitation_requests").add({
+            teamId: teamId,
+            invitatorUid: invitatorUid,
+            targetUid: targetUid
+        });
+
+        return true;
     }
 }
 

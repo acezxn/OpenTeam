@@ -140,3 +140,23 @@ exports.removeTeamMember = functions.https.onCall(async (data, context) => {
         return false;
     }
 });
+
+exports.updateAnnouncement = functions.https.onCall(async (data, context) => {
+    if (!context.auth) return false;
+    try {
+        const { teamId, announcement } = data;
+        return await Database.TeamManager.updateAnnouncement(teamId, context.auth.uid, announcement);
+    } catch (exception) {
+        return false;
+    }
+});
+
+exports.createInvitationRequest = functions.https.onCall(async (data, context) => {
+    if (!context.auth) return false;
+    try {
+        const { teamId, targetUID } = data;
+        return await Database.TeamManager.createInvitationRequest(teamId, context.auth.uid, targetUID);
+    } catch (exception) {
+        return false;
+    }
+});

@@ -395,7 +395,7 @@ Database.TeamManager = class {
     static async updateProtectedTeamData(teamId, protectedData) {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { announcement: protectedData.announcement });
-    }
+    } // implemented function
     static async createInvitationRequest(teamId, invitatorUid, targetUid) {
         await addDoc(collection(db, "invitation_requests"), {
             teamId: teamId,

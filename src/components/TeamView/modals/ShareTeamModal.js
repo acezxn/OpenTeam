@@ -78,7 +78,7 @@ export const ShareTeamModal = (props) => {
             }
             
             await DatabaseManager.TeamManager.addTeamMember(props.teamId, selectedUser[index].uid);
-            await Database.TeamManager.createInvitationRequest(props.teamId, auth.currentUser.uid, selectedUser[index].uid);
+            await DatabaseManager.TeamManager.createInvitationRequest(props.teamId, selectedUser[index].uid);
             props.onParticipantsUpdate([...publicTeamData.participants, selectedUser[index].uid]);
         }
     }

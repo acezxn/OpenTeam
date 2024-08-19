@@ -102,7 +102,7 @@ export const TeamView = (props) => {
             updatedProtectedData.announcement = content;
             setProtectedData(updatedProtectedData);
             setAnnouncement(content);
-            await Database.TeamManager.updateProtectedTeamData(props.teamId, updatedProtectedData);
+            await DatabaseManager.TeamManager.updateAnnouncement(props.teamId, announcement);
         } catch (exception) {
 
         }

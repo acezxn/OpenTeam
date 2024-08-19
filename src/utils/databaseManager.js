@@ -118,6 +118,15 @@ DatabaseManager.TeamManager = class {
         const callCloudFunction = httpsCallable(functions, "teamManager-removeTeamMember");
         return (await callCloudFunction({ teamId: teamId, targetUID: targetUID })).data;
     }
+
+    static async updateAnnouncement(teamId, announcement) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-updateAnnouncement");
+        return (await callCloudFunction({ teamId: teamId, announcement: announcement })).data;
+    }
+    static async createInvitationRequest(teamId, targetUID) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-createInvitationRequest");
+        return (await callCloudFunction({ teamId: teamId, targetUID: targetUID })).data;
+    }
 }
 
 DatabaseManager.TeamManager.MessageManager = class {
