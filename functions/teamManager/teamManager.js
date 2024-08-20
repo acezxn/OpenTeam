@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const Database = require("../utils/database");
 
 exports.messageManager = require("./messageManager/messageManager");
+exports.tasksManager = require("./tasksManager/tasksManager");
 
 exports.createTeam = functions.https.onCall(async (data, context) => {
     if (!context.auth) return false;
@@ -156,6 +157,16 @@ exports.createInvitationRequest = functions.https.onCall(async (data, context) =
     try {
         const { teamId, targetUID } = data;
         return await Database.TeamManager.createInvitationRequest(teamId, context.auth.uid, targetUID);
+    } catch (exception) {
+        return false;
+    }
+});
+
+exports.removeInvitationRequest = functions.https.onCall(async (data, context) => {
+    if (!context.auth) return false;
+    try {
+        const { invitationId } = data;
+        return await Database.TeamManager.removeInvitationRequest(invitationId, context.auth.uid);
     } catch (exception) {
         return false;
     }

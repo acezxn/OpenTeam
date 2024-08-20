@@ -402,10 +402,10 @@ Database.TeamManager = class {
             invitatorUid: invitatorUid,
             targetUid: targetUid
         });
-    }
+    } // implemented function
     static async removeInvitationRequest(invitationId) {
         await deleteDoc(doc(db, "invitation_requests", invitationId));
-    }
+    } // implemented function
     static async queryInvitationRequest(teamId, targetUid) {
         return getDocs(query(
             collection(db, "invitation_requests"),
@@ -418,11 +418,11 @@ Database.TeamManager.TasksManager = class {
     static async createNewTask(teamId, taskData) {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { tasks: arrayUnion({ id: taskData.id, title: taskData.title, description: taskData.description, category: taskData.category }) });
-    }
+    } // implemented function
     static async removeTask(teamId, taskData) {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { tasks: arrayRemove({ id: taskData.id, title: taskData.title, description: taskData.description, category: taskData.category }) });
-    }
+    } // implemented function
     static async changeTaskCategory(teamId, oldCategoryName, newCategoryName, taskData) {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { tasks: arrayRemove({ id: taskData.id, title: taskData.title, description: taskData.description, category: oldCategoryName }) });

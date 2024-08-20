@@ -66,7 +66,7 @@ export const TeamsPage = () => {
         for (let index = 0; index < querySnapshot.docs.length; index++) {
             let snapshot = querySnapshot.docs[index];
             DatabaseManager.TeamManager.createJoinedTeamsLink(teamId, auth.currentUser.uid);
-            Database.TeamManager.removeInvitationRequest(snapshot.id);
+            DatabaseManager.TeamManager.removeInvitationRequest(snapshot.id);
         }
     }
 

@@ -12,6 +12,7 @@ import { NewCategoryModal } from "./modals/NewCategoryModal";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 import { ConfirmationModal } from "../modals/ConfirmationModal";
+import DatabaseManager from "../../utils/databaseManager";
 var categoryToIdMap = Object.create(null);
 
 export const TaskBoard = (props) => {
@@ -125,13 +126,13 @@ export const TaskBoard = (props) => {
             ...taskData
         }
         columnsData[categoryToIdMap[taskData.category]].items.push(uploadData);
-        Database.TeamManager.TasksManager.createNewTask(props.teamId, uploadData);
+        DatabaseManager.TeamManager.TasksManager.createNewTask(props.teamId, uploadData);
         setColumns(columnsData);
         handleNewTaskModalClose();
     }
 
     const handleTaskRemove = (columnId, column, item) => {
-        Database.TeamManager.TasksManager.removeTask(props.teamId, { category: column.name, ...item });
+        DatabaseManager.TeamManager.TasksManager.removeTask(props.teamId, { category: column.name, ...item });
         setColumns({
             ...columns,
             [columnId]: {

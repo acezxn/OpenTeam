@@ -127,8 +127,24 @@ DatabaseManager.TeamManager = class {
         const callCloudFunction = httpsCallable(functions, "teamManager-createInvitationRequest");
         return (await callCloudFunction({ teamId: teamId, targetUID: targetUID })).data;
     }
+
+    static async removeInvitationRequest(invitationId) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-removeInvitationRequest");
+        return (await callCloudFunction({ invitationId: invitationId })).data;
+    }
 }
 
+DatabaseManager.TeamManager.TasksManager = class {
+    static async createNewTask(teamId, taskData) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-tasksManager-createNewTask");
+        return (await callCloudFunction({ teamId: teamId, taskData: taskData })).data;
+    }
+
+    static async removeTask(teamId, taskData) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-tasksManager-removeTask");
+        return (await callCloudFunction({ teamId: teamId, taskData: taskData })).data;
+    }
+}
 DatabaseManager.TeamManager.MessageManager = class {
     static async deleteMessage(id) {
         const callCloudFunction = httpsCallable(functions, "teamManager-messageManager-removeTeam");

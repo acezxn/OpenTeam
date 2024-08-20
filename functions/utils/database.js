@@ -289,7 +289,7 @@ Database.TeamManager = class {
             return false;
         }
 
-        await targetJoinRequestDoc.update({ requests: FieldValue.arrayRemove({ uid: targetUID, introduction: introduction })});
+        await targetJoinRequestDoc.update({ requests: FieldValue.arrayRemove({ uid: targetUID, introduction: introduction }) });
         return true;
     }
 
@@ -376,6 +376,64 @@ Database.TeamManager = class {
         });
 
         return true;
+    }
+
+    static async removeInvitationRequest(invitationId, uid) {
+        const invitationDocRef = db.collection("invitation_requests").doc(invitationId);
+        const teamId = (await invitationDocRef.get()).data().teamId;
+        const invitedUID = (await invitationDocRef.get()).data().targetUid;
+        const teamDocRef = db.collection("teams").doc(teamId);
+
+        // not the owner of the team or not the invited user
+        if (uid !== (await teamDocRef.get()).data().ownerUID && uid !== invitedUID) {
+            return false;
+        }
+
+        await invitationDocRef.delete();
+
+        return true;
+    }
+}
+
+Database.TeamManager.TasksManager = class {
+    static async createNewTask(teamId, uid, taskData) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+        const publicTeamDocRef = db.collection("public_team_data").doc(teamId);
+        if (
+            uid !== (await teamDocRef.get()).data().ownerUID &&
+            !(await publicTeamDocRef.get()).data().participants.includes(uid)
+        ) {
+            return false;
+        }
+
+        await db.collection("protected_team_data").doc(teamId).update({
+            tasks: FieldValue.arrayUnion({
+                id: taskData.id,
+                title: taskData.title,
+                description: taskData.description,
+                category: taskData.category
+            })
+        });
+        return true;
+    }
+    static async removeTask(teamId, uid, taskData) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+        const publicTeamDocRef = db.collection("public_team_data").doc(teamId);
+        if (
+            uid !== (await teamDocRef.get()).data().ownerUID &&
+            !(await publicTeamDocRef.get()).data().participants.includes(uid)
+        ) {
+            return false;
+        }
+
+        await db.collection("protected_team_data").doc(teamId).update({
+            tasks: FieldValue.arrayRemove({
+                id: taskData.id,
+                title: taskData.title,
+                description: taskData.description,
+                category: taskData.category
+            })
+        });
     }
 }
 

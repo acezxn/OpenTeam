@@ -53,7 +53,7 @@ export const MembersModal = (props) => {
         // remove invitation requests
         const querySnapshot = await Database.TeamManager.queryInvitationRequest(props.teamId, uid);
         for (let index = 0; index < querySnapshot.docs.length; index++) {
-            Database.TeamManager.removeInvitationRequest(querySnapshot.docs[index].id);
+            DatabaseManager.TeamManager.removeInvitationRequest(querySnapshot.docs[index].id);
         }
 
         await DatabaseManager.TeamManager.removeTeamMember(props.teamId, uid);
