@@ -435,6 +435,99 @@ Database.TeamManager.TasksManager = class {
             })
         });
     }
+    static async changeTaskCategory(teamId, uid, oldCategoryName, newCategoryName, taskData) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+        const publicTeamDocRef = db.collection("public_team_data").doc(teamId);
+        const protectedTeamDocRef = db.collection("protected_team_data").doc(teamId);
+        if (
+            uid !== (await teamDocRef.get()).data().ownerUID &&
+            !(await publicTeamDocRef.get()).data().participants.includes(uid)
+        ) {
+            return false;
+        }
+
+        await protectedTeamDocRef.update({
+            tasks: FieldValue.arrayRemove({
+                id: taskData.id,
+                title: taskData.title,
+                description: taskData.description,
+                category: oldCategoryName
+            })
+        });
+        await protectedTeamDocRef.update({
+            tasks: FieldValue.arrayUnion({
+                id: taskData.id,
+                title: taskData.title,
+                description: taskData.description,
+                category: newCategoryName
+            })
+        });
+
+        return true;
+    }
+    static async updateTaskData(teamId, uid, oldTaskData, newTaskData) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+        const publicTeamDocRef = db.collection("public_team_data").doc(teamId);
+        const protectedTeamDocRef = db.collection("protected_team_data").doc(teamId);
+        if (
+            uid !== (await teamDocRef.get()).data().ownerUID &&
+            !(await publicTeamDocRef.get()).data().participants.includes(uid)
+        ) {
+            return false;
+        }
+
+        await protectedTeamDocRef.update({
+            tasks: FieldValue.arrayRemove({ id: oldTaskData.id, title: oldTaskData.title, description: oldTaskData.description, category: oldTaskData.category })
+        });
+        await protectedTeamDocRef.update({
+            tasks: FieldValue.arrayUnion({ id: newTaskData.id, title: newTaskData.title, description: newTaskData.description, category: newTaskData.category })
+        });
+
+        return true;
+    }
+    static async createCategory(teamId, uid, category) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+        const publicTeamDocRef = db.collection("public_team_data").doc(teamId);
+        const protectedTeamDocRef = db.collection("protected_team_data").doc(teamId);
+        if (
+            uid !== (await teamDocRef.get()).data().ownerUID &&
+            !(await publicTeamDocRef.get()).data().participants.includes(uid)
+        ) {
+            return false;
+        }
+        await protectedTeamDocRef.update({
+            taskCategories: FieldValue.arrayUnion(category)
+        });
+
+        return true;
+    }
+    static async removeCategory(teamId, uid, category) {
+        const teamDocRef = db.collection("teams").doc(teamId);
+        const publicTeamDocRef = db.collection("public_team_data").doc(teamId);
+        const protectedTeamDocRef = db.collection("protected_team_data").doc(teamId);
+        if (
+            uid !== (await teamDocRef.get()).data().ownerUID &&
+            !(await publicTeamDocRef.get()).data().participants.includes(uid)
+        ) {
+            return false;
+        }
+        await protectedTeamDocRef.update({
+            taskCategories: FieldValue.arrayRemove(category)
+        });
+
+        let tasks = (await protectedTeamDocRef.get()).data().tasks;
+        for (let index = 0; index < tasks.length; index++) {
+            if (tasks[index].category === category) {
+                tasks.splice(index, 1);
+                index--;
+            }
+        }
+        await protectedTeamDocRef.update({
+            tasks: tasks
+        });
+        
+        return true;
+    }
 }
 
 Database.TeamManager.MessageManager = class {

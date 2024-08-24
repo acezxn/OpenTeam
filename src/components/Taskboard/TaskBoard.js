@@ -56,7 +56,7 @@ export const TaskBoard = (props) => {
             const newCategoryName = destColumn.name;
             const taskToRemove = sourceItems[source.index];
 
-            Database.TeamManager.TasksManager.changeTaskCategory(
+            DatabaseManager.TeamManager.TasksManager.changeTaskCategory(
                 props.teamId,
                 oldCategoryName,
                 newCategoryName,
@@ -145,7 +145,7 @@ export const TaskBoard = (props) => {
     }
     const handleTaskUpdate = (taskData) => {
         setEditTaskModalOpen(false);
-        Database.TeamManager.TasksManager.updateTaskData(
+        DatabaseManager.TeamManager.TasksManager.updateTaskData(
             props.teamId,
             { ...selectedTaskData, category: selectedColumn.name },
             { ...taskData, category: selectedColumn.name }
@@ -170,7 +170,7 @@ export const TaskBoard = (props) => {
     }
     const handleNewCategory = (categoryName) => {
         handleNewCategoryModalClose();
-        Database.TeamManager.TasksManager.createCategory(props.teamId, categoryName);
+        DatabaseManager.TeamManager.TasksManager.createCategory(props.teamId, categoryName);
         let categoryId = uuidv4();
         setColumns({
             ...columns,
@@ -183,7 +183,7 @@ export const TaskBoard = (props) => {
     }
     const handleCategoryRemove = () => {
         handleMenuClose();
-        Database.TeamManager.TasksManager.removeCategory(props.teamId, selectedColumn.name);
+        DatabaseManager.TeamManager.TasksManager.removeCategory(props.teamId, selectedColumn.name);
         let updatedColumns = columns;
         delete updatedColumns[selectedColumnId];
         setColumns(columns);

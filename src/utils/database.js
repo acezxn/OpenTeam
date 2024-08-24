@@ -428,17 +428,17 @@ Database.TeamManager.TasksManager = class {
             { tasks: arrayRemove({ id: taskData.id, title: taskData.title, description: taskData.description, category: oldCategoryName }) });
         await updateDoc(doc(db, "protected_team_data", teamId),
             { tasks: arrayUnion({ id: taskData.id, title: taskData.title, description: taskData.description, category: newCategoryName }) });
-    }
+    } // implemented function
     static async updateTaskData(teamId, oldTaskData, newTaskData) {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { tasks: arrayRemove({ id: oldTaskData.id, title: oldTaskData.title, description: oldTaskData.description, category: oldTaskData.category }) });
         await updateDoc(doc(db, "protected_team_data", teamId),
             { tasks: arrayUnion({ id: newTaskData.id, title: newTaskData.title, description: newTaskData.description, category: newTaskData.category }) });
-    }
+    } // implemented function
     static async createCategory(teamId, category) {
         await updateDoc(doc(db, "protected_team_data", teamId),
             { taskCategories: arrayUnion(category) });
-    }
+    } // implemented function
     static async removeCategory(teamId, category) {
         updateDoc(doc(db, "protected_team_data", teamId),
             { taskCategories: arrayRemove(category) });
@@ -451,7 +451,7 @@ Database.TeamManager.TasksManager = class {
         }
         updateDoc(doc(db, "protected_team_data", teamId),
             { tasks: tasks });
-    }
+    } // implemented function
 }
 
 Database.TeamManager.MessageManager = class {

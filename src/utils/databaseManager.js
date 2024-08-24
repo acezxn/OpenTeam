@@ -144,6 +144,39 @@ DatabaseManager.TeamManager.TasksManager = class {
         const callCloudFunction = httpsCallable(functions, "teamManager-tasksManager-removeTask");
         return (await callCloudFunction({ teamId: teamId, taskData: taskData })).data;
     }
+
+    static async changeTaskCategory(teamId, oldCategoryName, newCategoryName, taskData) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-tasksManager-changeTaskCategory");
+        return (await callCloudFunction({
+            teamId: teamId,
+            oldCategoryName: oldCategoryName,
+            newCategoryName: newCategoryName,
+            taskData: taskData
+        })).data;
+    }
+    static async updateTaskData(teamId, oldTaskData, newTaskData) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-tasksManager-updateTaskData");
+        return (await callCloudFunction({
+            teamId: teamId,
+            oldTaskData: oldTaskData,
+            newTaskData: newTaskData
+        })).data;
+    }
+    static async createCategory(teamId, category) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-tasksManager-createCategory");
+        return (await callCloudFunction({
+            teamId: teamId,
+            category: category
+        })).data;
+    }
+    
+    static async removeCategory(teamId, category) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-tasksManager-removeCategory");
+        return (await callCloudFunction({
+            teamId: teamId,
+            category: category
+        })).data;
+    }
 }
 DatabaseManager.TeamManager.MessageManager = class {
     static async deleteMessage(id) {
