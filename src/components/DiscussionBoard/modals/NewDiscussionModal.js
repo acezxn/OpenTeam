@@ -2,6 +2,7 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import Database from "../../../utils/database";
 import { auth } from "../../../utils/firebase";
+import DatabaseManager from "../../../utils/databaseManager";
 
 const modalStyle = {
     position: 'absolute',
@@ -31,7 +32,7 @@ export const NewDiscussionModal = (props) => {
         setLoading(true);
         submitButtonRef.current.disabled = true;
         const { uid, email, photoURL } = auth.currentUser;
-        await Database.TeamManager.DiscussionManager.createDiscussion({
+        await DatabaseManager.TeamManager.DiscussionManager.createDiscussion({
             uid: uid,
             email: email,
             photoURL: photoURL,

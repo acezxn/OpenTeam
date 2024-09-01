@@ -170,7 +170,7 @@ service cloud.firestore {
       allow list: if request.auth != null;
     }
     match /comments/{discussionId} {
-      // only discussion owner and team members can read the discussion
+      // only comment owner and team members can read the comment
       allow read: if request.auth != null && 
       (
         belongsTo(resource.data.uid) || 
@@ -178,19 +178,19 @@ service cloud.firestore {
         request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(resource.data.teamId)).data.participants
       );
 
-      // only team members could create discussions
+      // only team members could create comments
       allow create: if request.auth != null &&
       exists(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)) &&
       request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)).data.participants;
 
-      // only discussion owner or team owner could update discussions
+      // only comment owner or team owner could update comments
       allow update: if request.auth != null &&
       (
         request.auth.uid == resource.data.uid ||
         belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
       )
 
-      // only discussion owner or team owner could delete discussions
+      // only comment owner or team owner could delete comments
       allow delete: if request.auth != null &&
       (
         request.auth.uid == resource.data.uid ||

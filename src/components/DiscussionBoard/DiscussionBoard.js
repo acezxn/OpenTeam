@@ -8,6 +8,7 @@ import { onSnapshot } from "firebase/firestore";
 import { ConfirmationModal } from "../modals/ConfirmationModal";
 import { auth } from "../../utils/firebase";
 import { DiscussionDetailsModal } from "./modals/DiscussionDetailsModal";
+import DatabaseManager from "../../utils/databaseManager";
 
 export const DiscussionBoard = (props) => {
     const [anchorElement, setAnchorElement] = useState(null);
@@ -28,7 +29,7 @@ export const DiscussionBoard = (props) => {
 
     const handleDiscussionDelete = () => {
         handleMenuClose();
-        Database.TeamManager.DiscussionManager.deleteDiscussion(discussionHistory[selectedDiscussionIndex].id)
+        DatabaseManager.TeamManager.DiscussionManager.deleteDiscussion(discussionHistory[selectedDiscussionIndex].id)
     }
 
     const handleDetailsModalOpen = () => {

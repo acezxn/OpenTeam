@@ -191,11 +191,30 @@ DatabaseManager.TeamManager.MessageManager = class {
 
     static async addMessageAttachments(messageId, url, filename, filetype) {
         const callCloudFunction = httpsCallable(functions, "teamManager-messageManager-addMessageAttachments");
-        await callCloudFunction({ messageId: messageId, url: url, filename: filename, filetype: filetype });
+        return await callCloudFunction({ messageId: messageId, url: url, filename: filename, filetype: filetype });
     }
 
     static async removeMessageAttachment(url, messageId) {
         const callCloudFunction = httpsCallable(functions, "teamManager-messageManager-removeMessageAttachment");
         await callCloudFunction({ url: url, messageId: messageId });
+    }
+}
+
+DatabaseManager.TeamManager.DiscussionManager = class {
+    static async createDiscussion(discussionData) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-discussionManager-createDiscussion");
+        return await callCloudFunction({ discussionData: discussionData });
+    }
+    static async deleteDiscussion(discussionId) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-discussionManager-deleteDiscussion");
+        return await callCloudFunction({ discussionId: discussionId });
+    }
+    static async createComment(commentData) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-discussionManager-createComment");
+        return await callCloudFunction({ commentData: commentData });
+    }
+    static async deleteComment(commentId) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-discussionManager-deleteComment");
+        return await callCloudFunction({ commentId: commentId });
     }
 }

@@ -620,4 +620,56 @@ Database.TeamManager.MessageManager = class {
     }
 }
 
+Database.TeamManager.DiscussionManager = class {
+    static async createDiscussion(discussionData, uid) {
+        const teamDocRef = db.collection("teams").doc(discussionData.teamId);
+        const publicTeamDocRef = db.collection("public_team_data").doc(discussionData.teamId);
+        if (
+            uid !== (await teamDocRef.get()).data().ownerUID &&
+            !(await publicTeamDocRef.get()).data().participants.includes(uid)
+        ) {
+            return false;
+        }
+        await db.collection("discussions").add({ ...discussionData, createTime: FieldValue.serverTimestamp() });
+        return true;
+    }
+    static async deleteDiscussion(discussionId, uid) {
+        const targetDiscussionDoc = db.collection("discussions").doc(discussionId);
+        const targetDiscussionData = (await targetDiscussionDoc.get()).data();
+        const teamData = (await db.collection("teams").doc(targetDiscussionData.teamId).get()).data();
+
+        // not the owner of the discussion and not the owner of the team
+        if (uid !== targetDiscussionData.uid && uid !== teamData.ownerUID) {
+            return false;
+        }
+
+        await targetDiscussionDoc.delete();
+        return true;
+    }
+    static async createComment(commentData, uid) {
+        const teamDocRef = db.collection("teams").doc(commentData.teamId);
+        const publicTeamDocRef = db.collection("public_team_data").doc(commentData.teamId);
+        if (
+            uid !== (await teamDocRef.get()).data().ownerUID &&
+            !(await publicTeamDocRef.get()).data().participants.includes(uid)
+        ) {
+            return false;
+        }
+        await db.collection("comments").add({ ...commentData, createTime: FieldValue.serverTimestamp() });
+        return true;
+    }
+    static async deleteComment(commentId, uid) {
+        const targetCommentDoc = db.collection("comments").doc(commentId);
+        const targetCommentData = (await targetCommentDoc.get()).data();
+        const teamData = (await db.collection("teams").doc(targetCommentData.teamId).get()).data();
+
+        // not the owner of the comment and not the owner of the team
+        if (uid !== targetCommentData.uid && uid !== teamData.ownerUID) {
+            return false;
+        }
+
+        await targetCommentDoc.delete();
+        return true;
+    }
+}
 module.exports = Database;

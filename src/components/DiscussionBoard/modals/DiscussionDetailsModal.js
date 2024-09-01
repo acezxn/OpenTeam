@@ -6,6 +6,7 @@ import { IconButton, Menu, MenuItem, Modal } from "@material-ui/core";
 import { onSnapshot } from "firebase/firestore";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { ConfirmationModal } from "../../modals/ConfirmationModal";
+import DatabaseManager from "../../../utils/databaseManager";
 
 const modalStyle = {
     position: 'absolute',
@@ -42,7 +43,7 @@ export const DiscussionDetailsModal = (props) => {
         submitButtonRef.current.disabled = true;
         setCommentInputVisible(false);
         const { uid, email, photoURL } = auth.currentUser;
-        Database.TeamManager.DiscussionManager.createComment({
+        DatabaseManager.TeamManager.DiscussionManager.createComment({
             uid: uid,
             email: email,
             photoURL: photoURL,
@@ -75,7 +76,7 @@ export const DiscussionDetailsModal = (props) => {
     }, [props]);
 
     const handleCommentDeletion = () => {
-        Database.TeamManager.DiscussionManager.deleteComment(commentHistory[selectedCommentIndex].id);
+        DatabaseManager.TeamManager.DiscussionManager.deleteComment(commentHistory[selectedCommentIndex].id);
         handleDeleteConfirmModalClose();
         handleMenuClose();
     }

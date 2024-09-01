@@ -494,10 +494,10 @@ Database.TeamManager.MessageManager = class {
 Database.TeamManager.DiscussionManager = class {
     static async createDiscussion(discussionData) {
         await addDoc(collection(db, "discussions"), { ...discussionData, createTime: serverTimestamp() });
-    }
+    } // implemented function
     static async deleteDiscussion(id) {
         await deleteDoc(doc(db, "discussions", id));
-    }
+    } // implemented function
     static getDiscussions(teamId) {
         return query(
             collection(db, "discussions"),
@@ -507,10 +507,10 @@ Database.TeamManager.DiscussionManager = class {
     } // left client side
     static async createComment(commentData) {
         await addDoc(collection(db, "comments"), { ...commentData, createTime: serverTimestamp() });
-    }
+    } // implemented function
     static async deleteComment(commentId) {
         await deleteDoc(doc(db, "comments", commentId));
-    }
+    } // implemented function
     static getComments(discussionId) {
         return query(
             collection(db, "comments"),

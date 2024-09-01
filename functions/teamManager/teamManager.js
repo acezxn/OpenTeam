@@ -1,6 +1,7 @@
 const functions = require("firebase-functions");
 const Database = require("../utils/database");
 
+exports.discussionManager = require("./discussionManager/discussionManager");
 exports.messageManager = require("./messageManager/messageManager");
 exports.tasksManager = require("./tasksManager/tasksManager");
 
