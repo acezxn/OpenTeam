@@ -15,6 +15,9 @@ service cloud.firestore {
     // the collection for holding team invitation requests
     match /invitation_requests/{document=**} {
     	allow read: if request.auth != null;
+      // only target user or invitator can update and delete invitation request
+      allow update: if belongsTo(resource.data.invitatorUid) || belongsTo(resource.data.targetUid);
+      allow delete: if belongsTo(resource.data.invitatorUid) || belongsTo(resource.data.targetUid);
     }
     // the collection for holding user join requests
     match /join_requests/{teamId} {
@@ -28,6 +31,8 @@ service cloud.firestore {
     match /teams/{teamId} {
       allow read: if request.auth != null && 
       belongsTo(resource.data.ownerUID);
+
+      allow read: if resource.data.publiclyVisible || /databases/$(database)/documents/teams/$(teamId) in get(/databases/$(database)/documents/user_data/$(request.auth.uid)).data.joinedTeams;
     }
     // the collection for holding public team data
     match /public_team_data/{teamId} {
