@@ -10,47 +10,24 @@ service cloud.firestore {
     }
     // the collection for holding private user data
     match /user_data/{UID} {
-      allow read, write: if request.auth != null && belongsTo(UID);
+      allow read: if request.auth != null && belongsTo(UID);
     }
     // the collection for holding team invitation requests
     match /invitation_requests/{document=**} {
     	allow read: if request.auth != null;
-      // only team owner can create invitation request
-      allow create: if exists(/databases/$(database)/documents/user_data/$(request.resource.data.targetUid)) &&
-      /databases/$(database)/documents/teams/$(request.resource.data.teamId) in get(/databases/$(database)/documents/user_data/$(request.auth.uid)).data.teams;
-      // only target user or invitator can update and delete invitation request
-      allow update: if belongsTo(resource.data.invitatorUid) || belongsTo(resource.data.targetUid);
-      allow delete: if belongsTo(resource.data.invitatorUid) || belongsTo(resource.data.targetUid);
     }
     // the collection for holding user join requests
     match /join_requests/{teamId} {
     	allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null && request.resource.data.requests.size() > resource.data.requests.size();
-      allow write: if exists(/databases/$(database)/documents/user_data/$(request.auth.uid)) &&
-      /databases/$(database)/documents/teams/$(teamId) in get(/databases/$(database)/documents/user_data/$(request.auth.uid)).data.teams;
     }
     // the collection for holding public user data
     match /public_user_data/{UID} {
-      allow write: if request.auth != null && belongsTo(UID);
       allow read;
     }
     // the collection for holding private team data
     match /teams/{teamId} {
       allow read: if request.auth != null && 
       belongsTo(resource.data.ownerUID);
-
-      allow read: if resource.data.publiclyVisible || /databases/$(database)/documents/teams/$(teamId) in get(/databases/$(database)/documents/user_data/$(request.auth.uid)).data.joinedTeams;
-      
-      allow create, delete: if request.auth != null && 
-      belongsTo(resource.data.ownerUID);
-
-      allow update: if request.auth != null && 
-      belongsTo(resource.data.ownerUID) && 
-      withinSizeLimit(request.resource.data.title, 50) && 
-      withinSizeLimit(request.resource.data.description, 400);
-
-      allow create: if request.auth != null;
     }
     // the collection for holding public team data
     match /public_team_data/{teamId} {
@@ -61,28 +38,6 @@ service cloud.firestore {
         belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID) || 
         request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(teamId)).data.participants
       );
-      // only team owner can create and delete
-      allow create, delete: if request.auth != null && belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID);
-      
-      allow update: if request.auth != null && 
-      // only team members can update data
-      (
-        belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID) || 
-        request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(teamId)).data.participants
-      ) && 
-      // team members can only add or remove their own uid
-      (
-        belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID) || 
-        request.resource.data.participants == resource.data.participants ||
-        (
-          request.resource.data.participants.size() - resource.data.participants.size() == 1 &&
-          request.resource.data.participants.removeAll(resource.data.participants)[0] == request.auth.uid
-        ) ||
-        (
-          resource.data.participants.size() - request.resource.data.participants.size() == 1 &&
-          resource.data.participants.removeAll(request.resource.data.participants)[0] == request.auth.uid
-        )
-      );
     }
     // the collection for holding protected team data (public within members)
     match /protected_team_data/{teamId} {
@@ -90,16 +45,7 @@ service cloud.firestore {
       (
         belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID) || 
         request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(teamId)).data.participants
-        );
-
-      allow update: if request.auth != null && 
-      (
-        belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID) || 
-        request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(teamId)).data.participants
-      )
-      && withinSizeLimit(request.resource.data.announcement, 4000);
-       // only team owner can create and delete
-      allow create, delete: if request.auth != null && belongsTo(get(/databases/$(database)/documents/teams/$(teamId)).data.ownerUID);
+      );
     }
     // the collection for holding protected messages
     match /messages/{document=**} {
@@ -113,25 +59,6 @@ service cloud.firestore {
         belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID) ||
         request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(resource.data.teamId)).data.participants
       );
-
-      // only team members could create messages
-      allow create: if request.auth != null &&
-      exists(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)) &&
-      request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)).data.participants;
-
-      // only message owner or team owner could update messages
-      allow update: if request.auth != null &&
-      (
-        request.auth.uid == resource.data.uid ||
-        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
-      )
-
-      // only message owner or team owner could delete messages
-      allow delete: if request.auth != null &&
-      (
-        request.auth.uid == resource.data.uid ||
-        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
-      )
     }
     // the collection for holding protected discussions
     match /discussions/{document=**} {
@@ -145,25 +72,6 @@ service cloud.firestore {
         belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID) ||
         request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(resource.data.teamId)).data.participants
       );
-
-      // only team members could create discussions
-      allow create: if request.auth != null &&
-      exists(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)) &&
-      request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)).data.participants;
-
-      // only discussion owner or team owner could update discussions
-      allow update: if request.auth != null &&
-      (
-        request.auth.uid == resource.data.uid ||
-        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
-      )
-
-      // only discussion owner or team owner could delete discussions
-      allow delete: if request.auth != null &&
-      (
-        request.auth.uid == resource.data.uid ||
-        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
-      )
     }
     
     match /comments/{document=**} {
@@ -177,25 +85,6 @@ service cloud.firestore {
         belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID) ||
         request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(resource.data.teamId)).data.participants
       );
-
-      // only team members could create comments
-      allow create: if request.auth != null &&
-      exists(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)) &&
-      request.auth.uid in get(/databases/$(database)/documents/public_team_data/$(request.resource.data.teamId)).data.participants;
-
-      // only comment owner or team owner could update comments
-      allow update: if request.auth != null &&
-      (
-        request.auth.uid == resource.data.uid ||
-        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
-      )
-
-      // only comment owner or team owner could delete comments
-      allow delete: if request.auth != null &&
-      (
-        request.auth.uid == resource.data.uid ||
-        belongsTo(get(/databases/$(database)/documents/teams/$(resource.data.teamId)).data.ownerUID)
-      )
     }
   }
 }

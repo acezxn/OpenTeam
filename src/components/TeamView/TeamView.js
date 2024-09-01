@@ -12,7 +12,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import AddIcon from '@mui/icons-material/Add';
 import ShareIcon from '@mui/icons-material/Share';
 import EditIcon from '@mui/icons-material/Edit';
-import Database from "../../utils/database";
+import ClientSideDB from "../../utils/clientSideDB";
 import { MembersModal } from "./modals/MembersModal";
 import { JoinRequestsModal } from "./modals/JoinRequestsModal";
 import { JoinModal } from "./modals/JoinModal";
@@ -69,7 +69,7 @@ export const TeamView = (props) => {
                 const prevImageRef = storageRef(storage, data.bannerImageURL);
                 deleteObject(prevImageRef);
             }
-            const newURL = await Database.uploadFile(img, `user/${auth.currentUser.uid}/public/images/${uuidv4()}-${img.name}`);
+            const newURL = await ClientSideDB.uploadFile(img, `user/${auth.currentUser.uid}/public/images/${uuidv4()}-${img.name}`);
             let updatedData = data;
             updatedData.bannerImageURL = newURL;
             setData(updatedData);
@@ -122,7 +122,7 @@ export const TeamView = (props) => {
     useEffect(() => {
         if (props.data) {
             setData(props.data);
-            Database.TeamManager.getProtectedTeamData(props.teamId)
+            ClientSideDB.TeamManager.getProtectedTeamData(props.teamId)
                 .then((snapshot) => {
                     setAnnouncement(snapshot.data().announcement);
                 })

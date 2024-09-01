@@ -6,7 +6,6 @@ import RingLoader from "react-spinners/RingLoader";
 import TeamCard from "../components/TeamCard";
 import { Button, Divider, Typography } from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
-import Database from "../utils/database";
 import DatabaseManager from "../utils/databaseManager";
 
 

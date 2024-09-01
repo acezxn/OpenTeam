@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import { collection, doc, getDoc, updateDoc, arrayRemove } from "firebase/firestore";
 import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
-import Database from "../utils/database";
+import ClientSideDB from "../utils/clientSideDB";
 import { TeamTabView } from "../components/TeamTabView";
 import { Typography } from "@mui/material";
 import DatabaseManager from "../utils/databaseManager";
@@ -17,8 +17,8 @@ export const TeamsPage = () => {
 
     async function refresh() {
         try {
-            Database.initializeOctokit(await Database.UserManager.getGithubAccessToken(auth.currentUser.uid));
-            setParticipantData((await Database.TeamManager.getPublicTeamData(teamId)).data().participants);
+            ClientSideDB.initializeOctokit(await DatabaseManager.UserManager.getGithubAccessToken(auth.currentUser.uid));
+            setParticipantData((await ClientSideDB.TeamManager.getPublicTeamData(teamId)).data().participants);
             let teamSnapshot = await getDoc(doc(collection(db, 'teams'), teamId));
             let teamSnapshotData = teamSnapshot.data();
             setData(teamSnapshotData);
@@ -62,7 +62,7 @@ export const TeamsPage = () => {
             }
         }
         // remove invitation requests and add to joined teams
-        const querySnapshot = await Database.TeamManager.queryInvitationRequest(teamId, auth.currentUser.uid);
+        const querySnapshot = await ClientSideDB.TeamManager.queryInvitationRequest(teamId, auth.currentUser.uid);
         for (let index = 0; index < querySnapshot.docs.length; index++) {
             let snapshot = querySnapshot.docs[index];
             DatabaseManager.TeamManager.createJoinedTeamsLink(teamId, auth.currentUser.uid);

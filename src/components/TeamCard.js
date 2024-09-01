@@ -4,7 +4,6 @@ import "../css/TeamCard.css"
 import { Box, Button, Menu, MenuItem, Modal, TextField, Typography } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useState } from 'react';
-import Database from '../utils/database';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../utils/firebase';
 import { ConfirmationModal } from './modals/ConfirmationModal';

@@ -1,8 +1,7 @@
 import { IconButton, Menu, MenuItem, TextField, Typography } from "@mui/material"
 import { useEffect, useRef, useState } from "react";
 import { auth } from "../../utils/firebase";
-import "../../css/Chatbox.css"
-import Database from "../../utils/database";
+import ClientSideDB from "../../utils/clientSideDB";
 import { onSnapshot } from "firebase/firestore";
 import SendIcon from '@mui/icons-material/Send';
 import UploadIcon from '@mui/icons-material/Upload';
@@ -12,6 +11,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import RingLoader from "react-spinners/RingLoader";
 import { v4 as uuidv4 } from 'uuid';
 import DatabaseManager from "../../utils/databaseManager";
+import "../../css/Chatbox.css"
 
 
 
@@ -29,7 +29,7 @@ export const Chatbox = (props) => {
     const imageTypes = ['image/gif', 'image/jpeg', 'image/png'];
 
     const uploadMessageAttachment = async (file, name, type, teamId, messageId) => {
-        let uploadedUrl = await Database.uploadFile(file, `teams/${teamId}/protected/attachments/${uuidv4()}-${name}`);
+        let uploadedUrl = await ClientSideDB.uploadFile(file, `teams/${teamId}/protected/attachments/${uuidv4()}-${name}`);
         await DatabaseManager.TeamManager.MessageManager.addMessageAttachments(messageId, uploadedUrl, name, type);
     }
 
@@ -72,7 +72,7 @@ export const Chatbox = (props) => {
     const handleMessageDeletion = async () => {
         handleUserMenuClose();
         setLoading(true);
-        await Database.TeamManager.MessageManager.deleteMessage(messageHistory[selectedMessageIndex].id);
+        await DatabaseManager.TeamManager.MessageManager.deleteMessage(messageHistory[selectedMessageIndex].id);
         setLoading(false);
     }
 
@@ -88,7 +88,7 @@ export const Chatbox = (props) => {
 
     useEffect(() => {
         if (props) {
-            const snapshot = Database.TeamManager.MessageManager.getMessages(props.teamId);
+            const snapshot = ClientSideDB.TeamManager.MessageManager.getMessages(props.teamId);
             const unsubscribe = onSnapshot(snapshot, (querySnapshot) => {
                 const messages = [];
                 querySnapshot.forEach((doc) => {

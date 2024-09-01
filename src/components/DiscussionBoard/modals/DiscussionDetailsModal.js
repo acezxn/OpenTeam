@@ -1,6 +1,6 @@
 import { Box, Button, TextField, ThemeProvider, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
-import Database from "../../../utils/database";
+import ClientSideDB from "../../../utils/clientSideDB";
 import { auth } from "../../../utils/firebase";
 import { IconButton, Menu, MenuItem, Modal } from "@material-ui/core";
 import { onSnapshot } from "firebase/firestore";
@@ -56,7 +56,7 @@ export const DiscussionDetailsModal = (props) => {
     }
     useEffect(() => {
         if (props) {
-            const snapshot = Database.TeamManager.DiscussionManager.getComments(props.data.id);
+            const snapshot = ClientSideDB.TeamManager.DiscussionManager.getComments(props.data.id);
             const unsubscribe = onSnapshot(snapshot, (querySnapshot) => {
                 const comments = [];
                 querySnapshot.forEach((doc) => {

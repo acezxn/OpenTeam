@@ -11,7 +11,7 @@ import Protected from './components/Protected';
 import { TeamsPage } from './pages/TeamsPage';
 import Explore from './pages/Explore';
 import { SearchPage } from './pages/SearchPage';
-import Database from './utils/database';
+import Database from './utils/clientSideDB';
 import { v4 as uuidv4 } from 'uuid';
 import DatabaseManager from './utils/databaseManager';
 

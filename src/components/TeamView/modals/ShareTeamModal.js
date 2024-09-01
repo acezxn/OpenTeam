@@ -1,8 +1,7 @@
 import { Avatar, Box, Button, Chip, List, ListItem, ListItemText, Stack, TextField, Typography } from "@mui/material"
 import ShareIcon from '@mui/icons-material/Share';
 import { useEffect, useRef, useState } from "react";
-import Database from "../../../utils/database";
-import { auth } from "../../../utils/firebase";
+import ClientSideDB from "../../../utils/clientSideDB";
 import DatabaseManager from "../../../utils/databaseManager";
 
 
@@ -32,8 +31,8 @@ export const ShareTeamModal = (props) => {
     async function searchEmail() {
         if (searchingMail.length > 0) {
             let resultItemList = [];
-            const querySnapshot = await Database.UserManager.searchEmails(searchingMail);
-            const publicTeamData = (await Database.TeamManager.getPublicTeamData(props.teamId)).data();
+            const querySnapshot = await ClientSideDB.UserManager.searchEmails(searchingMail);
+            const publicTeamData = (await ClientSideDB.TeamManager.getPublicTeamData(props.teamId)).data();
             for (let index = 0; index < querySnapshot.docs.length; index++) {
                 let snapshot = querySnapshot.docs[index];
                 if (publicTeamData.participants.includes(snapshot.id)) {
@@ -71,7 +70,7 @@ export const ShareTeamModal = (props) => {
 
     async function shareToUsers(e) {
         e.preventDefault();
-        const publicTeamData = (await Database.TeamManager.getPublicTeamData(props.teamId)).data();
+        const publicTeamData = (await ClientSideDB.TeamManager.getPublicTeamData(props.teamId)).data();
         for (let index = 0; index < selectedUser.length; index++) {
             if (publicTeamData.participants.includes(selectedUser[index].uid)) {
                 continue;

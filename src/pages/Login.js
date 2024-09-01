@@ -3,7 +3,6 @@ import { signInWithPopup, GithubAuthProvider } from "firebase/auth";
 import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import Database from "../utils/database";
 import GitHubIcon from '@mui/icons-material/GitHub';
 import DatabaseManager from "../utils/databaseManager";
 

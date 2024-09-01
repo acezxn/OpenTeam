@@ -3,7 +3,7 @@ import AnnouncementIcon from '@mui/icons-material/Announcement';
 import { NewDiscussionModal } from "./modals/NewDiscussionModal";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useEffect, useState } from "react";
-import Database from "../../utils/database";
+import ClientSideDB from "../../utils/clientSideDB";
 import { onSnapshot } from "firebase/firestore";
 import { ConfirmationModal } from "../modals/ConfirmationModal";
 import { auth } from "../../utils/firebase";
@@ -38,7 +38,7 @@ export const DiscussionBoard = (props) => {
 
     useEffect(() => {
         if (props) {
-            const snapshot = Database.TeamManager.DiscussionManager.getDiscussions(props.teamId);
+            const snapshot = ClientSideDB.TeamManager.DiscussionManager.getDiscussions(props.teamId);
             const unsubscribe = onSnapshot(snapshot, (querySnapshot) => {
                 const discussions = [];
                 querySnapshot.forEach((doc) => {

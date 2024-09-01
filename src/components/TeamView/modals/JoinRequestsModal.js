@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { styled } from '@mui/material/styles';
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../utils/firebase";
-import Database from "../../../utils/database";
 import DatabaseManager from "../../../utils/databaseManager";
 
 const modalStyle = {

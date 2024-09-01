@@ -5,7 +5,7 @@ import "../../css/StatisticBoard.css"
 import { IconButton, Typography } from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
 import RingLoader from "react-spinners/RingLoader";
-import Database from "../../utils/database";
+import ClientSideDB from "../../utils/clientSideDB";
 
 
 export const StatisticChart = (props) => {
@@ -17,7 +17,7 @@ export const StatisticChart = (props) => {
         setLoading(true);
         if (props.repositoryUser !== "" && props.repositoryName !== "") {
             while (true) {
-                const result = await Database.getOctokit().request(`/repos/${props.repositoryUser}/${props.repositoryName}/stats/contributors`);
+                const result = await ClientSideDB.getOctokit().request(`/repos/${props.repositoryUser}/${props.repositoryName}/stats/contributors`);
                 if (Array.isArray(result.data)) {
                     setContributorData(result.data);
                     break;

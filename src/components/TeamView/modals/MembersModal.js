@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../utils/firebase";
 import { useEffect, useState } from "react";
-import Database from "../../../utils/database";
+import ClientSideDB from "../../../utils/clientSideDB";
 import DatabaseManager from "../../../utils/databaseManager";
 
 const modalStyle = {
@@ -51,7 +51,7 @@ export const MembersModal = (props) => {
     }
     const handleRemoveMember = async (uid) => {
         // remove invitation requests
-        const querySnapshot = await Database.TeamManager.queryInvitationRequest(props.teamId, uid);
+        const querySnapshot = await ClientSideDB.TeamManager.queryInvitationRequest(props.teamId, uid);
         for (let index = 0; index < querySnapshot.docs.length; index++) {
             DatabaseManager.TeamManager.removeInvitationRequest(querySnapshot.docs[index].id);
         }

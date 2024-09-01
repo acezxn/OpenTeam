@@ -1,15 +1,13 @@
 import { Button, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
-import Database from "../../utils/database"
+import ClientSideDB from "../../utils/clientSideDB"
 import { AddRepositoryModal } from "./modals/AddRepositoryModal";
 import { Modal } from "@material-ui/core";
 import RingLoader from "react-spinners/RingLoader";
-import Chart from 'chart.js/auto';
-import 'chartjs-adapter-moment';
-import "../../css/StatisticBoard.css"
 import { StatisticChart } from "./StatisticCharts";
 import { CommitLog } from "./CommitLog";
-
+import "../../css/StatisticBoard.css"
+import 'chartjs-adapter-moment';
 
 export const StatisticBoard = (props) => {
     const [loading, setLoading] = useState(false);
@@ -26,7 +24,7 @@ export const StatisticBoard = (props) => {
 
     const getProtectedTeamData = async () => {
         setLoading(true);
-        const protectedTeamData = (await Database.TeamManager.getProtectedTeamData(props.teamId)).data();
+        const protectedTeamData = (await ClientSideDB.TeamManager.getProtectedTeamData(props.teamId)).data();
         setRepositoryURL(protectedTeamData.repositoryURL);
 
         // expecting html URL

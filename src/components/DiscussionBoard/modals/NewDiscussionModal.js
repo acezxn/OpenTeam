@@ -1,6 +1,5 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
-import Database from "../../../utils/database";
 import { auth } from "../../../utils/firebase";
 import DatabaseManager from "../../../utils/databaseManager";
 

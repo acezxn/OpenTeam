@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import Database from "../../utils/database";
 import { Button, IconButton, Menu, MenuItem, Modal, Typography } from "@mui/material";
 import { NewTaskModal } from "./modals/NewTaskModal";
 import { v4 as uuidv4 } from 'uuid';
