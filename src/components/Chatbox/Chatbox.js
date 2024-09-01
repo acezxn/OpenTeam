@@ -11,6 +11,7 @@ import FilePresentIcon from '@mui/icons-material/FilePresent';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import RingLoader from "react-spinners/RingLoader";
 import { v4 as uuidv4 } from 'uuid';
+import DatabaseManager from "../../utils/databaseManager";
 
 
 
@@ -29,7 +30,7 @@ export const Chatbox = (props) => {
 
     const uploadMessageAttachment = async (file, name, type, teamId, messageId) => {
         let uploadedUrl = await Database.uploadFile(file, `teams/${teamId}/protected/attachments/${uuidv4()}-${name}`);
-        await Database.TeamManager.MessageManager.addMessageAttachments(messageId, uploadedUrl, name, type);
+        await DatabaseManager.TeamManager.MessageManager.addMessageAttachments(messageId, uploadedUrl, name, type);
     }
 
     const sendMessage = async (event) => {
@@ -44,7 +45,7 @@ export const Chatbox = (props) => {
         }
 
         const { uid, email, photoURL } = auth.currentUser;
-        const messageDoc = await Database.TeamManager.MessageManager.createMessage({
+        const messageDocId = await DatabaseManager.TeamManager.MessageManager.createMessage({
             uid: uid,
             email: email,
             photoURL: photoURL,
@@ -57,7 +58,7 @@ export const Chatbox = (props) => {
 
         // creates upload tasks and wait for them to finish uploading
         for (let file of files) {
-            await uploadMessageAttachment(file, file.name, file.type, props.teamId, messageDoc.id);
+            await uploadMessageAttachment(file, file.name, file.type, props.teamId, messageDocId);
         }
 
         setMessage("");

@@ -179,9 +179,19 @@ DatabaseManager.TeamManager.TasksManager = class {
     }
 }
 DatabaseManager.TeamManager.MessageManager = class {
+    static async createMessage(messageData) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-messageManager-createMessage");
+        return (await callCloudFunction({ messageData: messageData })).data;
+    }
+
     static async deleteMessage(id) {
-        const callCloudFunction = httpsCallable(functions, "teamManager-messageManager-removeTeam");
+        const callCloudFunction = httpsCallable(functions, "teamManager-messageManager-deleteMessage");
         return (await callCloudFunction({ messageId: id })).data;
+    }
+
+    static async addMessageAttachments(messageId, url, filename, filetype) {
+        const callCloudFunction = httpsCallable(functions, "teamManager-messageManager-addMessageAttachments");
+        await callCloudFunction({ messageId: messageId, url: url, filename: filename, filetype: filetype });
     }
 
     static async removeMessageAttachment(url, messageId) {

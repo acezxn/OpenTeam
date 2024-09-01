@@ -525,12 +525,28 @@ Database.TeamManager.TasksManager = class {
         await protectedTeamDocRef.update({
             tasks: tasks
         });
-        
+
         return true;
     }
 }
 
 Database.TeamManager.MessageManager = class {
+    static async createMessage(messageData, uid) {
+        const teamDocRef = db.collection("teams").doc(messageData.teamId);
+        const publicTeamDocRef = db.collection("public_team_data").doc(messageData.teamId);
+        if (
+            uid !== (await teamDocRef.get()).data().ownerUID &&
+            !(await publicTeamDocRef.get()).data().participants.includes(uid)
+        ) {
+            return false;
+        }
+
+        return (await db.collection("messages").add({
+            ...messageData,
+            createTime: FieldValue.serverTimestamp()
+        })).id;
+    }
+
     static async deleteMessage(messageId, uid) {
         const targetMessageDoc = db.collection("messages").doc(messageId);
         const targetMessageData = (await targetMessageDoc.get()).data();
@@ -538,7 +554,6 @@ Database.TeamManager.MessageManager = class {
 
         // not the owner of the message and not the owner of the team
         if (uid !== targetMessageData.uid && uid !== teamData.ownerUID) {
-            console.log("Warning: insufficient permissions");
             return false;
         }
 
@@ -552,6 +567,27 @@ Database.TeamManager.MessageManager = class {
         await Promise.all(deletionJobs);
 
         await targetMessageDoc.delete();
+        return true;
+    }
+
+    static async addMessageAttachments(messageId, url, filename, filetype, uid) {
+        const targetMessageDoc = db.collection("messages").doc(messageId);
+        const targetMessageData = (await targetMessageDoc.get()).data();
+        const teamData = (await db.collection("teams").doc(targetMessageData.teamId).get()).data();
+
+        // not the owner of the message and not the owner of the team
+        if (uid !== targetMessageData.uid && uid !== teamData.ownerUID) {
+            return false;
+        }
+
+        const urls = targetMessageData.attachments;
+        const filenames = targetMessageData.filenames;
+        const filetypes = targetMessageData.filetypes;
+        await targetMessageDoc.update({
+            attachments: [...urls, url],
+            filenames: [...filenames, filename],
+            filetypes: [...filetypes, filetype]
+        });
         return true;
     }
 
@@ -579,7 +615,6 @@ Database.TeamManager.MessageManager = class {
             await file.delete();
             return true;
         } catch (exception) {
-            console.log("Warning: attachment not found");
             return false;
         }
     }

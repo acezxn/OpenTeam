@@ -457,7 +457,7 @@ Database.TeamManager.TasksManager = class {
 Database.TeamManager.MessageManager = class {
     static async createMessage(messageData) {
         return await addDoc(collection(db, "messages"), { ...messageData, createTime: serverTimestamp() });
-    }
+    } // implemented function
     static async deleteMessage(id) {
         const attachmentUrls = (await getDoc(doc(db, "messages", id))).data().attachments;
 
@@ -482,7 +482,7 @@ Database.TeamManager.MessageManager = class {
                 filetypes: [...filetypes, filetype]
             }
         );
-    }
+    } // implemented function
     static getMessages(teamId) {
         return query(
             collection(db, "messages"),
