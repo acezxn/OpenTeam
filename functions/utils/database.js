@@ -20,7 +20,7 @@ Database.UserManager = class {
         let doc = await userDoc.get();
         if (!doc.exists) {
             await userDoc.set({
-                githubAccesToken: "",
+                githubAccessToken: "",
                 teams: [],
                 pendingTeams: [],
                 joinedTeams: []
@@ -41,13 +41,13 @@ Database.UserManager = class {
     static async updateGithubAccessToken(uid, token) {
         const userDoc = db.collection("user_data").doc(uid);
         await userDoc.update({
-            githubAccesToken: token
+            githubAccessToken: token
         });
         return true;
     }
 
     static async getGithubAccessToken(uid) {
-        return (await db.collection("user_data").doc(uid).get()).data().githubAccesToken;
+        return (await db.collection("user_data").doc(uid).get()).data().githubAccessToken;
     }
 
     /**

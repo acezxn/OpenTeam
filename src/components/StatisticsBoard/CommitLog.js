@@ -2,7 +2,7 @@ import { IconButton, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import RefreshIcon from '@mui/icons-material/Refresh';
 import RingLoader from "react-spinners/RingLoader";
-import ClientSideDB from "../../utils/clientSideDB"
+import DatabaseManager from "../../utils/databaseManager";
 
 export const CommitLog = (props) => {
     const [loading, setLoading] = useState(false);
@@ -10,7 +10,7 @@ export const CommitLog = (props) => {
     const defaultPhotoURL = "https://github.githubassets.com/images/gravatars/gravatar-user-420.png?size=32";
     const getCommits = async () => {
         setLoading(true);
-        const result = await ClientSideDB.getOctokit().request(
+        const result = await DatabaseManager.getOctokit().request(
             `/repos/${props.repositoryUser}/${props.repositoryName}/commits`
         );
         setCommits(result.data);

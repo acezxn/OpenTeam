@@ -1,7 +1,7 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useState } from "react";
-import ClientSideDB from "../../utils/clientSideDB";
 import { auth } from "../../utils/firebase";
+import DatabaseManager from "../../utils/databaseManager";
 
 const modalStyle = {
     position: 'absolute',
@@ -23,7 +23,7 @@ export const GHTokenUpdateModal = (props) => {
     const [token, setToken] = useState("");
     const handleTokenUpdate = async (e) => {
         e.preventDefault();
-        await ClientSideDB.UserManager.updateGithubAccessToken(auth.currentUser.uid, token);
+        await DatabaseManager.UserManager.updateGithubAccessToken(token);
         props.onClose();
     }
     return (

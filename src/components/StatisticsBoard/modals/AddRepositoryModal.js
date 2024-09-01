@@ -2,7 +2,6 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Modal } from "@material-ui/core";
 import { GHTokenUpdateModal } from "../../modals/GHTokenUpdateModal";
-import ClientSideDB from "../../../utils/clientSideDB";
 import { auth } from "../../../utils/firebase";
 import DatabaseManager from "../../../utils/databaseManager";
 
@@ -60,7 +59,7 @@ export const AddRepositoryModal = (props) => {
             try {
                 const user = url.pathname.split("/")[1];
                 const repo = url.pathname.split("/")[2];
-                const data = await ClientSideDB.getOctokit().request(`/repos/${user}/${repo}`);
+                const data = await DatabaseManager.getOctokit().request(`/repos/${user}/${repo}`);
                 if (data.status === 200) {
                     setRepositoryUser(user);
                     setRepositoryName(repo);
@@ -68,6 +67,7 @@ export const AddRepositoryModal = (props) => {
                     setErrorMessage("");
                 }
             } catch (exception) {
+                console.log(exception);
                 setErrorMessage("Repository not found");
                 setInfoMessage("");
             }
@@ -93,7 +93,8 @@ export const AddRepositoryModal = (props) => {
                 open={tokenUpdateModalOpen}
                 onClose={handleTokenUpdateModalClose}>
                 <GHTokenUpdateModal onClose={async () => {
-                    await ClientSideDB.initializeOctokit(await ClientSideDB.UserManager.getGithubAccessToken(auth.currentUser.uid));
+                    console.log(await DatabaseManager.UserManager.getGithubAccessToken(auth.currentUser.uid))
+                    await DatabaseManager.initializeOctokit(await DatabaseManager.UserManager.getGithubAccessToken(auth.currentUser.uid));
                     handleTokenUpdateModalClose();
                     verifyReporitoryURL();
                 }} />

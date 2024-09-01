@@ -8,6 +8,8 @@ import { StatisticChart } from "./StatisticCharts";
 import { CommitLog } from "./CommitLog";
 import "../../css/StatisticBoard.css"
 import 'chartjs-adapter-moment';
+import DatabaseManager from "../../utils/databaseManager";
+import { auth } from "../../utils/firebase";
 
 export const StatisticBoard = (props) => {
     const [loading, setLoading] = useState(false);
@@ -35,8 +37,12 @@ export const StatisticBoard = (props) => {
         }
         setLoading(false);
     }
+    const initializeOctokit = async() => {
+        await DatabaseManager.initializeOctokit(await DatabaseManager.UserManager.getGithubAccessToken(auth.currentUser.uid));
+    }
 
     useEffect(() => {
+        initializeOctokit();
         getProtectedTeamData();
     }, [props]);
 
