@@ -93,7 +93,6 @@ export const AddRepositoryModal = (props) => {
                 open={tokenUpdateModalOpen}
                 onClose={handleTokenUpdateModalClose}>
                 <GHTokenUpdateModal onClose={async () => {
-                    console.log(await DatabaseManager.UserManager.getGithubAccessToken(auth.currentUser.uid))
                     await DatabaseManager.initializeOctokit(await DatabaseManager.UserManager.getGithubAccessToken(auth.currentUser.uid));
                     handleTokenUpdateModalClose();
                     verifyReporitoryURL();
