@@ -1,13 +1,14 @@
-# OpenTeam
+# TeamOn
 
 An experimental project to facilitate communication between developers, allowing them to discover projects, contact project owners, and collaborate with other members.
 
 [Project Demo](https://openteam-330ce.web.app/)
 
-<img width="80%" alt="Screen Shot 2024-03-30 at 12 42 44 AM" src="https://github.com/acezxn/OpenTeam/assets/14313049/d7f88968-9f54-4a67-bed3-815929f6ad32">
-<br />
-<img width="40%" alt="Screen Shot 2024-03-30 at 12 44 36 AM" src="https://github.com/acezxn/OpenTeam/assets/14313049/49703313-dc0b-4bcd-9d99-122dfc8e2aa9">
-<img width="40%" alt="Screen Shot 2024-03-30 at 12 44 47 AM" src="https://github.com/acezxn/OpenTeam/assets/14313049/6ecab12c-79f2-40a8-a60c-32169a67cab4">
+<img width="49%" src="https://github.com/user-attachments/assets/a1251cb4-ad11-4fc5-902a-2849c1a8a3e4">
+<img width="49%" src="https://github.com/user-attachments/assets/6e3b55e2-850b-4e40-9558-d0e73b9e7143">
+<img width="49%" src="https://github.com/user-attachments/assets/0888b0ec-50a6-41e5-adcb-5eb029bce5b8">
+<img width="49%" src="https://github.com/user-attachments/assets/1674690f-fa1d-4a20-8f2c-dda94ac50e20">
+<img width="49%" src="https://github.com/user-attachments/assets/39d17c8e-5478-4fdc-89d3-c721e9958519">
 
 ## Features
 
