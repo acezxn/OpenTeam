@@ -5,7 +5,7 @@
   --board-color: #212b39;
   --board-focus-color: #405470;
   --foreground-color: rgb(255, 255, 255);
-  --primary-color: rgb(109, 255, 211);
+  --primary-color: rgb(109, 255, 150);
   --placeholder-color: rgb(157, 157, 157);
   --error-color: rgb(255, 103, 103);
 }
@@ -49,7 +49,11 @@ code {
 }
 
 .gradient_background {
-  background: linear-gradient(207deg, rgb(92, 0, 141) 0%, rgba(0,48,139,1) 57%, rgba(25,25,117,1) 100%);
+  background: linear-gradient(
+    207deg,
+    rgb(59, 0, 90) 0%,
+    rgb(0, 22, 82) 57%,
+    rgb(4, 4, 49) 100%);
   background-size: 200% 200%;
   height: 100vh;
   width: 100vw;

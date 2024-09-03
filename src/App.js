@@ -13,14 +13,13 @@ import Explore from './pages/Explore';
 import { SearchPage } from './pages/SearchPage';
 import Database from './utils/clientSideDB';
 import { v4 as uuidv4 } from 'uuid';
-import DatabaseManager from './utils/databaseManager';
 
 
 const darkTheme = createTheme({
     palette: {
         mode: "dark",
         primary: {
-            main: 'rgb(109, 255, 211)',
+            main: 'rgb(109, 255, 150)',
         },
     },
 });

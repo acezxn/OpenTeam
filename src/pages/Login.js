@@ -34,7 +34,7 @@ const Login = () => {
                 <Typography variant="h3" style={{ textAlign: "center" }}>Login</Typography>
                 <br />
                 <div style={{ display: "flex", alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
-                    <Button variant="contained" onClick={onLogin} startIcon={<GitHubIcon />} disableElevation>Log in with Github</Button>
+                    <Button variant="outlined" onClick={onLogin} startIcon={<GitHubIcon />} disableElevation>Log in with Github</Button>
                 </div>
             </div>
         </div>

@@ -82,7 +82,7 @@ export default function Navbar() {
                                         onClick={
                                             handleExpandClick
                                         }
-                                    >
+                                        color="inherit">
                                         <MenuIcon />
                                         {expanded ? (
                                             <ExpandLess />
@@ -98,7 +98,7 @@ export default function Navbar() {
                                             navigate("/");
                                         }}
                                     >
-                                        OpenTeam
+                                        TeamOn
                                     </Typography>
                                 </ListItem>
                                 <Collapse
@@ -113,9 +113,6 @@ export default function Navbar() {
                                         <ListItem>
                                             <ListItemText primary="Explore" onClick={() => { navigate("/explore") }} />
                                         </ListItem>
-                                        {/* <ListItem>
-                                            <ListItemText primary="About" onClick={() => { navigate("/about") }} />
-                                        </ListItem> */}
                                         <ListItem>
                                             <ListItemText primary="Login" onClick={() => { navigate("/login") }} />
                                         </ListItem>
@@ -137,14 +134,11 @@ export default function Navbar() {
                                 color="inherit"
                                 onClick={() => { navigate("/") }}
                             >
-                                OpenTeam
+                                TeamOn
                             </Typography>
                             <Button color="inherit" onClick={() => { navigate("/explore") }}>
                                 Explore
                             </Button>
-                            {/* <Button color="inherit" onClick={() => { navigate("/about") }}>
-                                About
-                            </Button> */}
                             <Button color="inherit" onClick={() => { navigate("/login") }}>
                                 Login
                             </Button>

@@ -64,7 +64,7 @@ const Explore = () => {
                     <div style={{ marginTop: 10, overflow: "auto" }}>
                         {
                             teams.length === 0 ? (
-                                <Typography sx={{ color: "var(--placeholder-color)", fontStyle: 'italic' }}>No teams currently available</Typography>
+                                <Typography sx={{ color: "var(--placeholder-color)", fontStyle: 'italic'}}>No teams currently available</Typography>
                             ) : (
                                 <>
                                     {

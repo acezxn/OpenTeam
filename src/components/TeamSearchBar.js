@@ -25,7 +25,7 @@ export const TeamSearchBar = (props) => {
                 size="small"
                 onChange={updateSearchText}
                 defaultValue={props.defaultValue}
-                style={{ width: "calc(100% - 40px)" }} />
+                style={{ width: "calc(100% - 50px)" }} />
             <IconButton type="submit" aria-label="search">
                 <SearchIcon />
             </IconButton>
