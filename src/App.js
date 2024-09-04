@@ -24,20 +24,23 @@ const darkTheme = createTheme({
     },
 });
 
-darkTheme.typography.h3 = {
+darkTheme.typography.h2 = {
+    fontSize: '2.5rem',
     '@media (min-width:600px)': {
-        fontSize: '1.6rem',
+        fontSize: '3rem',
     },
-    [darkTheme.breakpoints.up('md')]: {
+};
+
+darkTheme.typography.h3 = {
+    fontSize: '1.7rem',
+    '@media (min-width:600px)': {
         fontSize: '2.4rem',
     },
 };
 
 darkTheme.typography.h4 = {
+    fontSize: '1.5rem',
     '@media (min-width:600px)': {
-        fontSize: '1.5rem',
-    },
-    [darkTheme.breakpoints.up('md')]: {
         fontSize: '2.2rem',
     },
 };

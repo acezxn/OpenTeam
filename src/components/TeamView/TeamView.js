@@ -25,6 +25,9 @@ export const TeamView = (props) => {
     // loading states
     const [loading, setLoading] = useState(true);
 
+    // window width state
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
     // modal open states
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -133,6 +136,9 @@ export const TeamView = (props) => {
             setParticipants(props.participants);
             setLoading(false);
         }
+        window.addEventListener('resize', () => {
+            setWindowWidth(window.innerWidth);
+        });
     }, [props]);
 
     return (
@@ -158,7 +164,7 @@ export const TeamView = (props) => {
                                         style={{
                                             position: "absolute",
                                             zIndex: 1,
-                                            top: 110,
+                                            top: windowWidth < 600 ? 120 : 102,
                                             right: 110,
                                             color: "inherit",
                                         }}
@@ -170,7 +176,7 @@ export const TeamView = (props) => {
                                         style={{
                                             position: "absolute",
                                             zIndex: 1,
-                                            top: 110,
+                                            top: windowWidth < 600 ? 120 : 102,
                                             right: 10,
                                             color: "inherit",
                                         }}
@@ -182,7 +188,7 @@ export const TeamView = (props) => {
                                         style={{
                                             position: "absolute",
                                             zIndex: 1,
-                                            top: 110,
+                                            top: windowWidth < 600 ? 120 : 102,
                                             right: 60,
                                             color: "inherit"
                                         }}
@@ -258,7 +264,7 @@ export const TeamView = (props) => {
                     <div style={{ marginLeft: 10, marginRight: 10 }}>
                         <div style={{ height: 100 }}></div>
                         <Typography variant="h2" className="team_title">{data.title}</Typography>
-                        <div style={{ height: 30 }}></div>
+                        <div style={{ height: windowWidth < 600 ? 60 : 50 }}></div>
                         <div style={{
                             width: auth.currentUser !== null &&
                                 ((data && participants.includes(auth.currentUser.uid)) ||
