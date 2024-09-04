@@ -17,6 +17,7 @@ const modalStyle = {
     width: "max(10vw, 340px)",
     height: "200px",
     backgroundColor: 'var(--background-color)',
+    boxShadow: "0px 1px 2px 1px rgba(0,0,0,0.3)",
     borderRadius: 4,
     padding: 10,
     zIndex: "1"

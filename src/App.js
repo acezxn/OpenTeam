@@ -24,6 +24,24 @@ const darkTheme = createTheme({
     },
 });
 
+darkTheme.typography.h3 = {
+    '@media (min-width:600px)': {
+        fontSize: '1.6rem',
+    },
+    [darkTheme.breakpoints.up('md')]: {
+        fontSize: '2.4rem',
+    },
+};
+
+darkTheme.typography.h4 = {
+    '@media (min-width:600px)': {
+        fontSize: '1.5rem',
+    },
+    [darkTheme.breakpoints.up('md')]: {
+        fontSize: '2.2rem',
+    },
+};
+
 export default function App() {
     const [user, setUser] = useState(null);
 

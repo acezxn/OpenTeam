@@ -269,14 +269,14 @@ export const TaskBoard = (props) => {
                                                         background: snapshot.isDraggingOver
                                                             ? "var(--board-dark-focus-color)"
                                                             : "var(--board-dark-color)",
+                                                        boxShadow: "0px 1px 2px 1px rgba(0,0,0,0.3)",
                                                         padding: 4,
                                                         borderRadius: 7,
                                                         width: 250,
                                                         height: "calc(100vh - 220px)",
                                                         overflow: "scroll",
                                                         margin: 8
-                                                    }}
-                                                >
+                                                    }}>
 
                                                     {column.items.map((item, index) => {
                                                         return (
