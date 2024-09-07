@@ -2,6 +2,27 @@ import { collection, doc, getDoc, orderBy, query, where, getDocs } from "firebas
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "./firebase";
 import { Octokit } from "@octokit/core";
+import DatabaseManager from "./databaseManager";
+import Compressor from "compressorjs";
+
+export const compress = async (
+    file,
+    quality,
+    maxHeight,
+    maxWidth,
+    convertSize
+) => {
+    return await new Promise((resolve, reject) => {
+        new Compressor(file, {
+            quality,
+            maxHeight,
+            maxWidth,
+            convertSize,
+            success: resolve,
+            error: reject,
+        });
+    });
+};
 
 export default class ClientSideDB {
     static #octokit = null;
@@ -22,9 +43,11 @@ export default class ClientSideDB {
      */
     static async uploadFile(file, path) {
         const imageRef = storageRef(storage, path);
-        const snapshot = await uploadBytes(imageRef, file);
-        return await getDownloadURL(snapshot.ref)
-    } 
+        const compressedFile = await compress(file, 0.6, 2000, 2000, 1000);
+        const snapshot = await uploadBytes(imageRef, compressedFile);
+        const publicURL = await getDownloadURL(snapshot.ref);
+        return publicURL;
+    }
 }
 ClientSideDB.UserManager = class {
     static async searchEmails(email) {
@@ -33,22 +56,22 @@ ClientSideDB.UserManager = class {
             where("email", '>=', email),
             where("email", '<=', email + "\uf8ff"),
         ));
-    } 
+    }
 }
 ClientSideDB.TeamManager = class {
     static async getPublicTeamData(teamId) {
         return getDoc(doc(db, "public_team_data", teamId));
-    } 
+    }
     static async getProtectedTeamData(teamId) {
         return await getDoc(doc(db, "protected_team_data", teamId));
-    } 
+    }
     static async queryInvitationRequest(teamId, targetUid) {
         return getDocs(query(
             collection(db, "invitation_requests"),
             where("teamId", "==", teamId),
             where("targetUid", "==", targetUid)
         ));
-    } 
+    }
 }
 
 ClientSideDB.TeamManager.MessageManager = class {
@@ -58,7 +81,7 @@ ClientSideDB.TeamManager.MessageManager = class {
             orderBy("createTime", "desc"),
             where("teamId", "==", teamId)
         );
-    } 
+    }
 }
 ClientSideDB.TeamManager.DiscussionManager = class {
     static getDiscussions(teamId) {
@@ -67,12 +90,12 @@ ClientSideDB.TeamManager.DiscussionManager = class {
             orderBy("createTime", "desc"),
             where("teamId", "==", teamId)
         );
-    } 
+    }
     static getComments(discussionId) {
         return query(
             collection(db, "comments"),
             where("discussionId", "==", discussionId),
             orderBy("createTime", "desc")
         );
-    } 
+    }
 }
