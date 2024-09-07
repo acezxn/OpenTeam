@@ -37,13 +37,17 @@ export const StatisticBoard = (props) => {
         }
         setLoading(false);
     }
-    const initializeOctokit = async() => {
+    const initializeOctokit = async () => {
         await DatabaseManager.initializeOctokit(await DatabaseManager.UserManager.getGithubAccessToken(auth.currentUser.uid));
     }
 
+    const refresh = async () => {
+        await initializeOctokit();
+        await getProtectedTeamData();
+    }
+
     useEffect(() => {
-        initializeOctokit();
-        getProtectedTeamData();
+        refresh();
     }, [props]);
 
     return (
