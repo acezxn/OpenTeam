@@ -1,5 +1,5 @@
 import { Box, Button, Divider, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const modalStyle = {
     position: 'absolute',
@@ -35,6 +35,14 @@ export const EditTaskModal = (props) => {
         setDescription(updatedDescription);
         props.onTaskUpdate({ id: props.taskData.id, title: updatedTitle, description: updatedDescription });
     }
+    const handleTaskDuplicate = () => {
+        props.onTaskDuplicate({ title: props.taskData.title, description: props.taskData.description })
+    }
+    useEffect(() => {
+        if (props) {
+            console.log(props.taskData);
+        }
+    }, [props])
     return (
         <Box style={modalStyle}>
             <div style={{ margin: 10 }}>
@@ -61,7 +69,8 @@ export const EditTaskModal = (props) => {
                             setUpdatedDescription(description);
                             setEditMode(true);
                         }}>Edit</Button>
-                        <Button color="error" onClick={() => { handleTaskDelete() }}>Delete task</Button>
+                        <Button color="warning" onClick={handleTaskDuplicate}>Duplicate</Button>
+                        <Button color="error" onClick={handleTaskDelete}>Delete</Button>
                     </>
                 ) : (
                     <>

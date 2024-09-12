@@ -141,6 +141,20 @@ export const TaskBoard = (props) => {
                 })
             }
         });
+        handleEditTaskModalClose();
+    }
+    const handleTaskDuplicate = (taskData) => {
+        handleMenuClose();
+        let columnsData = columns;
+        let uploadData = {
+            id: uuidv4(),
+            ...taskData,
+            category: selectedColumn.name
+        }
+        columnsData[categoryToIdMap[selectedColumn.name]].items.push(uploadData);
+        DatabaseManager.TeamManager.TasksManager.createNewTask(props.teamId, uploadData);
+        setColumns(columnsData);
+        handleEditTaskModalClose();
     }
     const handleTaskUpdate = (taskData) => {
         setEditTaskModalOpen(false);
@@ -233,9 +247,9 @@ export const TaskBoard = (props) => {
                     taskData={selectedTaskData}
                     onTaskDelete={() => {
                         handleTaskRemove(selectedColumnId, selectedColumn, selectedTaskData);
-                        handleEditTaskModalClose();
                     }}
                     onTaskUpdate={handleTaskUpdate}
+                    onTaskDuplicate={handleTaskDuplicate}
                 />
             </Modal>
             <Modal open={newCategoryModalOpen} onClose={handleNewCategoryModalClose}>
