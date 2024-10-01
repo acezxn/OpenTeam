@@ -3,11 +3,13 @@
     height: calc(100vh - 100px);
     border-radius: 7px;
 }
+
 .messages {
     overflow-y: scroll;
     scroll-behavior: smooth;
     height: calc(100vh - 144px);
 }
+
 @media all and (max-width: 600px) {
     .messages {
         overflow-y: scroll;
@@ -15,18 +17,26 @@
         height: calc(100vh - 166px);
     }
 }
+
 .message {
     background-color: rgba(255, 255, 255, 0.1);
     padding: 10px;
     margin: 10px;
     border-radius: 7px;
 }
+
+.message_content {
+    overflow: "hidden"
+}
+
 .message_sender {
     display: inline-block;
 }
+
 .message_create_time {
     float: right;
 }
+
 .message_body {
     display: inline-block;
     padding: 10px;

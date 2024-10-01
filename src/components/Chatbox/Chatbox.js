@@ -168,8 +168,10 @@ export const Chatbox = (props) => {
                                                         <>
                                                             {
                                                                 imageTypes.includes(message.filetypes[index]) ? (
-                                                                    <a href={url}><img src={url} style={{ height: 250, overflow: "hidden" }}></img></a>
+                                                                    // show image
+                                                                    <a href={url}><img src={url} style={{ height: "min(250px, max(150px, 30vh))" }}></img></a>
                                                                 ) : (
+                                                                    // show file indicator
                                                                     <a href={url} style={{ color: "inherit" }}>
                                                                         <FilePresentIcon sx={{ fontSize: 50, verticalAlign: "middle" }} />
                                                                         <Typography style={{ display: "inline-block", verticalAlign: "middle" }}>{message.filenames[index]}</Typography>
@@ -217,8 +219,10 @@ export const Chatbox = (props) => {
                                         </IconButton>
                                         {
                                             imageTypes.includes(file.type) ? (
+                                                // show image
                                                 <img src={URL.createObjectURL(file)} style={{ height: 150, width: 200, overflow: "hidden" }}></img>
                                             ) : (
+                                                // show file indicator
                                                 <FilePresentIcon sx={{ fontSize: 150 }} />
                                             )
                                         }
