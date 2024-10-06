@@ -356,7 +356,6 @@ Database.TeamManager = class {
         ) {
             return false;
         }
-
         await db.collection("protected_team_data").doc(teamId).update({ announcement: announcement });
         return true;
     }
